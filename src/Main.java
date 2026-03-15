@@ -5,7 +5,7 @@ public class Main {
         Board board = new Board();
 
         while() {
-            board.update(Cli.getUserMove)
+            board.update(api.getUserMove)
             Move move = Bot.getMove()
             print(move)
         }
