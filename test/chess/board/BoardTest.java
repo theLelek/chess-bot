@@ -2,18 +2,17 @@ package chess.board;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 class BoardTest {
 
     @Test
-    void initializeBoardByFen() {
-        String fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
+    void initializeFromFen() {
+        String fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w Kq - 2 3";
 
-        Board board = Board.initializeBoardByFen(fen);
-        BoardPiece[][] b = board.getBoard();
+        Board board = Board.initializeFromFen(fen);
+        BoardPiece[][] b = board.getBoardPieces();
 
         // Black pieces
         assertEquals(BoardPiece.BLACK_ROOK, b[0][0]);
@@ -31,12 +30,21 @@ class BoardTest {
         // White pieces
         assertEquals(BoardPiece.WHITE_ROOK, b[7][0]);
         assertEquals(BoardPiece.WHITE_KING, b[7][4]);
+
+        assertEquals(PieceColor.WHITE, board.getSideToMove());
+
+        assertTrue(board.getCastlingRights().canWhiteCastleKingSide());
+        assertTrue(board.getCastlingRights().canBlackCastleQueenSide());
+        assertFalse(board.getCastlingRights().canBlackCastleKingSide());
+        assertFalse(board.getCastlingRights().canWhiteCastleQueenSide());
+        assertEquals(2, board.getHalfMoveClock());
+        assertEquals(3, board.getFullMoveNumber());
     }
 
     @Test
     void initializeDefaultBoard() {
         Board board = Board.initializeDefaultBoard();
-        BoardPiece[][] b = board.getBoard();
+        BoardPiece[][] b = board.getBoardPieces();
 
         // Black back rank
         assertEquals(BoardPiece.BLACK_ROOK, b[0][0]);
@@ -74,5 +82,12 @@ class BoardTest {
         assertEquals(BoardPiece.WHITE_BISHOP, b[7][5]);
         assertEquals(BoardPiece.WHITE_KNIGHT, b[7][6]);
         assertEquals(BoardPiece.WHITE_ROOK, b[7][7]);
+
+        assertTrue(board.getCastlingRights().canWhiteCastleKingSide());
+        assertTrue(board.getCastlingRights().canBlackCastleQueenSide());
+        assertTrue(board.getCastlingRights().canBlackCastleKingSide());
+        assertTrue(board.getCastlingRights().canWhiteCastleQueenSide());
+        assertEquals(0, board.getHalfMoveClock());
+        assertEquals(1, board.getFullMoveNumber());
     }
 }
