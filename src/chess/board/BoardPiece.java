@@ -5,18 +5,17 @@ public enum BoardPiece {
     BLACK_ROOK('r'), BLACK_KNIGHT('n'),  BLACK_BISHOP('b'), BLACK_QUEEN('q'), BLACK_KING('k'), BLACK_PAWN('p');
 
     private final char fortsythEdwardsNotation;
+    private boolean isEnPassantPossible;
 
     BoardPiece(char fen) {
         this.fortsythEdwardsNotation = fen;
+        this.isEnPassantPossible = false;
     }
 
-    public boolean isWhite() {
+   public boolean isWhite() {
         String pieceName = this.toString();
-        if (pieceName.startsWith("WHITE")) {
-            return true;
-        }
-        return false;
-    }
+        return pieceName.startsWith("WHITE");
+   }
 
 
     public boolean isBlack() {
@@ -34,5 +33,13 @@ public enum BoardPiece {
             }
         }
         return null;
+    }
+
+    public boolean isEnPassantPossible() {
+        return isEnPassantPossible;
+    }
+
+    public void setEnPassantPossible(boolean enPassantPossible) {
+        isEnPassantPossible = enPassantPossible;
     }
 }
