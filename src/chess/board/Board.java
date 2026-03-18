@@ -26,15 +26,15 @@ public class Board {
     public static Board initializeFromFen(String fen) {
         String[] fenParts = fen.split(" ");
         BoardPiece[][] boardPieces = initializeBoardPiecesFromFen(fenParts[0]);
-        PieceColor sideToMove = initializeSideToMoveFromFen(fenParts[1]);
-        CastlingRights castlingRights = CastlingRights.initializeByFen(fenParts[2]);
-        String enPassantTarget = fenParts[3];
-        int halfMoveClock = Integer.parseInt(fenParts[4]);
-        int fullMoveNumber = Integer.parseInt(fenParts[5]);
+        var sideToMove = PieceColor.initializeFromFen(fenParts[1]); // TODO rename function
+        var castlingRights = CastlingRights.initializeFromFen(fenParts[2]);
+        var enPassantTarget = fenParts[3];
+        var halfMoveClock = Integer.parseInt(fenParts[4]);
+        var fullMoveNumber = Integer.parseInt(fenParts[5]);
         return new Board(boardPieces, sideToMove, castlingRights, enPassantTarget, halfMoveClock, fullMoveNumber);
     }
 
-    private static BoardPiece[][] initializeBoardPiecesFromFen(String piecePlacements) {
+     private static BoardPiece[][] initializeBoardPiecesFromFen(String piecePlacements) {
         BoardPiece[][] boardPieces = new BoardPiece[8][8];
         String[] lines = piecePlacements.split("/");
         for (int i = lines.length -1; i >= 0; i--) {
@@ -48,15 +48,6 @@ public class Board {
             }
         }
         return boardPieces;
-    }
-
-    private static PieceColor initializeSideToMoveFromFen(String whiteToMove) {
-        if (whiteToMove.equals("w")) {
-            return PieceColor.WHITE;
-        } else if (whiteToMove.equals("b")) {
-            return PieceColor.BLACK;
-        }
-        return null;
     }
 
     public BoardPiece[][] getBoardPieces() {
