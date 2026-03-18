@@ -18,11 +18,12 @@ public record Move(int fromX, int fromY, int toX, int toY) {
 
     @Override
     public String toString() {
-        return "Move{" +
-                "fromX=" + fromX +
-                ", fromY=" + fromY +
-                ", toX=" + toX +
-                ", toY=" + toY +
-                '}';
+        return  "from: " +
+                (char)(fromY + 96) +
+                fromX +
+                " to: " +
+
+                (char)(toY + 96) +
+                toX;
     }
 }
