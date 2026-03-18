@@ -4,3 +4,5 @@ https://www.youtube.com/watch?v=_vqlIPDR2TU = for advanced chess bot programming
 https://www.youtube.com/watch?v=l-hh51ncgDI = for minimax and alpha beta pruning
 
 create api for fen 
+
+Move::toString() with chars for better visualization
