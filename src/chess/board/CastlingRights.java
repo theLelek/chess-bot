@@ -3,7 +3,7 @@ package chess.board;
 public record CastlingRights(boolean canWhiteCastleKingSide, boolean canBlackCastleKingSide,
                              boolean canWhiteCastleQueenSide, boolean canBlackCastleQueenSide) {
 
-    public static CastlingRights initializeByFen(String castlingRights) {
+    public static CastlingRights initializeFromFen(String castlingRights) {
         boolean canWhiteCastleKingSide = false;
         boolean canBlackCastleKingSide = false;
         boolean canWhiteCastleQueenSide = false;

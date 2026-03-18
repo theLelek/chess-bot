@@ -17,7 +17,6 @@ public enum BoardPiece {
         return pieceName.startsWith("WHITE");
    }
 
-
     public boolean isBlack() {
         return ! isWhite();
     }
