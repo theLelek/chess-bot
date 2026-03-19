@@ -2,28 +2,37 @@ package chess;
 
 import java.util.Objects;
 
-public record Move(int fromX, int fromY, int toX, int toY) {
+public record Move(BoardPosition from, BoardPosition to) {
 
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Move move = (Move) o;
-        return toX == move.toX && toY == move.toY && fromX == move.fromX && fromY == move.fromY;
+        return Objects.equals(to, move.to) && Objects.equals(from, move.from);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(fromX, fromY, toX, toY);
+        return Objects.hash(from, to);
     }
 
-    @Override
-    public String toString() {
-        return  "from: " +
-                (char)(fromY + 96) +
-                fromX +
-                " to: " +
+    public static class Builder {
 
-                (char)(toY + 96) +
-                toX;
+        private BoardPosition from;
+        private BoardPosition to;
+
+        public Builder from(BoardPosition from) {
+            this.from = from;
+            return this;
+        }
+
+        public Builder to(BoardPosition to) {
+            this.to = to;
+            return this;
+        }
+
+        public Move build() {
+            return new Move(from, to);
+        }
     }
 }
