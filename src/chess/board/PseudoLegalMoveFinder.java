@@ -1,5 +1,9 @@
 package chess.board;
 
+import chess.board.model.Board;
+import chess.board.model.BoardIndex;
+import chess.board.model.BoardPiece;
+
 public class PseudoLegalMoveFinder {
     // format: y x
     private static final int[][] KING_MOVES = {

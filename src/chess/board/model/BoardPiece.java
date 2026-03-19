@@ -1,6 +1,4 @@
-package chess.board;
-
-import chess.Move;
+package chess.board.model;
 
 import java.util.ArrayList;
 import java.util.List;

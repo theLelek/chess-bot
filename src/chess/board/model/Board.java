@@ -1,4 +1,6 @@
-package chess.board;
+package chess.board.model;
+
+import chess.board.PseudoLegalMoveFinder;
 
 import java.util.*;
 

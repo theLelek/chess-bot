@@ -1,4 +1,4 @@
-package chess.board;
+package chess.board.model;
 
 public record CastlingRights(boolean canWhiteCastleKingSide, boolean canBlackCastleKingSide,
                              boolean canWhiteCastleQueenSide, boolean canBlackCastleQueenSide) {
