@@ -1,8 +1,11 @@
 package chess.board;
 
+import java.util.*;
+
 public class Board {
 
     private final BoardPiece[][] boardPieces;
+    private final List<BoardIndex> piecesIndexes; // TODO O(n) for removing elements find faster way
     private final PieceColor sideToMove;
     private final CastlingRights castlingRights;
     private final String possibleEnPassants;
@@ -10,8 +13,9 @@ public class Board {
     private int fullMoveNumber;
     // TODO enPassantTarget is not finished yet, will be in each BoardPiece
 
-    public Board(BoardPiece[][] boardPieces, PieceColor sideToMove, CastlingRights castlingRights, String possibleEnPassants, int halfMoveClock, int fullMoveNumber) {
+    public Board(BoardPiece[][] boardPieces, List<BoardIndex> piecesIndexes, PieceColor sideToMove, CastlingRights castlingRights, String possibleEnPassants, int halfMoveClock, int fullMoveNumber) {
         this.boardPieces = boardPieces;
+        this.piecesIndexes = piecesIndexes;
         this.sideToMove = sideToMove;
         this.castlingRights = castlingRights;
         this.possibleEnPassants = possibleEnPassants;
@@ -25,13 +29,16 @@ public class Board {
 
     public static Board initializeFromFen(String fen) {
         String[] fenParts = fen.split(" ");
-        BoardPiece[][] boardPieces = initializeBoardPiecesFromFen(fenParts[0]);
-        var sideToMove = PieceColor.initializeFromFen(fenParts[1]); // TODO rename function
+        var boardPieces = initializeBoardPiecesFromFen(fenParts[0]);
+        var piecesIndexes = initializePiecesIndexes(boardPieces);
+        var sideToMove = PieceColor.initializeFromFen(fenParts[1]);
         var castlingRights = CastlingRights.initializeFromFen(fenParts[2]);
         var enPassantTarget = fenParts[3];
         var halfMoveClock = Integer.parseInt(fenParts[4]);
         var fullMoveNumber = Integer.parseInt(fenParts[5]);
-        return new Board(boardPieces, sideToMove, castlingRights, enPassantTarget, halfMoveClock, fullMoveNumber);
+        Board board = new Board(boardPieces, piecesIndexes, sideToMove, castlingRights, enPassantTarget, halfMoveClock, fullMoveNumber);
+        PseudoLegalMoveFinder.addPseudoLegalMoves(board);
+        return board;
     }
 
      private static BoardPiece[][] initializeBoardPiecesFromFen(String piecePlacements) {
@@ -48,6 +55,18 @@ public class Board {
             }
         }
         return boardPieces;
+    }
+
+    private static List<BoardIndex> initializePiecesIndexes(BoardPiece[][] boardPieces) {
+        List<BoardIndex> piecesIndexes = new ArrayList<>();
+        for (int i = 0; i < boardPieces.length; i++) {
+            for (int j = 0; j < boardPieces[i].length; j++) {
+                if (boardPieces[i][j] != null) {
+                    piecesIndexes.add(new BoardIndex(i, j));
+                }
+            }
+        }
+        return piecesIndexes;
     }
 
     public BoardPiece[][] getBoardPieces() {
@@ -80,5 +99,9 @@ public class Board {
 
     public String getPossibleEnPassants() {
         return possibleEnPassants;
+    }
+
+    public List<BoardIndex> getPiecesIndexes() {
+        return piecesIndexes;
     }
 }
