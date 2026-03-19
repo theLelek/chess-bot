@@ -16,6 +16,11 @@ public record Move(BoardPosition from, BoardPosition to) {
         return Objects.hash(from, to);
     }
 
+    @Override
+    public String toString() {
+        return "from: " + from.toString() + " to: " + to.toString();
+    }
+
     public static class Builder {
 
         private BoardPosition from;
