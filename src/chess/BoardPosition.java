@@ -16,6 +16,11 @@ public record BoardPosition(int x, int y) {
         return Objects.hash(y, x);
     }
 
+    @Override
+    public String toString() {
+        return (char)(x + 96) + String.valueOf(y);
+    }
+
     public static class Builder {
 
         private int y;

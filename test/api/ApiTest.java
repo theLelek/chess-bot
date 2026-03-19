@@ -16,14 +16,13 @@ class ApiTest {
         Move actal = Api.initializeMove(testInput);
         assertEquals(new Move(new BoardPosition(1, 2), new BoardPosition(2, 4)), actal);
     }
+    
+    @Test
+    @DisplayName("test Move::toString() with a3 and b4")
+    void testToString() {
+        Move actual = new Move(new BoardPosition(1, 3), new BoardPosition(2, 4));
 
-    // TODO write toString()
-//    @Test
-//    @DisplayName("test Move::toString() with a3 and b4")
-//    void testToString() {
-//        Move actual = new Move(new BoardPosition(3, 1), new BoardPosition(4, 2));
-//
-//        String expected = "from: a3 to: b4";
-//        assertEquals(expected, actual.toString());
-//    }
+        String expected = "from: a3 to: b4";
+        assertEquals(expected, actual.toString());
+    }
 }
