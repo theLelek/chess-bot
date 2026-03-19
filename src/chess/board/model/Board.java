@@ -1,5 +1,6 @@
 package chess.board.model;
 
+import chess.BoardPosition;
 import chess.board.PseudoLegalMoveFinder;
 
 import java.util.*;
@@ -7,7 +8,7 @@ import java.util.*;
 public class Board {
 
     private final BoardPiece[][] boardPieces;
-    private final List<BoardIndex> piecesIndexes; // TODO O(n) for removing elements find faster way
+    private final List<BoardPosition> piecesIndexes; // TODO O(n) for removing elements find faster way
     private final PieceColor sideToMove;
     private final CastlingRights castlingRights;
     private final String possibleEnPassants;
@@ -15,7 +16,7 @@ public class Board {
     private int fullMoveNumber;
     // TODO enPassantTarget is not finished yet, will be in each BoardPiece
 
-    public Board(BoardPiece[][] boardPieces, List<BoardIndex> piecesIndexes, PieceColor sideToMove, CastlingRights castlingRights, String possibleEnPassants, int halfMoveClock, int fullMoveNumber) {
+    public Board(BoardPiece[][] boardPieces, List<BoardPosition> piecesIndexes, PieceColor sideToMove, CastlingRights castlingRights, String possibleEnPassants, int halfMoveClock, int fullMoveNumber) {
         this.boardPieces = boardPieces;
         this.piecesIndexes = piecesIndexes;
         this.sideToMove = sideToMove;
@@ -39,7 +40,7 @@ public class Board {
         var halfMoveClock = Integer.parseInt(fenParts[4]);
         var fullMoveNumber = Integer.parseInt(fenParts[5]);
         Board board = new Board(boardPieces, piecesIndexes, sideToMove, castlingRights, enPassantTarget, halfMoveClock, fullMoveNumber);
-        PseudoLegalMoveFinder.addPseudoLegalMoves(board);
+//        PseudoLegalMoveFinder.addPseudoLegalMoves(board);
         return board;
     }
 
@@ -59,12 +60,15 @@ public class Board {
         return boardPieces;
     }
 
-    private static List<BoardIndex> initializePiecesIndexes(BoardPiece[][] boardPieces) {
-        List<BoardIndex> piecesIndexes = new ArrayList<>();
+    private static List<BoardPosition> initializePiecesIndexes(BoardPiece[][] boardPieces) {
+        List<BoardPosition> piecesIndexes = new ArrayList<>();
         for (int i = 0; i < boardPieces.length; i++) {
             for (int j = 0; j < boardPieces[i].length; j++) {
                 if (boardPieces[i][j] != null) {
-                    piecesIndexes.add(new BoardIndex(i, j));
+                    BoardPosition boardPosition = new BoardPosition.Builder()
+                            .y(i)
+                            .x(j).build();
+                    piecesIndexes.add(boardPosition);
                 }
             }
         }
@@ -103,7 +107,7 @@ public class Board {
         return possibleEnPassants;
     }
 
-    public List<BoardIndex> getPiecesIndexes() {
+    public List<BoardPosition> getPiecesIndexes() {
         return piecesIndexes;
     }
 }

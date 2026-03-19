@@ -1,5 +1,7 @@
 package chess.board.model;
 
+import chess.BoardPosition;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,7 +11,7 @@ public enum BoardPiece {
 
     private final char fortsythEdwardsNotation;
     private boolean isEnPassantPossible;
-    private final List<BoardIndex> legalMoves; // TODO test if LinkedList is faster
+    private final List<BoardPosition> legalMoves; // TODO test if LinkedList is faster
 
     BoardPiece(char fen) {
         this.fortsythEdwardsNotation = fen;
@@ -47,7 +49,7 @@ public enum BoardPiece {
         isEnPassantPossible = enPassantPossible;
     }
 
-    public List<BoardIndex> getLegalMoves() {
+    public List<BoardPosition> getLegalMoves() {
         return legalMoves;
     }
 }

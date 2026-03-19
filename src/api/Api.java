@@ -1,5 +1,6 @@
 package api;
 
+import chess.BoardPosition;
 import chess.Move;
 
 public class Api {
@@ -11,6 +12,6 @@ public class Api {
         int fromY = Integer.parseInt(moveParts[1]);
         int toX = Integer.parseInt(moveParts[2]);
         int toY = Integer.parseInt(moveParts[3]);
-        return new Move(fromX, fromY, toX, toY);
+        return new Move(new BoardPosition(fromX, fromY), new BoardPosition(toX, toY));
     }
 }
