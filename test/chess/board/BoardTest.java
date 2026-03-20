@@ -2,7 +2,6 @@ package chess.board;
 
 import chess.board.model.Board;
 import chess.board.model.BoardPiece;
-import chess.board.model.PieceColor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

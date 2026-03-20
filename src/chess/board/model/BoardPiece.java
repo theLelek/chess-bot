@@ -1,22 +1,33 @@
 package chess.board.model;
 
 import chess.BoardPosition;
+import chess.board.PieceMoveRules;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public enum BoardPiece {
-    WHITE_ROOK('R'), WHITE_KNIGHT('N'), WHITE_BISHOP('B'), WHITE_QUEEN('Q'), WHITE_KING('K'), WHITE_PAWN('P'),
-    BLACK_ROOK('r'), BLACK_KNIGHT('n'),  BLACK_BISHOP('b'), BLACK_QUEEN('q'), BLACK_KING('k'), BLACK_PAWN('p');
+    WHITE_ROOK('R', new PieceMoveRules(
+
+    )),
+    WHITE_KNIGHT('N'),
+    WHITE_BISHOP('B'),
+    WHITE_QUEEN('Q'),
+    WHITE_KING('K'),
+    WHITE_PAWN('P'),
+    BLACK_ROOK('r'),
+    BLACK_KNIGHT('n'),
+    BLACK_BISHOP('b'),
+    BLACK_QUEEN('q'),
+    BLACK_KING('k'),
+    BLACK_PAWN('p');
 
     private final char fortsythEdwardsNotation;
-    private boolean isEnPassantPossible;
-    private final List<BoardPosition> legalMoves; // TODO test if LinkedList is faster
+    private final PieceMoveRules rules;
 
-    BoardPiece(char fen) {
+    BoardPiece(char fen,  PieceMoveRules rules) {
         this.fortsythEdwardsNotation = fen;
-        this.isEnPassantPossible = false;
-        legalMoves = new ArrayList<>();
+        this.rules = rules;
     }
 
     public boolean isWhite() {
@@ -25,7 +36,7 @@ public enum BoardPiece {
     }
 
     public boolean isBlack() {
-        return ! isWhite();
+        return !isWhite();
     }
 
     public char getFortsythEdwardsNotation() {
@@ -39,17 +50,5 @@ public enum BoardPiece {
             }
         }
         return null;
-    }
-
-    public boolean isEnPassantPossible() {
-        return isEnPassantPossible;
-    }
-
-    public void setEnPassantPossible(boolean enPassantPossible) {
-        isEnPassantPossible = enPassantPossible;
-    }
-
-    public List<BoardPosition> getLegalMoves() {
-        return legalMoves;
     }
 }
