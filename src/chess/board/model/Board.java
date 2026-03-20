@@ -9,17 +9,17 @@ public class Board {
 
     private final BoardPiece[][] boardPieces;
     private final List<BoardPosition> piecesIndexes; // TODO O(n) for removing elements find faster way
-    private final PieceColor sideToMove;
+    private final boolean isWhiteToMove;
     private final CastlingRights castlingRights;
     private final String possibleEnPassants;
     private int halfMoveClock;
     private int fullMoveNumber;
     // TODO enPassantTarget is not finished yet, will be in each BoardPiece
 
-    public Board(BoardPiece[][] boardPieces, List<BoardPosition> piecesIndexes, PieceColor sideToMove, CastlingRights castlingRights, String possibleEnPassants, int halfMoveClock, int fullMoveNumber) {
+    public Board(BoardPiece[][] boardPieces, List<BoardPosition> piecesIndexes, boolean isWhiteToMove, CastlingRights castlingRights, String possibleEnPassants, int halfMoveClock, int fullMoveNumber) {
         this.boardPieces = boardPieces;
         this.piecesIndexes = piecesIndexes;
-        this.sideToMove = sideToMove;
+        this.isWhiteToMove = isWhiteToMove;
         this.castlingRights = castlingRights;
         this.possibleEnPassants = possibleEnPassants;
         this.halfMoveClock = halfMoveClock;
@@ -34,12 +34,12 @@ public class Board {
         String[] fenParts = fen.split(" ");
         var boardPieces = initializeBoardPiecesFromFen(fenParts[0]);
         var piecesIndexes = initializePiecesIndexes(boardPieces);
-        var sideToMove = PieceColor.initializeFromFen(fenParts[1]);
+        var isWhiteToMove = isWhiteToMoveFromFen(fenParts[1]);
         var castlingRights = CastlingRights.initializeFromFen(fenParts[2]);
         var enPassantTarget = fenParts[3];
         var halfMoveClock = Integer.parseInt(fenParts[4]);
         var fullMoveNumber = Integer.parseInt(fenParts[5]);
-        Board board = new Board(boardPieces, piecesIndexes, sideToMove, castlingRights, enPassantTarget, halfMoveClock, fullMoveNumber);
+        Board board = new Board(boardPieces, piecesIndexes, isWhiteToMove, castlingRights, enPassantTarget, halfMoveClock, fullMoveNumber);
 //        PseudoLegalMoveFinder.addPseudoLegalMoves(board);
         return board;
     }
@@ -75,12 +75,20 @@ public class Board {
         return piecesIndexes;
     }
 
+    private static boolean isWhiteToMoveFromFen(String fen) {
+        return fen.equals("w");
+    }
+
     public BoardPiece[][] getBoardPieces() {
         return boardPieces;
     }
 
-    public PieceColor getSideToMove() {
-        return sideToMove;
+    public boolean isWhiteToMove() {
+        return isWhiteToMove;
+    }
+
+    public boolean isBlackToMove(){
+        return !isWhiteToMove;
     }
 
     public CastlingRights getCastlingRights() {
