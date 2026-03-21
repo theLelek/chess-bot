@@ -1,26 +1,20 @@
 package chess.board.model;
 
-import chess.BoardPosition;
 import chess.board.PieceMoveRules;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public enum BoardPiece {
-    WHITE_ROOK('R', new PieceMoveRules(
-
-    )),
-    WHITE_KNIGHT('N'),
-    WHITE_BISHOP('B'),
-    WHITE_QUEEN('Q'),
-    WHITE_KING('K'),
-    WHITE_PAWN('P'),
-    BLACK_ROOK('r'),
-    BLACK_KNIGHT('n'),
-    BLACK_BISHOP('b'),
-    BLACK_QUEEN('q'),
-    BLACK_KING('k'),
-    BLACK_PAWN('p');
+    WHITE_ROOK('R', PieceMoveRules.ROOK),
+    WHITE_KNIGHT('N', PieceMoveRules.KNIGHT),
+    WHITE_BISHOP('B',  PieceMoveRules.BISHOP),
+    WHITE_QUEEN('Q', PieceMoveRules.QUEEN),
+    WHITE_KING('K',  PieceMoveRules.KING),
+    WHITE_PAWN('P', PieceMoveRules.PAWN),
+    BLACK_ROOK('r', PieceMoveRules.ROOK),
+    BLACK_KNIGHT('n', PieceMoveRules.KNIGHT),
+    BLACK_BISHOP('b', PieceMoveRules.BISHOP),
+    BLACK_QUEEN('q', PieceMoveRules.QUEEN),
+    BLACK_KING('k', PieceMoveRules.KING),
+    BLACK_PAWN('p', PieceMoveRules.PAWN),;
 
     private final char fortsythEdwardsNotation;
     private final PieceMoveRules rules;
