@@ -33,7 +33,7 @@ class BoardTest {
         assertEquals(BoardPiece.WHITE_ROOK, b[7][0]);
         assertEquals(BoardPiece.WHITE_KING, b[7][4]);
 
-        assertEquals(PieceColor.WHITE, board.getSideToMove());
+        assertEquals(true, board.isWhiteToMove());
 
         assertTrue(board.getCastlingRights().canWhiteCastleKingSide());
         assertTrue(board.getCastlingRights().canBlackCastleQueenSide());
