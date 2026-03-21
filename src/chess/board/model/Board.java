@@ -7,6 +7,7 @@ import java.util.*;
 
 public class Board {
 
+    public static final int SIZE = 8;
     private final BoardPiece[][] boardPieces;
     private final List<BoardPosition> piecesIndexes; // TODO O(n) for removing elements find faster way
     private final boolean isWhiteToMove;
