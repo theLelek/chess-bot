@@ -9,26 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PseudoLegalMoveFinder {
-    // format: y x
-    private static final int[][] KING_MOVES = {
-            {-1, -1}, {-1, 0}, {-1, 1},
-            { 0, -1},          { 0, 1},
-            { 1, -1}, { 1, 0}, { 1, 1}
-    };
-    private static final int[][] QUEEN_MOVES = {
-            {-1, -1}, {-1, 0}, {-1, 1},
-            { 0, -1},          { 0, 1},
-            { 1, -1}, { 1, 0}, { 1, 1}
-    };
-    private static final int[][] ROOK_MOVES = {
-                    {-1, 0},
-            {0, -1},       {0, 1},
-                    {1, 0},
-    };
-    private static final int[][] KNIGHT_MOVES = {{-2, 1}, {-2, -1}, {-1, 2}, {-1, -2}, {1, 2}, {1, -2}, {2, 1}, {2, -1}};
-    private static final int[][] BISHOP_MOVES = {{1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
-
-    public static void addPseudoLegalMoves(Board board) {
+    public static List<Move> getPseudoLegalMoves(Board board) {
         List<Move> pseudoLegalMoves = new ArrayList<>(); // TODO test if LinkedList is faster
         for (BoardPosition boardPosition : board.getPiecesIndexes()) {
             BoardPiece currentPiece = board.getBoardPieces()[boardPosition.y()][boardPosition.x()];
@@ -47,5 +28,22 @@ public class PseudoLegalMoveFinder {
                     break;
             }
         }
+        return null;
+    }
+
+    private static void addLegalMoves(Board board, BoardPosition piecePosition, List<Move> pseudoLegalMoves) {
+        BoardPiece currentPiece = board.getBoardPieces()[piecePosition.y()][piecePosition.x()];
+        PieceMoveRules moveRules = currentPiece.getMoveRules();
+        for (int[] move : moveRules.getDirections()) {
+            int moveX = move[0];
+            int moveY = move[1];
+            if (piecePosition.x() + moveX >= board.SIZE || piecePosition.x() + moveX < 0) {
+                continue;
+            }
+
+//            pseudoLegalMoves.add(new Move.Builder()
+        }
+
+
     }
 }
