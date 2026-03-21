@@ -17,11 +17,11 @@ public enum BoardPiece {
     BLACK_PAWN('p', PieceMoveRules.PAWN),;
 
     private final char fortsythEdwardsNotation;
-    private final PieceMoveRules rules;
+    private final PieceMoveRules moveRules;
 
-    BoardPiece(char fen,  PieceMoveRules rules) {
+    BoardPiece(char fen,  PieceMoveRules moveRules) {
         this.fortsythEdwardsNotation = fen;
-        this.rules = rules;
+        this.moveRules = moveRules;
     }
 
     public boolean isWhite() {
@@ -44,5 +44,9 @@ public enum BoardPiece {
             }
         }
         return null;
+    }
+
+    public PieceMoveRules getMoveRules() {
+        return moveRules;
     }
 }
