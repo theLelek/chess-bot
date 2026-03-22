@@ -13,37 +13,34 @@ public class PseudoLegalMoveFinder {
         List<Move> pseudoLegalMoves = new ArrayList<>(); // TODO test if LinkedList is faster
         for (BoardPosition boardPosition : board.getPiecesIndexes()) {
             BoardPiece currentPiece = board.getBoardPieces()[boardPosition.y()][boardPosition.x()];
-            switch(currentPiece.getFortsythEdwardsNotation()) {
-                case 'R': case 'r':
-                    break;
-                case 'N': case 'n':
-                    break;
-                case 'B': case 'b':
-                    break;
-                case 'Q': case 'q':
-                    break;
-                case 'K': case 'k':
-                    break;
-                case 'P': case 'p':
-                    break;
-            }
+
+
         }
         return null;
     }
 
-    private static void addLegalMoves(Board board, BoardPosition piecePosition, List<Move> pseudoLegalMoves) {
-        BoardPiece currentPiece = board.getBoardPieces()[piecePosition.y()][piecePosition.x()];
-        PieceMoveRules moveRules = currentPiece.getMoveRules();
-        for (int[] move : moveRules.getDirections()) {
-            int moveX = move[0];
-            int moveY = move[1];
-            if (piecePosition.x() + moveX >= board.SIZE || piecePosition.x() + moveX < 0) {
-                continue;
+    private static void addLegalMoves(Board board, BoardPosition currentPosition, List<Move> pseudoLegalMoves) {
+        BoardPiece currentPiece = board.getBoardPieces()[currentPosition.y()][currentPosition.x()];
+        PieceMoveRules currentPieceMoveRules = currentPiece.getMoveRules();
+        boolean[] isBlocked = new boolean[currentPieceMoveRules.getDirections().length];
+
+        int currentX = currentPosition.x();
+        int currentY = currentPosition.y();
+        do {
+            for (int i = 0; i < currentPieceMoveRules.getDirections().length; i++) {
+                int[] move = currentPieceMoveRules.getDirections()[i];
+                currentX += move[0];
+                currentY += move[1];
+
+                if (currentX >= Board.SIZE || currentX < 0 || currentY >= Board.SIZE || currentY < 0) {
+                    continue;
+                }
+                pseudoLegalMoves.add(new Move.Builder()
+                        .fromX(currentPosition.x())
+                        .fromY(currentPosition.y())
+                        .toX(currentX)
+                        .toY(currentY).build());
             }
-
-//            pseudoLegalMoves.add(new Move.Builder()
-        }
-
-
+        } while (currentPieceMoveRules.canMoveInfinitely());
     }
 }
