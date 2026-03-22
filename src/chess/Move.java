@@ -23,21 +23,34 @@ public record Move(BoardPosition from, BoardPosition to) {
 
     public static class Builder {
 
-        private BoardPosition from;
-        private BoardPosition to;
+        private int fromX;
+        private int fromY;
+        private int toX;
+        private int toY;
 
-        public Builder from(BoardPosition from) {
-            this.from = from;
+        public Builder fromX(int fromX) {
+            this.fromX = fromX;
             return this;
         }
 
-        public Builder to(BoardPosition to) {
-            this.to = to;
+        public Builder fromY(int fromY) {
+            this.fromY = fromY;
+            return this;
+        }
+
+        public Builder toX(int toX) {
+            this.toX = toX;
+            return this;
+        }
+
+        public Builder toY(int toY) {
+            this.toY = toY;
             return this;
         }
 
         public Move build() {
-            return new Move(from, to);
+            return new Move(new BoardPosition.Builder().x(fromX).y(fromY).build(),
+                            new BoardPosition.Builder().x(toX).y(toY).build());
         }
     }
 }
