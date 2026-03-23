@@ -119,4 +119,8 @@ public class Board {
     public List<BoardPosition> getPiecesIndexes() {
         return piecesIndexes;
     }
+
+    public BoardPiece get(BoardPosition currentPosition) {
+        return this.boardPieces[currentPosition.x()][currentPosition.y()];
+    }
 }

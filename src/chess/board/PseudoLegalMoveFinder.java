@@ -14,33 +14,34 @@ public class PseudoLegalMoveFinder {
         for (BoardPosition boardPosition : board.getPiecesIndexes()) {
             BoardPiece currentPiece = board.getBoardPieces()[boardPosition.y()][boardPosition.x()];
 
+            PieceMoveRules moveRules = currentPiece.getMoveRules();
 
+            pseudoLegalMoves.addAll(getLegalMoves(board, boardPosition));
         }
         return null;
     }
 
-    private static void addLegalMoves(Board board, BoardPosition currentPosition, List<Move> pseudoLegalMoves) {
-        BoardPiece currentPiece = board.getBoardPieces()[currentPosition.y()][currentPosition.x()];
+    public static List<Move> getLegalMoves(Board board, BoardPosition position) {
+        List<Move> legalMoves = new ArrayList<>();
+        BoardPiece currentPiece = board.getBoardPieces()[position.y()][position.x()];
         PieceMoveRules currentPieceMoveRules = currentPiece.getMoveRules();
-        boolean[] isBlocked = new boolean[currentPieceMoveRules.getDirections().length];
 
-        int currentX = currentPosition.x();
-        int currentY = currentPosition.y();
-        do {
-            for (int i = 0; i < currentPieceMoveRules.getDirections().length; i++) {
-                int[] move = currentPieceMoveRules.getDirections()[i];
-                currentX += move[0];
-                currentY += move[1];
-
-                if (currentX >= Board.SIZE || currentX < 0 || currentY >= Board.SIZE || currentY < 0) {
+        for (int[] direction : currentPieceMoveRules.getDirections()) {
+            BoardPosition currentPosition = position.copy();
+            boolean interrupted = false;
+            do{
+                try {
+                    currentPosition = currentPosition.move(direction);
+                } catch (IndexOutOfBoundsException e){
+                    interrupted = true;
                     continue;
                 }
-                pseudoLegalMoves.add(new Move.Builder()
-                        .fromX(currentPosition.x())
-                        .fromY(currentPosition.y())
-                        .toX(currentX)
-                        .toY(currentY).build());
-            }
-        } while (currentPieceMoveRules.canMoveInfinitely());
+                if(board.get(currentPosition) != null){
+                    interrupted = true;
+                }
+                legalMoves.add(new Move(position, currentPosition));
+            } while (currentPieceMoveRules.canMoveInfinitely() && !interrupted);
+        }
+        return legalMoves;
     }
 }
