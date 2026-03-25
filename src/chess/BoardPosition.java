@@ -1,5 +1,7 @@
 package chess;
 
+import chess.board.model.Board;
+
 import java.util.Objects;
 
 public record BoardPosition(int x, int y) {
@@ -18,7 +20,7 @@ public record BoardPosition(int x, int y) {
 
     @Override
     public String toString() {
-        return (char)(x + 97) + String.valueOf(y + 1);
+        return (char)(x + 97) + String.valueOf(Math.abs(y - Board.SIZE));
     }
 
     public BoardPosition copy() {

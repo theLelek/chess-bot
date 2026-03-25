@@ -49,4 +49,8 @@ public enum BoardPiece {
     public PieceMoveRules getMoveRules() {
         return moveRules;
     }
+
+    public boolean hasSameColor(BoardPiece currentPiece) {
+        return this.isWhite() == currentPiece.isWhite();
+    }
 }

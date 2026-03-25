@@ -14,6 +14,11 @@ public class PseudoLegalMoveFinder {
         for (BoardPosition boardPosition : board.getPiecesIndexes()) {
             BoardPiece currentPiece = board.getBoardPieces()[boardPosition.y()][boardPosition.x()];
 
+            if(currentPiece == BoardPiece.BLACK_PAWN || currentPiece == BoardPiece.WHITE_PAWN) {
+                System.out.println("TODO, not created yet");
+                continue;
+            }
+
             PieceMoveRules moveRules = currentPiece.getMoveRules();
 
             pseudoLegalMoves.addAll(getLegalMoves(board, boardPosition));
@@ -38,6 +43,9 @@ public class PseudoLegalMoveFinder {
                 }
                 if(board.get(currentPosition) != null){
                     interrupted = true;
+                    if(board.get(currentPosition).hasSameColor(currentPiece)){
+                        continue;
+                    }
                 }
                 legalMoves.add(new Move(position, currentPosition));
             } while (currentPieceMoveRules.canMoveInfinitely() && !interrupted);

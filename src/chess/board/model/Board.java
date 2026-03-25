@@ -46,16 +46,18 @@ public class Board {
     }
 
      private static BoardPiece[][] initializeBoardPiecesFromFen(String piecePlacements) {
-        BoardPiece[][] boardPieces = new BoardPiece[8][8];
+        BoardPiece[][] boardPieces = new BoardPiece[SIZE][SIZE];
         String[] lines = piecePlacements.split("/");
         for (int i = lines.length -1; i >= 0; i--) {
+            int boardCounter = 0;
             for (int j = 0; j < lines[i].length(); j++) {
                 char currentChar =  lines[i].charAt(j);
                 if (Character.isDigit(currentChar)) {
-                    j += Integer.parseInt(String.valueOf(currentChar));
+                    boardCounter += Integer.parseInt(String.valueOf(currentChar));
                     continue;
                 }
-                boardPieces[i][j] = BoardPiece.getByFen(currentChar);
+                boardPieces[i][boardCounter] = BoardPiece.getByFen(currentChar);
+                boardCounter++;
             }
         }
         return boardPieces;
@@ -121,6 +123,6 @@ public class Board {
     }
 
     public BoardPiece get(BoardPosition currentPosition) {
-        return this.boardPieces[currentPosition.x()][currentPosition.y()];
+        return this.boardPieces[currentPosition.y()][currentPosition.x()];
     }
 }
