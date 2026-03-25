@@ -27,6 +27,16 @@ public record BoardPosition(int x, int y) {
         return new BoardPosition(x, y);
     }
 
+    public static BoardPosition getFromString(String str) {
+        if (str.length() != 2) {
+            return null;
+        }
+        char x = str.charAt(0);
+        int y = str.charAt(1) - 48;
+
+        return new BoardPosition(x - 97, Math.abs(y - Board.SIZE));
+    }
+
     public BoardPosition move(int[] direction) throws IndexOutOfBoundsException{
         if(x + direction[0] < 0 || y + direction[1] < 0 ||  x + direction[0] > 8 || y + direction[1] > 8){
             throw new IndexOutOfBoundsException("Move index out of bounds");

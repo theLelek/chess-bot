@@ -52,4 +52,13 @@ public class PseudoLegalMoveFinder {
         }
         return legalMoves;
     }
+
+    private List<Move> getLegalPawnMoves(Board board, BoardPosition position) {
+        List<Move> legalMoves = new ArrayList<>();
+        if(board.get(position) == BoardPiece.WHITE_PAWN || board.get(position) == BoardPiece.BLACK_PAWN) {
+            throw new RuntimeException("Pawn function got other piece");
+        }
+
+        return legalMoves;
+    }
 }

@@ -7,6 +7,4 @@ https://www.youtube.com/watch?v=l-hh51ncgDI = for minimax and alpha beta pruning
 über function naming conventions reden (was ist besser: initialize... getBy...)
 implement enPassant rule
 think about storing legal moves in list seperate of pieces
-Board::initializeFromFen() does not work, bugfix that
-
 
