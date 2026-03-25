@@ -23,4 +23,18 @@ public class PseudoLegalMoveFinderTest {
     }
 
 
+    @Test
+    @DisplayName("Test find legal pawn move with white pawn on e4, can capture en passant and move forward")
+    public void testFindLegalPawnMoves() {
+        Board board = Board.initializeFromFen("");
+
+    }
+
+    @Test
+    @DisplayName("Test find legal pawn move with black pawn on h7, can capture and move two fields foreward")
+    public void testFindLegalPawnMoves2() {
+
+    }
+
+
 }

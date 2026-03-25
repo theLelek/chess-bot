@@ -8,13 +8,13 @@ public enum BoardPiece {
     WHITE_BISHOP('B',  PieceMoveRules.BISHOP),
     WHITE_QUEEN('Q', PieceMoveRules.QUEEN),
     WHITE_KING('K',  PieceMoveRules.KING),
-    WHITE_PAWN('P', PieceMoveRules.PAWN),
+    WHITE_PAWN('P', PieceMoveRules.WHITE_PAWN),
     BLACK_ROOK('r', PieceMoveRules.ROOK),
     BLACK_KNIGHT('n', PieceMoveRules.KNIGHT),
     BLACK_BISHOP('b', PieceMoveRules.BISHOP),
     BLACK_QUEEN('q', PieceMoveRules.QUEEN),
     BLACK_KING('k', PieceMoveRules.KING),
-    BLACK_PAWN('p', PieceMoveRules.PAWN),;
+    BLACK_PAWN('p', PieceMoveRules.BLACK_PAWN);
 
     private final char fortsythEdwardsNotation;
     private final PieceMoveRules moveRules;
@@ -51,6 +51,16 @@ public enum BoardPiece {
     }
 
     public boolean hasSameColor(BoardPiece currentPiece) {
+        if(currentPiece == null) {
+            return false;
+        }
         return this.isWhite() == currentPiece.isWhite();
+    }
+
+    public boolean hasOppositeColor(BoardPiece currentPiece) {
+        if(currentPiece == null) {
+            return false;
+        }
+        return this.isBlack() == currentPiece.isWhite();
     }
 }
