@@ -12,12 +12,12 @@ public class Board {
     private final List<BoardPosition> piecesIndexes; // TODO O(n) for removing elements find faster way
     private final boolean isWhiteToMove;
     private final CastlingRights castlingRights;
-    private final String possibleEnPassants;
+    private final BoardPosition possibleEnPassants;
     private int halfMoveClock;
     private int fullMoveNumber;
     // TODO enPassantTarget is not finished yet, will be in each BoardPiece
 
-    public Board(BoardPiece[][] boardPieces, List<BoardPosition> piecesIndexes, boolean isWhiteToMove, CastlingRights castlingRights, String possibleEnPassants, int halfMoveClock, int fullMoveNumber) {
+    public Board(BoardPiece[][] boardPieces, List<BoardPosition> piecesIndexes, boolean isWhiteToMove, CastlingRights castlingRights, BoardPosition possibleEnPassants, int halfMoveClock, int fullMoveNumber) {
         this.boardPieces = boardPieces;
         this.piecesIndexes = piecesIndexes;
         this.isWhiteToMove = isWhiteToMove;
@@ -37,7 +37,7 @@ public class Board {
         var piecesIndexes = initializePiecesIndexes(boardPieces);
         var isWhiteToMove = isWhiteToMoveFromFen(fenParts[1]);
         var castlingRights = CastlingRights.initializeFromFen(fenParts[2]);
-        var enPassantTarget = fenParts[3];
+        var enPassantTarget = BoardPosition.getFromString(fenParts[3]);
         var halfMoveClock = Integer.parseInt(fenParts[4]);
         var fullMoveNumber = Integer.parseInt(fenParts[5]);
         Board board = new Board(boardPieces, piecesIndexes, isWhiteToMove, castlingRights, enPassantTarget, halfMoveClock, fullMoveNumber);
@@ -114,7 +114,7 @@ public class Board {
         this.fullMoveNumber = fullMoveNumber;
     }
 
-    public String getPossibleEnPassants() {
+    public BoardPosition getPossibleEnPassants() {
         return possibleEnPassants;
     }
 

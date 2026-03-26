@@ -6,6 +6,7 @@ import chess.BoardPosition;
 import chess.board.model.BoardPiece;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class PseudoLegalMoveFinder {
@@ -15,7 +16,7 @@ public class PseudoLegalMoveFinder {
             BoardPiece currentPiece = board.getBoardPieces()[boardPosition.y()][boardPosition.x()];
 
             if(currentPiece == BoardPiece.BLACK_PAWN || currentPiece == BoardPiece.WHITE_PAWN) {
-                System.out.println("TODO, not created yet");
+                pseudoLegalMoves.addAll(getLegalPawnMoves(board, boardPosition));
                 continue;
             }
 
@@ -50,6 +51,54 @@ public class PseudoLegalMoveFinder {
                 legalMoves.add(new Move(position, currentPosition));
             } while (currentPieceMoveRules.canMoveInfinitely() && !interrupted);
         }
+        return legalMoves;
+    }
+
+    static List<Move> getLegalPawnMoves(Board board, BoardPosition position) {
+        List<Move> legalMoves = new ArrayList<>();
+        int[][] directions = board.get(position).getMoveRules().getDirections();
+        BoardPiece currentPiece = board.get(position);
+
+        if(board.get(position) != BoardPiece.WHITE_PAWN && board.get(position) != BoardPiece.BLACK_PAWN) {
+            throw new RuntimeException("Pawn function got other piece");
+        }
+        if(board.getPossibleEnPassants() != null) {
+            legalMoves.add(new Move(position, board.getPossibleEnPassants()));
+        }
+
+        boolean backrow = false;
+        if(board.get(position).isWhite()) {
+            backrow = position.y() == 6;
+        } else if(board.get(position).isBlack()) {
+            backrow = position.y() == 1;
+        }
+
+        try {
+            BoardPosition currentPosition = position.move(directions[0]);
+            if(!currentPiece.hasSameColor(board.get(currentPosition))) {
+                legalMoves.add(new  Move(position, currentPosition));
+
+                if(backrow) {
+                    currentPosition = currentPosition.move(directions[0]);
+                    if(!currentPiece.hasSameColor(board.get(currentPosition))) {
+                        legalMoves.add(new Move(position, currentPosition));
+                    }
+                }
+            }
+        } catch (IndexOutOfBoundsException _) {}
+
+
+
+
+        for(int i = 1; i <= 2; i++) {
+            try{
+                BoardPosition currentPosition = position.move(directions[i]);
+                if(currentPiece.hasOppositeColor(board.get(currentPosition))){
+                    legalMoves.add(new Move(position, currentPosition));
+                }
+            } catch (IndexOutOfBoundsException _){}
+        }
+
         return legalMoves;
     }
 }

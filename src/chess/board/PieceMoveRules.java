@@ -8,7 +8,8 @@ public enum PieceMoveRules {
     ROOK(new int[][]{{-1, 0}, {0, -1}, {0,  1}, {1,  0}}, true),
     KNIGHT(new int[][]{{1, -2}, {-1, -2}, {2, -1}, {-2, -1}, {2,  1}, {-2,  1}, {1,  2}, {-1,  2}}, false),
     KING(new int[][]{{-1, -1}, {0, -1}, {1, -1}, {-1,  0}, {1,  0}, {-1,  1}, {0,  1}, { 1,  1}}, false),
-    PAWN(null, false); // TODO not sure what do do yet with pawn
+    WHITE_PAWN(new int[][]{{0,-1},{-1,-1},{1,-1}}, false),
+    BLACK_PAWN(new int[][]{{0,1},{-1,1},{1,1}}, false);
 
     private final int[][] directions;
     private final boolean canMoveInfinitely;
