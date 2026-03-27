@@ -22,7 +22,7 @@ class ApiTest {
     void testToString() {
         Move actual = new Move(new BoardPosition(1, 3), new BoardPosition(2, 4));
 
-        String expected = "from: a3 to: b4";
+        String expected = "from: b5 to: c4";
         assertEquals(expected, actual.toString());
     }
 }

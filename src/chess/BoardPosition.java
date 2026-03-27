@@ -60,7 +60,7 @@ public record BoardPosition(int x, int y) {
         }
 
         public BoardPosition build() {
-            return new BoardPosition(y, x);
+            return new BoardPosition(x, y);
         }
     }
 }
