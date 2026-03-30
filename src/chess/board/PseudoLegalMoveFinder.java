@@ -6,7 +6,6 @@ import chess.BoardPosition;
 import chess.board.model.BoardPiece;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 public class PseudoLegalMoveFinder {
@@ -14,20 +13,16 @@ public class PseudoLegalMoveFinder {
         List<Move> pseudoLegalMoves = new ArrayList<>(); // TODO test if LinkedList is faster
         for (BoardPosition boardPosition : board.getPiecesIndexes()) {
             BoardPiece currentPiece = board.getBoardPieces()[boardPosition.y()][boardPosition.x()];
-
             if(currentPiece == BoardPiece.BLACK_PAWN || currentPiece == BoardPiece.WHITE_PAWN) {
                 pseudoLegalMoves.addAll(getLegalPawnMoves(board, boardPosition));
                 continue;
             }
-
-            PieceMoveRules moveRules = currentPiece.getMoveRules();
-
             pseudoLegalMoves.addAll(getLegalMoves(board, boardPosition));
         }
-        return null;
+        return pseudoLegalMoves;
     }
 
-    public static List<Move> getLegalMoves(Board board, BoardPosition position) {
+    private static List<Move> getLegalMoves(Board board, BoardPosition position) {
         List<Move> legalMoves = new ArrayList<>();
         BoardPiece currentPiece = board.getBoardPieces()[position.y()][position.x()];
         PieceMoveRules currentPieceMoveRules = currentPiece.getMoveRules();
@@ -54,7 +49,7 @@ public class PseudoLegalMoveFinder {
         return legalMoves;
     }
 
-    static List<Move> getLegalPawnMoves(Board board, BoardPosition position) {
+    private static List<Move> getLegalPawnMoves(Board board, BoardPosition position) {
         List<Move> legalMoves = new ArrayList<>();
         int[][] directions = board.get(position).getMoveRules().getDirections();
         BoardPiece currentPiece = board.get(position);
@@ -86,10 +81,6 @@ public class PseudoLegalMoveFinder {
                 }
             }
         } catch (IndexOutOfBoundsException _) {}
-
-
-
-
         for(int i = 1; i <= 2; i++) {
             try{
                 BoardPosition currentPosition = position.move(directions[i]);
