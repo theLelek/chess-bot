@@ -38,7 +38,7 @@ public record BoardPosition(int x, int y) {
     }
 
     public BoardPosition move(int[] direction) throws IndexOutOfBoundsException{
-        if(x + direction[0] < 0 || y + direction[1] < 0 ||  x + direction[0] > 8 || y + direction[1] > 8){
+        if(x + direction[0] < 0 || y + direction[1] < 0 ||  x + direction[0] >= Board.SIZE || y + direction[1] >= Board.SIZE) {
             throw new IndexOutOfBoundsException("Move index out of bounds");
         }
         return new BoardPosition(x + direction[0], y + direction[1]);
