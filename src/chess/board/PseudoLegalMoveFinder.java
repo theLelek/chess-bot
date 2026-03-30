@@ -9,10 +9,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PseudoLegalMoveFinder {
-    public static List<Move> getPseudoLegalMoves(Board board) {
+    public static List<Move> getPseudoLegalMoves(Board board, boolean isWhiteToMove) {
         List<Move> pseudoLegalMoves = new ArrayList<>(); // TODO test if LinkedList is faster
         for (BoardPosition boardPosition : board.getPiecesIndexes()) {
             BoardPiece currentPiece = board.getBoardPieces()[boardPosition.y()][boardPosition.x()];
+            if (! currentPiece.isWhite() == isWhiteToMove) {
+                continue;
+            }
             if(currentPiece == BoardPiece.BLACK_PAWN || currentPiece == BoardPiece.WHITE_PAWN) {
                 pseudoLegalMoves.addAll(getLegalPawnMoves(board, boardPosition));
                 continue;

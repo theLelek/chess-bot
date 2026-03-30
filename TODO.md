@@ -9,3 +9,6 @@ think about storing legal moves in list seperate of pieces
 talk if PseudoLegalMoveFinder::getLegalPawnMoves() is good enough
 implement promotion
 
+refactor getPseudoLegalMoves
+
+add color seperation in PseudoLegalMoveFinder
