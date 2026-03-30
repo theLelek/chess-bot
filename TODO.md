@@ -10,5 +10,3 @@ talk if PseudoLegalMoveFinder::getLegalPawnMoves() is good enough
 implement promotion
 
 refactor getPseudoLegalMoves
-
-add color seperation in PseudoLegalMoveFinder
