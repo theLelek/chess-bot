@@ -1,25 +1,19 @@
 package chess.board.model;
 
-public record CastlingRights(boolean canWhiteCastleKingSide, boolean canBlackCastleKingSide,
-                             boolean canWhiteCastleQueenSide, boolean canBlackCastleQueenSide) {
+import chess.Color;
 
-    public static CastlingRights initializeFromFen(String castlingRights) {
-        boolean canWhiteCastleKingSide = false;
-        boolean canBlackCastleKingSide = false;
-        boolean canWhiteCastleQueenSide = false;
-        boolean canBlackCastleQueenSide = false;
-        if (castlingRights.contains("K")) {
-            canWhiteCastleKingSide = true;
+public record CastlingRights(boolean canCastleKingSide, boolean canCastleQueenSide) {
+
+    public static CastlingRights fromFen(String fen, Color color) {
+        boolean kingSide;
+        boolean queenSide;
+        if (color == Color.WHITE) {
+            kingSide = fen.contains("K");
+            queenSide = fen.contains("Q");
+        } else {
+            kingSide = fen.contains("k");
+            queenSide = fen.contains("q");
         }
-        if (castlingRights.contains("k")) {
-            canBlackCastleKingSide = true;
-        }
-        if (castlingRights.contains("Q")) {
-            canWhiteCastleQueenSide = true;
-        }
-        if (castlingRights.contains("q")) {
-            canBlackCastleQueenSide = true;
-        }
-        return new CastlingRights(canWhiteCastleKingSide, canBlackCastleKingSide, canWhiteCastleQueenSide, canBlackCastleQueenSide);
+        return new CastlingRights(kingSide, queenSide);
     }
 }
