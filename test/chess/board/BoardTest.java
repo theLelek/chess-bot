@@ -35,10 +35,10 @@ class BoardTest {
 
         assertEquals(true, board.isWhiteToMove());
 
-        assertTrue(board.getCastlingRights().canWhiteCastleKingSide());
-        assertTrue(board.getCastlingRights().canBlackCastleQueenSide());
-        assertFalse(board.getCastlingRights().canBlackCastleKingSide());
-        assertFalse(board.getCastlingRights().canWhiteCastleQueenSide());
+        assertTrue(board.getCastlingRightsWhite().canCastleKingSide());
+        assertTrue(board.getCastlingRightsBlack().canCastleQueenSide());
+        assertFalse(board.getCastlingRightsBlack().canCastleKingSide());
+        assertFalse(board.getCastlingRightsWhite().canCastleQueenSide());
         assertEquals(2, board.getHalfMoveClock());
         assertEquals(3, board.getFullMoveNumber());
     }
@@ -85,10 +85,10 @@ class BoardTest {
         assertEquals(BoardPiece.WHITE_KNIGHT, b[7][6]);
         assertEquals(BoardPiece.WHITE_ROOK, b[7][7]);
 
-        assertTrue(board.getCastlingRights().canWhiteCastleKingSide());
-        assertTrue(board.getCastlingRights().canBlackCastleQueenSide());
-        assertTrue(board.getCastlingRights().canBlackCastleKingSide());
-        assertTrue(board.getCastlingRights().canWhiteCastleQueenSide());
+        assertTrue(board.getCastlingRightsWhite().canCastleKingSide());
+        assertTrue(board.getCastlingRightsBlack().canCastleQueenSide());
+        assertTrue(board.getCastlingRightsBlack().canCastleKingSide());
+        assertTrue(board.getCastlingRightsWhite().canCastleQueenSide());
         assertEquals(0, board.getHalfMoveClock());
         assertEquals(1, board.getFullMoveNumber());
     }

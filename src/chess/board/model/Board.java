@@ -1,6 +1,7 @@
 package chess.board.model;
 
 import chess.BoardPosition;
+import chess.Color;
 import chess.Move;
 import chess.board.PseudoLegalMoveFinder;
 
@@ -12,7 +13,8 @@ public class Board {
     private final BoardPiece[][] boardPieces;
     private final List<BoardPosition> piecesIndexes; // TODO O(n) for removing elements find faster way
     private final boolean isWhiteToMove;
-    private final CastlingRights castlingRights;
+    private final CastlingRights castlingRightsWhite;
+    private final CastlingRights castlingRightsBlack;
     private final BoardPosition possibleEnPassants;
     private int halfMoveClock;
     private int fullMoveNumber;
@@ -20,11 +22,12 @@ public class Board {
     private List<Move> pseudoLegalMovesBlack;
     // TODO enPassantTarget is not finished yet, will be in each BoardPiece
 
-    public Board(BoardPiece[][] boardPieces, List<BoardPosition> piecesIndexes, boolean isWhiteToMove, CastlingRights castlingRights, BoardPosition possibleEnPassants, int halfMoveClock, int fullMoveNumber, List<Move> pseudoLegalMovesWhite, List<Move> pseudoLegalMovesBlack) {
+    public Board(BoardPiece[][] boardPieces, List<BoardPosition> piecesIndexes, boolean isWhiteToMove, CastlingRights castlingRightsWhite, CastlingRights castlingRightsBlack, BoardPosition possibleEnPassants, int halfMoveClock, int fullMoveNumber, List<Move> pseudoLegalMovesWhite, List<Move> pseudoLegalMovesBlack) {
         this.boardPieces = boardPieces;
         this.piecesIndexes = piecesIndexes;
         this.isWhiteToMove = isWhiteToMove;
-        this.castlingRights = castlingRights;
+        this.castlingRightsWhite = castlingRightsWhite;
+        this.castlingRightsBlack = castlingRightsBlack;
         this.possibleEnPassants = possibleEnPassants;
         this.halfMoveClock = halfMoveClock;
         this.fullMoveNumber = fullMoveNumber;
@@ -32,11 +35,12 @@ public class Board {
         this.pseudoLegalMovesBlack = pseudoLegalMovesBlack;
     }
 
-    private Board(BoardPiece[][] boardPieces, List<BoardPosition> piecesIndexes, boolean isWhiteToMove, CastlingRights castlingRights, BoardPosition possibleEnPassants, int halfMoveClock, int fullMoveNumber) {
+    private Board(BoardPiece[][] boardPieces, List<BoardPosition> piecesIndexes, boolean isWhiteToMove, CastlingRights castlingRightsWhite, CastlingRights castlingRightsBlack, BoardPosition possibleEnPassants, int halfMoveClock, int fullMoveNumber) {
         this.boardPieces = boardPieces;
         this.piecesIndexes = piecesIndexes;
         this.isWhiteToMove = isWhiteToMove;
-        this.castlingRights = castlingRights;
+        this.castlingRightsWhite = castlingRightsWhite;
+        this.castlingRightsBlack = castlingRightsBlack;
         this.possibleEnPassants = possibleEnPassants;
         this.halfMoveClock = halfMoveClock;
         this.fullMoveNumber = fullMoveNumber;
@@ -53,11 +57,13 @@ public class Board {
         var boardPieces = initializeBoardPiecesFromFen(fenParts[0]);
         var piecesIndexes = initializePiecesIndexes(boardPieces);
         var isWhiteToMove = isWhiteToMoveFromFen(fenParts[1]);
-        var castlingRights = CastlingRights.initializeFromFen(fenParts[2]);
+        var castlingRightsWhite = CastlingRights.fromFen(fenParts[2], Color.WHITE);
+        var castlingRightsBlack = CastlingRights.fromFen(fenParts[2], Color.BLACK);
         var enPassantTarget = BoardPosition.getFromString(fenParts[3]);
         var halfMoveClock = Integer.parseInt(fenParts[4]);
         var fullMoveNumber = Integer.parseInt(fenParts[5]);
-        Board board = new Board(boardPieces, piecesIndexes, isWhiteToMove, castlingRights, enPassantTarget, halfMoveClock, fullMoveNumber);
+        Board board = new Board(boardPieces, piecesIndexes, isWhiteToMove, castlingRightsWhite, castlingRightsBlack, enPassantTarget, halfMoveClock, fullMoveNumber);
+
         var pseudoLegalMovesWhite = PseudoLegalMoveFinder.getPseudoLegalMoves(board, true);
         var pseudoLegalMovesBlack = PseudoLegalMoveFinder.getPseudoLegalMoves(board, false);
         board.pseudoLegalMovesWhite = pseudoLegalMovesWhite;
@@ -65,7 +71,7 @@ public class Board {
         return board;
     }
 
-     private static BoardPiece[][] initializeBoardPiecesFromFen(String piecePlacements) {
+    private static BoardPiece[][] initializeBoardPiecesFromFen(String piecePlacements) {
         BoardPiece[][] boardPieces = new BoardPiece[SIZE][SIZE];
         String[] lines = piecePlacements.split("/");
         for (int i = lines.length -1; i >= 0; i--) {
@@ -114,8 +120,12 @@ public class Board {
         return !isWhiteToMove;
     }
 
-    public CastlingRights getCastlingRights() {
-        return castlingRights;
+    public CastlingRights getCastlingRightsWhite() {
+        return castlingRightsWhite;
+    }
+
+    public CastlingRights getCastlingRightsBlack() {
+        return castlingRightsBlack;
     }
 
     public int getHalfMoveClock() {
