@@ -2,7 +2,20 @@ package chess.board.model;
 
 import chess.Color;
 
-public record CastlingRights(boolean canCastleKingSide, boolean canCastleQueenSide) {
+public class CastlingRights {
+
+    private final boolean canCastleKingSide;
+    private final boolean canCastleQueenSide;
+
+    public CastlingRights(boolean canCastleKingSide, boolean canCastleQueenSide) {
+        this.canCastleKingSide = canCastleKingSide;
+        this.canCastleQueenSide = canCastleQueenSide;
+    }
+
+    public CastlingRights(CastlingRights castlingRights) {
+        this.canCastleKingSide = castlingRights.canCastleKingSide;
+        this.canCastleQueenSide = castlingRights.canCastleQueenSide;
+    }
 
     public static CastlingRights fromFen(String fen, Color color) {
         boolean kingSide;
