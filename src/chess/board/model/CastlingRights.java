@@ -29,4 +29,12 @@ public class CastlingRights {
         }
         return new CastlingRights(kingSide, queenSide);
     }
+
+    public boolean canCastleKingSide() {
+        return canCastleKingSide;
+    }
+
+    public boolean canCastleQueenSide() {
+        return canCastleQueenSide;
+    }
 }
