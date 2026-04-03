@@ -39,8 +39,8 @@ class BoardTest {
         assertTrue(board.getCastlingRightsBlack().canCastleQueenSide());
         assertFalse(board.getCastlingRightsBlack().canCastleKingSide());
         assertFalse(board.getCastlingRightsWhite().canCastleQueenSide());
-        assertEquals(2, board.getHalfMoveClock());
-        assertEquals(3, board.getFullMoveNumber());
+        assertEquals(2, board.getHalfmoveClock());
+        assertEquals(3, board.getFullmoveNumber());
     }
 
     @Test
@@ -89,7 +89,7 @@ class BoardTest {
         assertTrue(board.getCastlingRightsBlack().canCastleQueenSide());
         assertTrue(board.getCastlingRightsBlack().canCastleKingSide());
         assertTrue(board.getCastlingRightsWhite().canCastleQueenSide());
-        assertEquals(0, board.getHalfMoveClock());
-        assertEquals(1, board.getFullMoveNumber());
+        assertEquals(0, board.getHalfmoveClock());
+        assertEquals(1, board.getFullmoveNumber());
     }
 }
