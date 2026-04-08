@@ -220,7 +220,7 @@ public class Board {
         return pseudoLegalMovesBlack;
     }
 
-    public BoardPiece get(BoardPosition currentPosition) {
+    public BoardPiece getBoardPiece(BoardPosition currentPosition) {
         return this.boardPieces[currentPosition.y()][currentPosition.x()];
     }
 }
