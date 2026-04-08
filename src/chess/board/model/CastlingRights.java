@@ -2,6 +2,8 @@ package chess.board.model;
 
 import chess.Color;
 
+import java.util.Objects;
+
 public class CastlingRights {
 
     private final boolean canCastleKingSide;
@@ -36,5 +38,17 @@ public class CastlingRights {
 
     public boolean canCastleQueenSide() {
         return canCastleQueenSide;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        CastlingRights that = (CastlingRights) o;
+        return canCastleKingSide == that.canCastleKingSide && canCastleQueenSide == that.canCastleQueenSide;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(canCastleKingSide, canCastleQueenSide);
     }
 }
