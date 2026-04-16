@@ -60,8 +60,8 @@ public class PseudoLegalMoveFinder {
         if(board.getBoardPiece(position) != BoardPiece.WHITE_PAWN && board.getBoardPiece(position) != BoardPiece.BLACK_PAWN) {
             throw new RuntimeException("Pawn function got other piece");
         }
-        if(board.getPossibleEnPassants() != null) {
-            legalMoves.add(new Move(position, board.getPossibleEnPassants()));
+        if(board.getPossibleEnPassant() != null) {
+            legalMoves.add(new Move(position, board.getPossibleEnPassant()));
         }
 
         boolean backrow = false;
