@@ -10,42 +10,36 @@ import java.util.*;
 public class Board {
 
     public static final int SIZE = 8;
+
     private final BoardPiece[][] boardPieces;
     private final List<BoardPosition> piecesIndexes; // TODO O(n) for removing elements find faster way
     private final boolean isWhiteToMove;
     private final CastlingRights castlingRightsWhite;
     private final CastlingRights castlingRightsBlack;
-    private final BoardPosition possibleEnPassants;
+    private final BoardPosition possibleEnPassant; // TODO is currently stored 2 times
     private int halfmoveClock;
     private int fullmoveNumber;
-    private List<Move> pseudoLegalMovesWhite;
-    private List<Move> pseudoLegalMovesBlack;
-    // TODO enPassantTarget is not finished yet, will be in each BoardPiece
 
-    public Board(BoardPiece[][] boardPieces, List<BoardPosition> piecesIndexes, boolean isWhiteToMove, CastlingRights castlingRightsWhite, CastlingRights castlingRightsBlack, BoardPosition possibleEnPassants, int halfmoveClock, int fullmoveNumber, List<Move> pseudoLegalMovesWhite, List<Move> pseudoLegalMovesBlack) {
+    private List<Move> pseudoLegalMovesWhite = null;
+    private List<BoardPosition> pseudoLegalPromotionsWhite = null;
+    private List<Move> pseudoLegalMovesBlack = null;
+    private List<BoardPosition> pseudoLegalPromotionsBlack = null;
+
+    public Board(BoardPiece[][] boardPieces, List<BoardPosition> piecesIndexes, boolean isWhiteToMove, CastlingRights castlingRightsWhite, CastlingRights castlingRightsBlack, BoardPosition possibleEnPassant, int halfmoveClock, int fullmoveNumber) {
         this.boardPieces = boardPieces;
         this.piecesIndexes = piecesIndexes;
         this.isWhiteToMove = isWhiteToMove;
         this.castlingRightsWhite = castlingRightsWhite;
         this.castlingRightsBlack = castlingRightsBlack;
-        this.possibleEnPassants = possibleEnPassants;
+        this.possibleEnPassant = possibleEnPassant;
         this.halfmoveClock = halfmoveClock;
         this.fullmoveNumber = fullmoveNumber;
-        this.pseudoLegalMovesWhite = pseudoLegalMovesWhite;
-        this.pseudoLegalMovesBlack = pseudoLegalMovesBlack;
     }
 
-    private Board(BoardPiece[][] boardPieces, List<BoardPosition> piecesIndexes, boolean isWhiteToMove, CastlingRights castlingRightsWhite, CastlingRights castlingRightsBlack, BoardPosition possibleEnPassants, int halfmoveClock, int fullmoveNumber) {
-        this.boardPieces = boardPieces;
-        this.piecesIndexes = piecesIndexes;
-        this.isWhiteToMove = isWhiteToMove;
-        this.castlingRightsWhite = castlingRightsWhite;
-        this.castlingRightsBlack = castlingRightsBlack;
-        this.possibleEnPassants = possibleEnPassants;
-        this.halfmoveClock = halfmoveClock;
-        this.fullmoveNumber = fullmoveNumber;
-        pseudoLegalMovesWhite = new ArrayList<>();
-        pseudoLegalMovesBlack = new ArrayList<>();
+    public void calculateLegalMoves() {
+      pseudoLegalMovesWhite = PseudoLegalMoveFinder.getPseudoLegalMoves(this, true);
+      pseudoLegalMovesBlack = PseudoLegalMoveFinder.getPseudoLegalMoves(this, false);
+
     }
 
     public Board move(Move move) {
@@ -57,7 +51,7 @@ public class Board {
         var isWhiteToMoveCopy = ! isWhiteToMove;
         var castlingRightsWhiteCopy = updateCastlingRightsForRookMove(castlingRightsWhite, move, Color.WHITE);
         var castlingRightsBlackCopy = updateCastlingRightsForRookMove(castlingRightsBlack, move, Color.BLACK);
-        var possibleEnPassantsCopy = getPossibleEnPassants().copy();
+        var possibleEnPassantsCopy = getPossibleEnPassant().copy();
         var halfMoveClockCopy = (pieceToMove == BoardPiece.WHITE_PAWN || pieceToMove == BoardPiece.BLACK_PAWN || pieceToCapture != null) ? 0 : halfmoveClock + 1;
         var fullMoveNumberCopy = (pieceToMove.isBlack()) ? fullmoveNumber + 1 : fullmoveNumber;
 
@@ -116,7 +110,7 @@ public class Board {
         String[] fenParts = fen.split(" ");
         var boardPieces = initializeBoardPiecesFromFen(fenParts[0]);
         var piecesIndexes = initializePiecesIndexes(boardPieces);
-        var isWhiteToMove = isWhiteToMoveFromFen(fenParts[1]);
+        var isWhiteToMove = fenParts[1].equals("w");
         var castlingRightsWhite = CastlingRights.fromFen(fenParts[2], Color.WHITE);
         var castlingRightsBlack = CastlingRights.fromFen(fenParts[2], Color.BLACK);
         var enPassantTarget = BoardPosition.getFromString(fenParts[3]);
@@ -124,10 +118,7 @@ public class Board {
         var fullMoveNumber = Integer.parseInt(fenParts[5]);
         Board board = new Board(boardPieces, piecesIndexes, isWhiteToMove, castlingRightsWhite, castlingRightsBlack, enPassantTarget, halfMoveClock, fullMoveNumber);
 
-        var pseudoLegalMovesWhite = PseudoLegalMoveFinder.getPseudoLegalMoves(board, true);
-        var pseudoLegalMovesBlack = PseudoLegalMoveFinder.getPseudoLegalMoves(board, false);
-        board.pseudoLegalMovesWhite = pseudoLegalMovesWhite;
-        board.pseudoLegalMovesBlack = pseudoLegalMovesBlack;
+
         return board;
     }
 
@@ -162,10 +153,6 @@ public class Board {
             }
         }
         return piecesIndexes;
-    }
-
-    private static boolean isWhiteToMoveFromFen(String fen) {
-        return fen.equals("w");
     }
 
     public BoardPiece[][] getBoardPieces() {
@@ -204,12 +191,16 @@ public class Board {
         this.fullmoveNumber = fullmoveNumber;
     }
 
-    public BoardPosition getPossibleEnPassants() {
-        return possibleEnPassants;
+    public BoardPosition getPossibleEnPassant() {
+        return possibleEnPassant;
     }
 
     public List<BoardPosition> getPiecesIndexes() {
         return piecesIndexes;
+    }
+
+    public BoardPiece getBoardPiece(BoardPosition currentPosition) {
+        return this.boardPieces[currentPosition.y()][currentPosition.x()];
     }
 
     public List<Move> getPseudoLegalMovesWhite() {
@@ -218,9 +209,5 @@ public class Board {
 
     public List<Move> getPseudoLegalMovesBlack() {
         return pseudoLegalMovesBlack;
-    }
-
-    public BoardPiece getBoardPiece(BoardPosition currentPosition) {
-        return this.boardPieces[currentPosition.y()][currentPosition.x()];
     }
 }
