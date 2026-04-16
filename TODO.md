@@ -14,3 +14,5 @@ implement promotion, en passant, castling
 find legal moves instead of pseudo legal
 maybe use the same board instance in every move generator node (faster)
 copy method in classes or constructor to copy instances
+
+calculate legal moves in mimimax

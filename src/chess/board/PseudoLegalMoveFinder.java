@@ -1,5 +1,6 @@
 package chess.board;
 
+import chess.LegalMoves;
 import chess.Move;
 import chess.board.model.Board;
 import chess.BoardPosition;
@@ -9,23 +10,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PseudoLegalMoveFinder {
-    public static List<Move> getPseudoLegalMoves(Board board, boolean isWhiteToMove) {
-        List<Move> pseudoLegalMoves = new ArrayList<>(); // TODO test if LinkedList is faster
+    public static LegalMoves getPseudoLegalMoves(Board board, boolean isWhiteToMove) {
+        List<Move> pseudoLegalMoves = new ArrayList<>();
+        List<BoardPosition> pseudoLegalPromotions = new ArrayList<>();
         for (BoardPosition boardPosition : board.getPiecesIndexes()) {
             BoardPiece currentPiece = board.getBoardPieces()[boardPosition.y()][boardPosition.x()];
-            if (! currentPiece.isWhite() == isWhiteToMove) {
+            if (currentPiece.isWhite() != isWhiteToMove) {
                 continue;
             }
-            if(currentPiece == BoardPiece.BLACK_PAWN || currentPiece == BoardPiece.WHITE_PAWN) {
-                pseudoLegalMoves.addAll(getLegalPawnMoves(board, boardPosition));
-                continue;
+            // pawn
+            // TODO pawn moves on last row will be removed and put into pseudolegalPromotions
+            if (currentPiece == BoardPiece.BLACK_PAWN || currentPiece == BoardPiece.WHITE_PAWN) {
+                pseudoLegalMoves.addAll(getPseudoLegalPawnMoves(board, boardPosition));
+            // general
+            } else {
+                pseudoLegalMoves.addAll(getPseudoLegalMoves(board, boardPosition));
             }
-            pseudoLegalMoves.addAll(getLegalMoves(board, boardPosition));
         }
-        return pseudoLegalMoves;
+        return new LegalMoves(pseudoLegalMoves, pseudoLegalPromotions);
     }
 
-    private static List<Move> getLegalMoves(Board board, BoardPosition position) {
+    private static List<Move> getPseudoLegalMoves(Board board, BoardPosition position) {
         List<Move> legalMoves = new ArrayList<>();
         BoardPiece currentPiece = board.getBoardPieces()[position.y()][position.x()];
         PieceMoveRules currentPieceMoveRules = currentPiece.getMoveRules();
@@ -33,7 +38,7 @@ public class PseudoLegalMoveFinder {
         for (int[] direction : currentPieceMoveRules.getDirections()) {
             BoardPosition currentPosition = position.copy();
             boolean interrupted = false;
-            do{
+            do {
                 try {
                     currentPosition = currentPosition.move(direction);
                 } catch (IndexOutOfBoundsException e){
@@ -52,47 +57,45 @@ public class PseudoLegalMoveFinder {
         return legalMoves;
     }
 
-    private static List<Move> getLegalPawnMoves(Board board, BoardPosition position) {
+    private static List<Move> getPseudoLegalPawnMoves(Board board, BoardPosition position) {
         List<Move> legalMoves = new ArrayList<>();
-        int[][] directions = board.getBoardPiece(position).getMoveRules().getDirections();
         BoardPiece currentPiece = board.getBoardPiece(position);
+        int direction = (currentPiece.isWhite()) ? -1 : +1;
+        int startingY = (currentPiece.isWhite()) ? 6 : 1;
+        int forwardY = position.y() + direction;
 
-        if(board.getBoardPiece(position) != BoardPiece.WHITE_PAWN && board.getBoardPiece(position) != BoardPiece.BLACK_PAWN) {
-            throw new RuntimeException("Pawn function got other piece");
-        }
-        if(board.getPossibleEnPassant() != null) {
-            legalMoves.add(new Move(position, board.getPossibleEnPassant()));
-        }
-
-        boolean backrow = false;
-        if(board.getBoardPiece(position).isWhite()) {
-            backrow = position.y() == 6;
-        } else if(board.getBoardPiece(position).isBlack()) {
-            backrow = position.y() == 1;
+        if (forwardY < 0 || forwardY >= Board.SIZE) {
+            return legalMoves;
         }
 
-        try {
-            BoardPosition currentPosition = position.move(directions[0]);
-            if(!currentPiece.hasSameColor(board.getBoardPiece(currentPosition))) {
-                legalMoves.add(new  Move(position, currentPosition));
+        // forward:
+        if (board.getBoardPieces()[forwardY][position.x()] == null) {
+            legalMoves.add(new Move(position.copy(), new BoardPosition(position.x(), forwardY)));
+        }
 
-                if(backrow) {
-                    currentPosition = currentPosition.move(directions[0]);
-                    if(!currentPiece.hasSameColor(board.getBoardPiece(currentPosition))) {
-                        legalMoves.add(new Move(position, currentPosition));
-                    }
-                }
+        // forward 2:
+        if (position.y() == startingY
+                && board.getBoardPieces()[forwardY][position.x()] == null
+                && board.getBoardPieces()[forwardY + direction][position.x()] == null) {
+            legalMoves.add(new Move(position.copy(), new BoardPosition(position.x(), forwardY + direction)));
+        }
+
+        // diagonal:
+        if (position.x() - 1 >= 0) {
+            BoardPosition diagonalPiecePosition = new BoardPosition(position.x() - 1, forwardY);
+            BoardPiece diagonalPiece = board.getBoardPiece(diagonalPiecePosition);
+            if (diagonalPiece != null && diagonalPiece.isWhite() != currentPiece.isWhite()) {
+                legalMoves.add(new Move(position.copy(), diagonalPiecePosition));
             }
-        } catch (IndexOutOfBoundsException _) {}
-        for(int i = 1; i <= 2; i++) {
-            try{
-                BoardPosition currentPosition = position.move(directions[i]);
-                if(currentPiece.hasOppositeColor(board.getBoardPiece(currentPosition))){
-                    legalMoves.add(new Move(position, currentPosition));
-                }
-            } catch (IndexOutOfBoundsException _){}
         }
 
+        if (position.x() + 1 < Board.SIZE) {
+            BoardPosition diagonalPiecePosition = new BoardPosition(position.x() + 1, forwardY);
+            BoardPiece diagonalPiece = board.getBoardPiece(diagonalPiecePosition);
+            if (diagonalPiece != null && diagonalPiece.isWhite() != currentPiece.isWhite()) {
+                legalMoves.add(new Move(position.copy(), diagonalPiecePosition));
+            }
+        }
         return legalMoves;
     }
 }
