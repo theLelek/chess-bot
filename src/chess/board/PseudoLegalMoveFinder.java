@@ -11,27 +11,26 @@ import java.util.List;
 
 public class PseudoLegalMoveFinder {
     public static LegalMoves getPseudoLegalMoves(Board board, boolean isWhiteToMove) {
-        List<Move> pseudoLegalMoves = new ArrayList<>();
-        List<BoardPosition> pseudoLegalPromotions = new ArrayList<>();
+        LegalMoves legalMoves = new LegalMoves();
         for (BoardPosition boardPosition : board.getPiecesIndexes()) {
             BoardPiece currentPiece = board.getBoardPieces()[boardPosition.y()][boardPosition.x()];
             if (currentPiece.isWhite() != isWhiteToMove) {
                 continue;
             }
-            // pawn
             // TODO pawn moves on last row will be removed and put into pseudolegalPromotions
+
+            // pawn
             if (currentPiece == BoardPiece.BLACK_PAWN || currentPiece == BoardPiece.WHITE_PAWN) {
-                pseudoLegalMoves.addAll(getPseudoLegalPawnMoves(board, boardPosition));
+                getPseudoLegalPawnMoves(board, boardPosition, legalMoves);
             // general
             } else {
-                pseudoLegalMoves.addAll(getPseudoLegalMoves(board, boardPosition));
+                getPseudoLegalMoves(board, boardPosition, legalMoves);
             }
         }
-        return new LegalMoves(pseudoLegalMoves, pseudoLegalPromotions);
+        return legalMoves;
     }
 
-    private static List<Move> getPseudoLegalMoves(Board board, BoardPosition position) {
-        List<Move> legalMoves = new ArrayList<>();
+    private static void getPseudoLegalMoves(Board board, BoardPosition position, LegalMoves legalMoves) {
         BoardPiece currentPiece = board.getBoardPieces()[position.y()][position.x()];
         PieceMoveRules currentPieceMoveRules = currentPiece.getMoveRules();
 
@@ -51,33 +50,31 @@ public class PseudoLegalMoveFinder {
                         continue;
                     }
                 }
-                legalMoves.add(new Move(position, currentPosition));
+                legalMoves.getLegalMoves().add(new Move(position, currentPosition));
             } while (currentPieceMoveRules.canMoveInfinitely() && !interrupted);
         }
-        return legalMoves;
     }
 
-    private static List<Move> getPseudoLegalPawnMoves(Board board, BoardPosition position) {
-        List<Move> legalMoves = new ArrayList<>();
+    private static void getPseudoLegalPawnMoves(Board board, BoardPosition position, LegalMoves legalMoves) {
         BoardPiece currentPiece = board.getBoardPiece(position);
         int direction = (currentPiece.isWhite()) ? -1 : +1;
         int startingY = (currentPiece.isWhite()) ? 6 : 1;
         int forwardY = position.y() + direction;
 
         if (forwardY < 0 || forwardY >= Board.SIZE) {
-            return legalMoves;
+            return;
         }
 
         // forward:
         if (board.getBoardPieces()[forwardY][position.x()] == null) {
-            legalMoves.add(new Move(position.copy(), new BoardPosition(position.x(), forwardY)));
+            legalMoves.getLegalMoves().add(new Move(position.copy(), new BoardPosition(position.x(), forwardY)));
         }
 
         // forward 2:
         if (position.y() == startingY
                 && board.getBoardPieces()[forwardY][position.x()] == null
                 && board.getBoardPieces()[forwardY + direction][position.x()] == null) {
-            legalMoves.add(new Move(position.copy(), new BoardPosition(position.x(), forwardY + direction)));
+            legalMoves.getLegalMoves().add(new Move(position.copy(), new BoardPosition(position.x(), forwardY + direction)));
         }
 
         // diagonal:
@@ -85,7 +82,7 @@ public class PseudoLegalMoveFinder {
             BoardPosition diagonalPiecePosition = new BoardPosition(position.x() - 1, forwardY);
             BoardPiece diagonalPiece = board.getBoardPiece(diagonalPiecePosition);
             if (diagonalPiece != null && diagonalPiece.isWhite() != currentPiece.isWhite()) {
-                legalMoves.add(new Move(position.copy(), diagonalPiecePosition));
+                legalMoves.getLegalMoves().add(new Move(position.copy(), diagonalPiecePosition));
             }
         }
 
@@ -93,9 +90,8 @@ public class PseudoLegalMoveFinder {
             BoardPosition diagonalPiecePosition = new BoardPosition(position.x() + 1, forwardY);
             BoardPiece diagonalPiece = board.getBoardPiece(diagonalPiecePosition);
             if (diagonalPiece != null && diagonalPiece.isWhite() != currentPiece.isWhite()) {
-                legalMoves.add(new Move(position.copy(), diagonalPiecePosition));
+                legalMoves.getLegalMoves().add(new Move(position.copy(), diagonalPiecePosition));
             }
         }
-        return legalMoves;
     }
 }

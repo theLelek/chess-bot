@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class LegalMoves {
@@ -7,9 +8,9 @@ public class LegalMoves {
     private List<Move> legalMoves;
     private List<BoardPosition> legalPromotions;
 
-    public LegalMoves(List<Move> legalMoves, List<BoardPosition> legalPromotions) {
-        this.legalMoves = legalMoves;
-        this.legalPromotions = legalPromotions;
+    public LegalMoves() {
+        this.legalMoves = new ArrayList<>();
+        this.legalPromotions = new ArrayList<>();
     }
 
     public List<Move> getLegalMoves() {
