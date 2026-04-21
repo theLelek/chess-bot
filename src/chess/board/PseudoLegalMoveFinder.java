@@ -30,6 +30,21 @@ public class PseudoLegalMoveFinder {
         return legalMoves;
     }
 
+    public static List<Move> getPromotionMoves(Board board, List<Move> moves, boolean color) {
+        List<Move> promotionMoves = new ArrayList<>();
+        int promotionRow = (color) ? 0 : 7;
+        for (int i = moves.size() - 1; i >= 0; i--) {
+            BoardPiece piece = board.getBoardPiece(moves.get(i).from());
+            if (piece != BoardPiece.BLACK_PAWN && piece != BoardPiece.WHITE_PAWN) {
+                continue;
+            }
+            if (moves.get(i).to().y() == promotionRow) {
+                promotionMoves.add(moves.get(i));
+                moves.remove(i);
+            }
+        }
+        return promotionMoves;
+    }
 
     private static void getPseudoLegalMoves(Board board, BoardPosition position, List<Move> legalMoves) {
         BoardPiece currentPiece = board.getBoardPieces()[position.y()][position.x()];

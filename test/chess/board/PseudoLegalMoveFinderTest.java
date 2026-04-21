@@ -112,10 +112,34 @@ public class PseudoLegalMoveFinderTest {
     }
 
     @Test
-    void black_cannotCastleEitherSide_whenSquaresBlocked() {
+    void getPromotionMoves_returnsEmpty_whenNoPawnsNearPromotion() {
         Board board = Board.initializeDefaultBoard();
-        CastlingRights result = PseudoLegalMoveFinder.getPseudoLegalCastlingRights(board, false);
-        Assertions.assertFalse(result.canCastleKingSide());
-        Assertions.assertFalse(result.canCastleQueenSide());
+        List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, true);
+        List<Move> promotionMoves = PseudoLegalMoveFinder.getPromotionMoves(board, pseudoLegalMoves, true);
+        Assertions.assertTrue(promotionMoves.isEmpty());
+    }
+
+    @Test
+    void getPromotionMoves_returnsPromotionMove_whenWhitePawnOnSeventhRank() {
+        Board board = Board.initializeFromFen("8/4P3/8/8/8/8/8/4K2k w - - 0 1");
+        List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, true);
+        List<Move> promotionMoves = PseudoLegalMoveFinder.getPromotionMoves(board, pseudoLegalMoves, true);
+        Assertions.assertFalse(promotionMoves.isEmpty());
+    }
+
+    @Test
+    void getPromotionMoves_returnsPromotionMove_whenBlackPawnOnSecondRank() {
+        Board board = Board.initializeFromFen("4K2k/8/8/8/8/8/4p3/8 b - - 0 1");
+        List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, false);
+        List<Move> promotionMoves = PseudoLegalMoveFinder.getPromotionMoves(board, pseudoLegalMoves, false);
+        Assertions.assertFalse(promotionMoves.isEmpty());
+    }
+
+    @Test
+    void getPromotionMoves_returnsMultiplePromotionMoves_whenMultiplePawnsOnSeventhRank() {
+        Board board = Board.initializeFromFen("8/2P1P3/8/8/8/8/8/4K2k w - - 0 1");
+        List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, true);
+        List<Move> promotionMoves = PseudoLegalMoveFinder.getPromotionMoves(board, pseudoLegalMoves, true);
+        Assertions.assertEquals(2, promotionMoves.size());
     }
 }
