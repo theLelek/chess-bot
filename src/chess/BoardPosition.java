@@ -50,7 +50,7 @@ public class BoardPosition {
         return new BoardPosition(x, y);
     }
 
-   public BoardPosition move(int[] direction) throws IndexOutOfBoundsException {
+    public BoardPosition move(int[] direction) throws IndexOutOfBoundsException {
         if (x + direction[0] < 0 || y + direction[1] < 0 || x + direction[0] >= Board.SIZE || y + direction[1] >= Board.SIZE) {
             throw new IndexOutOfBoundsException("Move index out of bounds");
         }
