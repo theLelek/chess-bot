@@ -102,7 +102,7 @@ public class Board {
         var isWhiteToMove = fenParts[1].equals("w");
         var castlingRightsWhite = CastlingRights.fromFen(fenParts[2], Color.WHITE);
         var castlingRightsBlack = CastlingRights.fromFen(fenParts[2], Color.BLACK);
-        var enPassantTarget = BoardPosition.getFromString(fenParts[3]);
+        var enPassantTarget = (! fenParts[3].equals("-")) ? new BoardPosition(fenParts[3]) : null;
         var halfMoveClock = Integer.parseInt(fenParts[4]);
         var fullMoveNumber = Integer.parseInt(fenParts[5]);
         Board board = new Board(boardPieces, piecesIndexes, isWhiteToMove, castlingRightsWhite, castlingRightsBlack, enPassantTarget, halfMoveClock, fullMoveNumber);
