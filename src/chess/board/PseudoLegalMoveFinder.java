@@ -1,17 +1,17 @@
 package chess.board;
 
-import chess.LegalMoves;
 import chess.Move;
 import chess.board.model.Board;
 import chess.BoardPosition;
 import chess.board.model.BoardPiece;
+import chess.board.model.CastlingRights;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class PseudoLegalMoveFinder {
-    public static LegalMoves getPseudoLegalMoves(Board board, boolean isWhiteToMove) {
-        LegalMoves legalMoves = new LegalMoves();
+    public static List<Move> getPseudoLegalMoves(Board board, boolean isWhiteToMove) {
+        List<Move> legalMoves = new ArrayList<>();
         for (BoardPosition boardPosition : board.getPiecesIndexes()) {
             BoardPiece currentPiece = board.getBoardPieces()[boardPosition.y()][boardPosition.x()];
             if (currentPiece.isWhite() != isWhiteToMove) {
@@ -30,7 +30,8 @@ public class PseudoLegalMoveFinder {
         return legalMoves;
     }
 
-    private static void getPseudoLegalMoves(Board board, BoardPosition position, LegalMoves legalMoves) {
+
+    private static void getPseudoLegalMoves(Board board, BoardPosition position, List<Move> legalMoves) {
         BoardPiece currentPiece = board.getBoardPieces()[position.y()][position.x()];
         PieceMoveRules currentPieceMoveRules = currentPiece.getMoveRules();
 
@@ -50,31 +51,31 @@ public class PseudoLegalMoveFinder {
                         continue;
                     }
                 }
-                legalMoves.getLegalMoves().add(new Move(position, currentPosition));
+                legalMoves.add(new Move(position, currentPosition));
             } while (currentPieceMoveRules.canMoveInfinitely() && !interrupted);
         }
     }
 
-    private static void getPseudoLegalPawnMoves(Board board, BoardPosition position, LegalMoves legalMoves) {
+    private static void getPseudoLegalPawnMoves(Board board, BoardPosition position, List<Move> legalMoves) {
         BoardPiece currentPiece = board.getBoardPiece(position);
-        int direction = (currentPiece.isWhite()) ? -1 : +1;
+        int direction = (currentPiece.isWhite()) ? -1 : 1;
         int startingY = (currentPiece.isWhite()) ? 6 : 1;
         int forwardY = position.y() + direction;
+        boolean isPromoting = currentPiece.isWhite() && forwardY == 0 || currentPiece.isBlack() && forwardY == Board.SIZE - 1;
 
         if (forwardY < 0 || forwardY >= Board.SIZE) {
             return;
         }
-
         // forward:
         if (board.getBoardPieces()[forwardY][position.x()] == null) {
-            legalMoves.getLegalMoves().add(new Move(position.copy(), new BoardPosition(position.x(), forwardY)));
+            legalMoves.add(new Move(position, new BoardPosition(position.x(), forwardY)));
         }
 
         // forward 2:
         if (position.y() == startingY
                 && board.getBoardPieces()[forwardY][position.x()] == null
                 && board.getBoardPieces()[forwardY + direction][position.x()] == null) {
-            legalMoves.getLegalMoves().add(new Move(position.copy(), new BoardPosition(position.x(), forwardY + direction)));
+            legalMoves.add(new Move(position, new BoardPosition(position.x(), forwardY + direction)));
         }
 
         // diagonal:
@@ -82,7 +83,7 @@ public class PseudoLegalMoveFinder {
             BoardPosition diagonalPiecePosition = new BoardPosition(position.x() - 1, forwardY);
             BoardPiece diagonalPiece = board.getBoardPiece(diagonalPiecePosition);
             if (diagonalPiece != null && diagonalPiece.isWhite() != currentPiece.isWhite()) {
-                legalMoves.getLegalMoves().add(new Move(position.copy(), diagonalPiecePosition));
+                legalMoves.add(new Move(position, diagonalPiecePosition));
             }
         }
 
@@ -90,8 +91,24 @@ public class PseudoLegalMoveFinder {
             BoardPosition diagonalPiecePosition = new BoardPosition(position.x() + 1, forwardY);
             BoardPiece diagonalPiece = board.getBoardPiece(diagonalPiecePosition);
             if (diagonalPiece != null && diagonalPiece.isWhite() != currentPiece.isWhite()) {
-                legalMoves.getLegalMoves().add(new Move(position.copy(), diagonalPiecePosition));
+                legalMoves.add(new Move(position, diagonalPiecePosition));
             }
         }
+    }
+
+    public static CastlingRights getPseudoLegalCastlingRights(Board board, boolean isWhiteToMove) {
+        CastlingRights rights = isWhiteToMove ? board.getCastlingRightsWhite() : board.getCastlingRightsBlack();
+        String rank = isWhiteToMove ? "1" : "8";
+
+        boolean canCastleKingSide = rights.canCastleKingSide()
+                && board.getBoardPiece(new BoardPosition("f" + rank)) == null
+                && board.getBoardPiece(new BoardPosition("g" + rank)) == null;
+
+        boolean canCastleQueenSide = rights.canCastleQueenSide()
+                && board.getBoardPiece(new BoardPosition("d" + rank)) == null
+                && board.getBoardPiece(new BoardPosition("c" + rank)) == null
+                && board.getBoardPiece(new BoardPosition("b" + rank)) == null;
+
+        return new CastlingRights(canCastleKingSide, canCastleQueenSide);
     }
 }
