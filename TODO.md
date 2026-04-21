@@ -16,3 +16,9 @@ maybe use the same board instance in every move generator node (faster)
 copy method in classes or constructor to copy instances
 
 calculate legal moves in mimimax
+
+right now CastlingRights class is used 2 times // todo change
+- in board to know if pieces have moved
+- for legal move finding to know if moves can be made
+
+remove Color enum
