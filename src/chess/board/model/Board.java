@@ -1,9 +1,6 @@
 package chess.board.model;
 
 import chess.BoardPosition;
-import chess.Color;
-import chess.Move;
-import chess.board.PseudoLegalMoveFinder;
 
 import java.util.*;
 
@@ -100,8 +97,8 @@ public class Board {
         var boardPieces = initializeBoardPiecesFromFen(fenParts[0]);
         var piecesIndexes = initializePiecesIndexes(boardPieces);
         var isWhiteToMove = fenParts[1].equals("w");
-        var castlingRightsWhite = CastlingRights.fromFen(fenParts[2], Color.WHITE);
-        var castlingRightsBlack = CastlingRights.fromFen(fenParts[2], Color.BLACK);
+        var castlingRightsWhite = CastlingRights.fromFen(fenParts[2], true);
+        var castlingRightsBlack = CastlingRights.fromFen(fenParts[2], false);
         var enPassantTarget = (! fenParts[3].equals("-")) ? new BoardPosition(fenParts[3]) : null;
         var halfMoveClock = Integer.parseInt(fenParts[4]);
         var fullMoveNumber = Integer.parseInt(fenParts[5]);
