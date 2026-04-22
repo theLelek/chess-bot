@@ -20,5 +20,3 @@ calculate legal moves in mimimax
 right now CastlingRights class is used 2 times // todo change
 - in board to know if pieces have moved
 - for legal move finding to know if moves can be made
-
-remove Color enum

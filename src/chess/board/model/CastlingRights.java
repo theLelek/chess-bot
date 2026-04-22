@@ -1,7 +1,5 @@
 package chess.board.model;
 
-import chess.Color;
-
 import java.util.Objects;
 
 public class CastlingRights {
@@ -19,10 +17,10 @@ public class CastlingRights {
         this.canCastleQueenSide = castlingRights.canCastleQueenSide;
     }
 
-    public static CastlingRights fromFen(String fen, Color color) {
+    public static CastlingRights fromFen(String fen, boolean isWhite) {
         boolean kingSide;
         boolean queenSide;
-        if (color == Color.WHITE) {
+        if (isWhite) {
             kingSide = fen.contains("K");
             queenSide = fen.contains("Q");
         } else {
