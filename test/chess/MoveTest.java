@@ -1,7 +1,6 @@
 package chess;
 
-import chess.board.model.Board;
-import org.junit.jupiter.api.BeforeEach;
+import chess.Move.Move;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

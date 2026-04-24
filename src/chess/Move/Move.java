@@ -1,8 +1,17 @@
-package chess;
+package chess.Move;
+
+import chess.BoardPosition;
 
 import java.util.Objects;
 
-public record Move(BoardPosition from, BoardPosition to) {
+public class Move {
+    private final BoardPosition from;
+    private final BoardPosition to;
+
+    public Move(BoardPosition from, BoardPosition to) {
+        this.from = from;
+        this.to = to;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -20,6 +29,15 @@ public record Move(BoardPosition from, BoardPosition to) {
     public String toString() {
         return "from: " + from.toString() + " to: " + to.toString();
     }
+
+    public BoardPosition from() {
+        return from;
+    }
+
+    public BoardPosition to() {
+        return to;
+    }
+
 
     public static class Builder {
 
@@ -50,7 +68,7 @@ public record Move(BoardPosition from, BoardPosition to) {
 
         public Move build() {
             return new Move(new BoardPosition.Builder().x(fromX).y(fromY).build(),
-                            new BoardPosition.Builder().x(toX).y(toY).build());
+                    new BoardPosition.Builder().x(toX).y(toY).build());
         }
     }
 }

@@ -1,5 +1,3 @@
-import chess.Move;
-
 import java.util.*;
 
 public class Test {

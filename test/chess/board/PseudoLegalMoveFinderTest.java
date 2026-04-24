@@ -1,7 +1,7 @@
 package chess.board;
 
 import chess.BoardPosition;
-import chess.Move;
+import chess.Move.Move;
 import chess.board.model.Board;
 import chess.board.model.CastlingRights;
 import org.junit.jupiter.api.*;

@@ -1,7 +1,7 @@
 package chess.move_generation;
 
 import chess.LegalMoves;
-import chess.Move;
+import chess.Move.Move;
 import chess.board.model.Board;
 
 public class MoveGenerator {
