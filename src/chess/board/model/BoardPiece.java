@@ -9,6 +9,7 @@ public enum BoardPiece {
     WHITE_QUEEN('Q', PieceMoveRules.QUEEN),
     WHITE_KING('K',  PieceMoveRules.KING),
     WHITE_PAWN('P', PieceMoveRules.WHITE_PAWN),
+
     BLACK_ROOK('r', PieceMoveRules.ROOK),
     BLACK_KNIGHT('n', PieceMoveRules.KNIGHT),
     BLACK_BISHOP('b', PieceMoveRules.BISHOP),
@@ -19,7 +20,7 @@ public enum BoardPiece {
     private final char fortsythEdwardsNotation;
     private final PieceMoveRules moveRules;
 
-    BoardPiece(char fen,  PieceMoveRules moveRules) {
+    BoardPiece(char fen, PieceMoveRules moveRules) {
         this.fortsythEdwardsNotation = fen;
         this.moveRules = moveRules;
     }
@@ -62,5 +63,29 @@ public enum BoardPiece {
             return false;
         }
         return this.isBlack() == currentPiece.isWhite();
+    }
+
+    public boolean isRook() {
+        return fortsythEdwardsNotation == 'r' || fortsythEdwardsNotation == 'R';
+    }
+
+    public boolean isKnight() {
+        return fortsythEdwardsNotation == 'n' || fortsythEdwardsNotation == 'N';
+    }
+
+    public boolean isBishop() {
+        return fortsythEdwardsNotation == 'b' || fortsythEdwardsNotation == 'B';
+    }
+
+    public boolean isQueen() {
+        return fortsythEdwardsNotation == 'q' || fortsythEdwardsNotation == 'Q';
+    }
+
+    public boolean isKing() {
+        return fortsythEdwardsNotation == 'k' || fortsythEdwardsNotation == 'K';
+    }
+
+    public boolean isPawn() {
+        return fortsythEdwardsNotation == 'p' || fortsythEdwardsNotation == 'P';
     }
 }
