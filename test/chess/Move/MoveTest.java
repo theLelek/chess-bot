@@ -1,6 +1,6 @@
-package chess;
+package chess.Move;
 
-import chess.Move.Move;
+import chess.BoardPosition;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
