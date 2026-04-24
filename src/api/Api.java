@@ -1,7 +1,6 @@
 package api;
 
-import chess.BoardPosition;
-import chess.Move;
+import chess.Move.Move;
 
 public class Api {
 

@@ -1,8 +1,7 @@
 package api;
 
 import chess.BoardPosition;
-import chess.Move;
-import org.junit.jupiter.api.Disabled;
+import chess.Move.Move;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

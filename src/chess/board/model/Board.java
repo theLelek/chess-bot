@@ -1,6 +1,7 @@
 package chess.board.model;
 
 import chess.BoardPosition;
+import chess.Move.Move;
 
 import java.util.*;
 
@@ -28,21 +29,24 @@ public class Board {
         this.fullmoveNumber = fullmoveNumber;
     }
 
-//    public Board move(Move move) {
-//        BoardPiece pieceToMove = boardPieces[move.from().y()][move.from().x()];
-//        BoardPiece pieceToCapture = boardPieces[move.to().y()][move.to().x()];
-//
-//        var boardPiecesUpdated = updateBoardPieces(move);
-//        var piecesIndexesUpdated = updatePiecesIndexes(move);
-//        var isWhiteToMoveCopy = ! isWhiteToMove;
-//        var castlingRightsWhiteCopy = updateCastlingRightsForRookMove(castlingRightsWhite, move, Color.WHITE);
-//        var castlingRightsBlackCopy = updateCastlingRightsForRookMove(castlingRightsBlack, move, Color.BLACK);
-//        var possibleEnPassantsCopy = getPossibleEnPassant().copy();
-//        var halfMoveClockCopy = (pieceToMove == BoardPiece.WHITE_PAWN || pieceToMove == BoardPiece.BLACK_PAWN || pieceToCapture != null) ? 0 : halfmoveClock + 1;
-//        var fullMoveNumberCopy = (pieceToMove.isBlack()) ? fullmoveNumber + 1 : fullmoveNumber;
-//
-//        return new Board(boardPiecesUpdated, piecesIndexesUpdated, isWhiteToMoveCopy, castlingRightsWhiteCopy, castlingRightsBlackCopy, possibleEnPassantsCopy, halfMoveClockCopy, fullMoveNumberCopy);
-//    }
+    public void move(Move move) {
+        BoardPiece pieceToMove = boardPieces[move.from().y()][move.from().x()];
+        BoardPiece pieceToCapture = boardPieces[move.to().y()][move.to().x()];
+
+        var boardPiecesUpdated = updateBoardPieces(move);
+        var piecesIndexesUpdated = updatePiecesIndexes(move);
+        var isWhiteToMoveCopy = ! isWhiteToMove;
+        var castlingRightsWhiteCopy = updateCastlingRightsForRookMove(castlingRightsWhite, move, Color.WHITE);
+        var castlingRightsBlackCopy = updateCastlingRightsForRookMove(castlingRightsBlack, move, Color.BLACK);
+        var possibleEnPassantsCopy = getPossibleEnPassant().copy();
+        var halfMoveClockCopy = (pieceToMove == BoardPiece.WHITE_PAWN || pieceToMove == BoardPiece.BLACK_PAWN || pieceToCapture != null) ? 0 : halfmoveClock + 1;
+        var fullMoveNumberCopy = (pieceToMove.isBlack()) ? fullmoveNumber + 1 : fullmoveNumber;
+
+    }
+
+    public void reverseMove(Move move) {
+
+    }
 //
 //    private BoardPiece[][] updateBoardPieces(Move move) {
 //        BoardPiece[][] boardPiecesUpdated = new BoardPiece[Board.SIZE][Board.SIZE];
