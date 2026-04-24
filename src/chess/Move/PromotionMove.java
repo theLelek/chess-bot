@@ -10,7 +10,8 @@ public class PromotionMove extends Move{
         this.promotionPiece = promotionPiece;
     }
 
-
-
-
+    @Override
+    public String toString() {
+        return super.toString() + " Promotion to: " + promotionPiece;
+    }
 }
