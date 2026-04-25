@@ -2,6 +2,7 @@ package chess.board.model;
 
 import chess.BoardPosition;
 import chess.Move.Move;
+import chess.Move.PromotionMove;
 
 import java.util.*;
 
@@ -11,10 +12,10 @@ public class Board {
 
     private final BoardPiece[][] boardPieces;
     private final List<BoardPosition> piecesIndexes; // TODO O(n) for removing elements find faster way
-    private final boolean isWhiteToMove;
+    private boolean isWhiteToMove;
     private final CastlingRights castlingRightsWhite;
     private final CastlingRights castlingRightsBlack;
-    private final BoardPosition possibleEnPassant; // TODO is currently stored 2 times
+    private BoardPosition possibleEnPassant; // TODO is currently stored 2 times
     private int halfmoveClock;
     private int fullmoveNumber;
 
@@ -29,68 +30,69 @@ public class Board {
         this.fullmoveNumber = fullmoveNumber;
     }
 
-//    public void move(Move move) {
-//        BoardPiece pieceToMove = boardPieces[move.from().y()][move.from().x()];
-//        BoardPiece pieceToCapture = boardPieces[move.to().y()][move.to().x()];
-//
-//        var boardPiecesUpdated = updateBoardPieces(move);
-//        var piecesIndexesUpdated = updatePiecesIndexes(move);
-//        var isWhiteToMoveCopy = ! isWhiteToMove;
-//        var castlingRightsWhiteCopy = updateCastlingRightsForRookMove(castlingRightsWhite, move, Color.WHITE);
-//        var castlingRightsBlackCopy = updateCastlingRightsForRookMove(castlingRightsBlack, move, Color.BLACK);
-//        var possibleEnPassantsCopy = getPossibleEnPassant().copy();
-//        var halfMoveClockCopy = (pieceToMove == BoardPiece.WHITE_PAWN || pieceToMove == BoardPiece.BLACK_PAWN || pieceToCapture != null) ? 0 : halfmoveClock + 1;
-//        var fullMoveNumberCopy = (pieceToMove.isBlack()) ? fullmoveNumber + 1 : fullmoveNumber;
-//
-//    }
-//
-//    public void reverseMove(Move move) {
-//
-//    }
-//
-//    private BoardPiece[][] updateBoardPieces(Move move) {
-//        BoardPiece[][] boardPiecesUpdated = new BoardPiece[Board.SIZE][Board.SIZE];
-//        for (int i = 0; i < Board.SIZE; i++) {
-//            boardPiecesUpdated[i] = this.boardPieces[i].clone();
-//        }
-//        BoardPiece foo = boardPiecesUpdated[move.from().y()][move.from().x()];
-//        boardPiecesUpdated[move.from().y()][move.from().x()] = null;
-//        boardPiecesUpdated[move.to().y()][move.to().x()] = foo;
-//        return boardPiecesUpdated;
-//    }
-//
-//    private List<BoardPosition> updatePiecesIndexes(Move move) {
-//        List<BoardPosition> piecesIndexesUpdated = new ArrayList<>(piecesIndexes);
-//        piecesIndexesUpdated.remove(new BoardPosition(move.from().x(), move.from().y()));
-//        piecesIndexesUpdated.add(new BoardPosition(move.to().x(), move.to().y()));
-//        return piecesIndexesUpdated;
-//    }
-//
-//    private CastlingRights updateCastlingRightsForRookMove(CastlingRights rights, Move move, Color color) {
-//        int xFrom = move.from().x();
-//        int yFrom = move.from().y();
-//
-//        if (color == Color.WHITE) {
-//            // bottom right
-//            if (xFrom == Board.SIZE - 1 && yFrom == Board.SIZE - 1) {
-//                return new CastlingRights(false, rights.canCastleQueenSide());
-//            }
-//            // bottom left
-//            if (xFrom == 0 && yFrom == Board.SIZE - 1) {
-//                return new CastlingRights(rights.canCastleKingSide(), false);
-//            }
-//        } else {
-//            // top right
-//            if (xFrom == Board.SIZE - 1 && yFrom == 0) {
-//                return new CastlingRights(false, rights.canCastleQueenSide());
-//            }
-//            // top left
-//            if (xFrom == 0 && yFrom == 0) {
-//                return new CastlingRights(rights.canCastleKingSide(), false);
-//            }
-//        }
-//        return rights;
-//    }
+    public void move(Move move) {
+        BoardPiece pieceToMove = getBoardPiece(move.from());
+        BoardPiece pieceToCapture = getBoardPiece(move.to());
+        int startRow = (isWhiteToMove) ? Board.SIZE - 1 : 0;
+
+        updateCastlingRights(move);
+        halfmoveClock = (! pieceToMove.isPawn() && pieceToCapture == null) ? halfmoveClock + 1 : 0;
+        if (isBlackToMove()) fullmoveNumber++;
+        updateBoardPieces(move);
+        updatePiecesIndexes(move);
+        possibleEnPassant = null;
+        updatePossibleEnPassant(move);
+        isWhiteToMove = ! isWhiteToMove;
+    }
+
+    private void updateCastlingRights(Move move) {
+        BoardPiece pieceToMove = getBoardPiece(move.from());
+        int startRow = (isWhiteToMove) ? Board.SIZE - 1 : 0;
+        int endRow = (isWhiteToMove) ? 0 : Board.SIZE - 1;
+        CastlingRights castlingRights = (isWhiteToMove) ? castlingRightsWhite : castlingRightsBlack;
+        CastlingRights castlingRightsOpponent = (isWhiteToMove) ? castlingRightsBlack : castlingRightsWhite;
+
+        if (pieceToMove.isKing()) {
+            castlingRights.setCanCastleKingSide(false);
+            castlingRights.setCanCastleQueenSide(false);
+        } else if (move.from().equals(new BoardPosition(0, startRow))) {
+            castlingRights.setCanCastleQueenSide(false);
+        } else if (move.from().equals(new BoardPosition(Board.SIZE - 1, startRow))) {
+            castlingRights.setCanCastleKingSide(false);
+        }
+
+        if (move.to().equals(new BoardPosition(0, endRow))) {
+            castlingRightsOpponent.setCanCastleQueenSide(false);
+        } else if (move.to().equals(new BoardPosition(Board.SIZE - 1, endRow))) {
+            castlingRightsOpponent.setCanCastleKingSide(false);
+        }
+    }
+
+    private void updatePossibleEnPassant(Move move) {
+        BoardPiece pieceToMove = getBoardPiece(move.to());
+        int pawnStartingRow = (isWhiteToMove) ? Board.SIZE - 2 : 1;
+        int pawnDoublePushRow = (isWhiteToMove) ? Board.SIZE - 4 : 3;
+        possibleEnPassant = (pieceToMove.isPawn() && move.from().y() == pawnStartingRow && move.to().y() == pawnDoublePushRow) ? move.to() : null;
+    }
+
+    private void updateBoardPieces(Move move) {
+        BoardPiece pieceToMove = boardPieces[move.from().y()][move.from().x()];
+        BoardPiece pieceToCapture = boardPieces[move.to().y()][move.to().x()];
+        boardPieces[move.from().y()][move.from().x()] = null;
+        BoardPiece pieceToPut = pieceToMove;
+
+        if (move instanceof PromotionMove) {
+            pieceToPut = ((PromotionMove) move).getPromotionPiece();
+        } else if (pieceToMove.isPawn() && pieceToCapture == null && move.from().x() != move.to().x()) {
+            boardPieces[possibleEnPassant.y()][possibleEnPassant.x()] = null;
+        }
+        boardPieces[move.to().y()][move.to().x()] = pieceToPut;
+    }
+
+    private void updatePiecesIndexes(Move move) {
+        piecesIndexes.remove(new BoardPosition(move.from().x(), move.from().y()));
+        piecesIndexes.add(new BoardPosition(move.to().x(), move.to().y()));
+    }
 
     public static Board initializeDefaultBoard() {
         return initializeFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
@@ -107,8 +109,6 @@ public class Board {
         var halfMoveClock = Integer.parseInt(fenParts[4]);
         var fullMoveNumber = Integer.parseInt(fenParts[5]);
         Board board = new Board(boardPieces, piecesIndexes, isWhiteToMove, castlingRightsWhite, castlingRightsBlack, enPassantTarget, halfMoveClock, fullMoveNumber);
-
-
         return board;
     }
 
