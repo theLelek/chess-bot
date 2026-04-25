@@ -20,3 +20,5 @@ calculate legal moves in mimimax
 right now CastlingRights class is used 2 times // todo change
 - in board to know if pieces have moved
 - for legal move finding to know if moves can be made
+
+refactor BoardPiece (also maybe add starting row for colors)

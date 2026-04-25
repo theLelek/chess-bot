@@ -5,6 +5,7 @@ import chess.BoardPosition;
 import java.util.Objects;
 
 public class Move {
+
     private final BoardPosition from;
     private final BoardPosition to;
 
