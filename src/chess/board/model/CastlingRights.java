@@ -4,8 +4,8 @@ import java.util.Objects;
 
 public class CastlingRights {
 
-    private final boolean canCastleKingSide;
-    private final boolean canCastleQueenSide;
+    private boolean canCastleKingSide;
+    private boolean canCastleQueenSide;
 
     public CastlingRights(boolean canCastleKingSide, boolean canCastleQueenSide) {
         this.canCastleKingSide = canCastleKingSide;
@@ -36,6 +36,14 @@ public class CastlingRights {
 
     public boolean canCastleQueenSide() {
         return canCastleQueenSide;
+    }
+
+    public void setCanCastleKingSide(boolean canCastleKingSide) {
+        this.canCastleKingSide = canCastleKingSide;
+    }
+
+    public void setCanCastleQueenSide(boolean canCastleQueenSide) {
+        this.canCastleQueenSide = canCastleQueenSide;
     }
 
     @Override
