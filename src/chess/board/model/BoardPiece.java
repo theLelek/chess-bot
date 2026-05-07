@@ -25,6 +25,19 @@ public enum BoardPiece {
         this.moveRules = moveRules;
     }
 
+    public int getStartingRow() {
+        return (isWhite()) ? Board.SIZE - 1 : 0;
+    }
+
+    public static BoardPiece getByFen(char fen) {
+        for (BoardPiece piece : BoardPiece.values()) {
+            if (piece.fortsythEdwardsNotation == fen) {
+                return piece;
+            }
+        }
+        return null;
+    }
+
     public boolean isWhite() {
         String pieceName = this.toString();
         return pieceName.startsWith("WHITE");
@@ -38,22 +51,13 @@ public enum BoardPiece {
         return fortsythEdwardsNotation;
     }
 
-    public static BoardPiece getByFen(char fen) {
-        for (BoardPiece piece : BoardPiece.values()) {
-            if (piece.fortsythEdwardsNotation == fen) {
-                return piece;
-            }
-        }
-        return null;
-    }
-
     public PieceMoveRules getMoveRules() {
         return moveRules;
     }
 
     public boolean hasSameColor(BoardPiece currentPiece) {
         if(currentPiece == null) {
-            return false;
+            throw new IllegalArgumentException();
         }
         return this.isWhite() == currentPiece.isWhite();
     }
