@@ -22,3 +22,5 @@ right now CastlingRights class is used 2 times // todo change
 - for legal move finding to know if moves can be made
 
 refactor BoardPiece (also maybe add starting row for colors)
+
+write unmove function in Board Class
