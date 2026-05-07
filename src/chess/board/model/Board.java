@@ -1,6 +1,7 @@
 package chess.board.model;
 
 import chess.BoardPosition;
+import chess.Move.EnPassentMove;
 import chess.Move.Move;
 import chess.Move.PromotionMove;
 
@@ -33,7 +34,6 @@ public class Board {
     public void move(Move move) {
         BoardPiece pieceToMove = getBoardPiece(move.from());
         BoardPiece pieceToCapture = getBoardPiece(move.to());
-        int startRow = (isWhiteToMove) ? Board.SIZE - 1 : 0;
 
         updateCastlingRights(move);
         halfmoveClock = (! pieceToMove.isPawn() && pieceToCapture == null) ? halfmoveClock + 1 : 0;
@@ -47,23 +47,25 @@ public class Board {
 
     private void updateCastlingRights(Move move) {
         BoardPiece pieceToMove = getBoardPiece(move.from());
-        int startRow = (isWhiteToMove) ? Board.SIZE - 1 : 0;
-        int endRow = (isWhiteToMove) ? 0 : Board.SIZE - 1;
+        int homeRank = BoardPiece.getHomeRank(isWhiteToMove);
+        int backRank = BoardPiece.getBackRank(isWhiteToMove);
         CastlingRights castlingRights = (isWhiteToMove) ? castlingRightsWhite : castlingRightsBlack;
         CastlingRights castlingRightsOpponent = (isWhiteToMove) ? castlingRightsBlack : castlingRightsWhite;
 
         if (pieceToMove.isKing()) {
             castlingRights.setCanCastleKingSide(false);
             castlingRights.setCanCastleQueenSide(false);
-        } else if (move.from().equals(new BoardPosition(0, startRow))) {
+        }
+        if (move.from().equals(new BoardPosition(0, homeRank))) {
             castlingRights.setCanCastleQueenSide(false);
-        } else if (move.from().equals(new BoardPosition(Board.SIZE - 1, startRow))) {
+        }
+        if (move.from().equals(new BoardPosition(Board.SIZE - 1, homeRank))) {
             castlingRights.setCanCastleKingSide(false);
         }
-
-        if (move.to().equals(new BoardPosition(0, endRow))) {
+        if (move.to().equals(new BoardPosition(0, backRank))) {
             castlingRightsOpponent.setCanCastleQueenSide(false);
-        } else if (move.to().equals(new BoardPosition(Board.SIZE - 1, endRow))) {
+        }
+        if (move.to().equals(new BoardPosition(Board.SIZE - 1, backRank))) {
             castlingRightsOpponent.setCanCastleKingSide(false);
         }
     }
@@ -83,7 +85,7 @@ public class Board {
 
         if (move instanceof PromotionMove) {
             pieceToPut = ((PromotionMove) move).getPromotionPiece();
-        } else if (pieceToMove.isPawn() && pieceToCapture == null && move.from().x() != move.to().x()) {
+        } else if (move instanceof EnPassentMove) {
             boardPieces[possibleEnPassant.y()][possibleEnPassant.x()] = null;
         }
         boardPieces[move.to().y()][move.to().x()] = pieceToPut;

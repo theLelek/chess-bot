@@ -25,6 +25,14 @@ public enum BoardPiece {
         this.moveRules = moveRules;
     }
 
+    public char getFortsythEdwardsNotation() {
+        return fortsythEdwardsNotation;
+    }
+
+    public PieceMoveRules getMoveRules() {
+        return moveRules;
+    }
+
     public boolean isWhite() {
         String pieceName = this.toString();
         return pieceName.startsWith("WHITE");
@@ -32,14 +40,6 @@ public enum BoardPiece {
 
     public boolean isBlack() {
         return !isWhite();
-    }
-
-    public char getFortsythEdwardsNotation() {
-        return fortsythEdwardsNotation;
-    }
-
-    public PieceMoveRules getMoveRules() {
-        return moveRules;
     }
 
     public boolean hasSameColor(BoardPiece currentPiece) {
@@ -80,12 +80,20 @@ public enum BoardPiece {
         return fortsythEdwardsNotation == 'p' || fortsythEdwardsNotation == 'P';
     }
 
-    public int getStartingRow() {
+    public int getHomeRank() {
         return (isWhite()) ? Board.SIZE - 1 : 0;
     }
 
-    public static int getStartingRow(boolean isWhiteToMove) {
+    public static int getHomeRank(boolean isWhiteToMove) {
         return (isWhiteToMove) ? Board.SIZE - 1 : 0;
+    }
+
+    public int getBackRank() {
+        return (isWhite()) ? 0: Board.SIZE - 1;
+    }
+
+    public static int getBackRank(boolean isWhiteToMove) {
+        return (isWhiteToMove) ? 0 : Board.SIZE - 1;
     }
 
     public static BoardPiece getByFen(char fen) {
