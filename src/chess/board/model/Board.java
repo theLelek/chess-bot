@@ -1,6 +1,7 @@
 package chess.board.model;
 
 import chess.BoardPosition;
+import chess.Move.CastlingMove;
 import chess.Move.EnPassentMove;
 import chess.Move.Move;
 import chess.Move.PromotionMove;
@@ -12,7 +13,7 @@ public class Board {
     public static final int SIZE = 8;
 
     private final BoardPiece[][] boardPieces;
-    private final List<BoardPosition> piecesIndexes; // TODO O(n) for removing elements find faster way
+    private final Set<BoardPosition> piecesIndexes; // TODO O(n) for removing elements find faster way
     private boolean isWhiteToMove;
     private final CastlingRights castlingRightsWhite;
     private final CastlingRights castlingRightsBlack;
@@ -20,7 +21,7 @@ public class Board {
     private int halfmoveClock;
     private int fullmoveNumber;
 
-    public Board(BoardPiece[][] boardPieces, List<BoardPosition> piecesIndexes, boolean isWhiteToMove, CastlingRights castlingRightsWhite, CastlingRights castlingRightsBlack, BoardPosition possibleEnPassant, int halfmoveClock, int fullmoveNumber) {
+    public Board(BoardPiece[][] boardPieces, Set<BoardPosition> piecesIndexes, boolean isWhiteToMove, CastlingRights castlingRightsWhite, CastlingRights castlingRightsBlack, BoardPosition possibleEnPassant, int halfmoveClock, int fullmoveNumber) {
         this.boardPieces = boardPieces;
         this.piecesIndexes = piecesIndexes;
         this.isWhiteToMove = isWhiteToMove;
@@ -36,12 +37,9 @@ public class Board {
         BoardPiece pieceToCapture = getBoardPiece(move.to());
 
         updateCastlingRights(move);
-        halfmoveClock = (! pieceToMove.isPawn() && pieceToCapture == null) ? halfmoveClock + 1 : 0;
+        halfmoveClock = (pieceToMove.isPawn() || pieceToCapture != null) ? 0 : halfmoveClock + 1;
         if (isBlackToMove()) fullmoveNumber++;
-        updateBoardPieces(move);
-        updatePiecesIndexes(move);
-        possibleEnPassant = null;
-        updatePossibleEnPassant(move);
+        updatePieces(move);
         isWhiteToMove = ! isWhiteToMove;
     }
 
@@ -70,30 +68,38 @@ public class Board {
         }
     }
 
-    private void updatePossibleEnPassant(Move move) {
-        BoardPiece pieceToMove = getBoardPiece(move.to());
-        int pawnStartingRow = (isWhiteToMove) ? Board.SIZE - 2 : 1;
-        int pawnDoublePushRow = (isWhiteToMove) ? Board.SIZE - 4 : 3;
-        possibleEnPassant = (pieceToMove.isPawn() && move.from().y() == pawnStartingRow && move.to().y() == pawnDoublePushRow) ? move.to() : null;
-    }
-
-    private void updateBoardPieces(Move move) {
+    private void updatePieces(Move move) {
         BoardPiece pieceToMove = boardPieces[move.from().y()][move.from().x()];
         BoardPiece pieceToCapture = boardPieces[move.to().y()][move.to().x()];
         boardPieces[move.from().y()][move.from().x()] = null;
-        BoardPiece pieceToPut = pieceToMove;
-
-        if (move instanceof PromotionMove) {
-            pieceToPut = ((PromotionMove) move).getPromotionPiece();
-        } else if (move instanceof EnPassentMove) {
-            boardPieces[possibleEnPassant.y()][possibleEnPassant.x()] = null;
+        boardPieces[move.to().y()][move.to().x()] = pieceToMove;
+        piecesIndexes.remove(move.from());
+        piecesIndexes.add(move.to());
+        switch (move) {
+            case PromotionMove m:
+                boardPieces[move.to().y()][move.to().x()] = m.getPromotionPiece();
+                break;
+            case EnPassentMove _:
+                boardPieces[possibleEnPassant.y()][possibleEnPassant.x()] = null;
+                piecesIndexes.remove(new BoardPosition(possibleEnPassant.x(), possibleEnPassant.y()));
+                break;
+            case CastlingMove m:
+                if (m.to().x() == Board.SIZE - 2) { // king side castling
+                    boardPieces[move.from().y()][Board.SIZE - 3] = boardPieces[move.from().y()][Board.SIZE - 1];
+                    boardPieces[move.from().y()][Board.SIZE - 1] = null;
+                    piecesIndexes.remove(new BoardPosition(Board.SIZE - 1, move.from().y()));
+                    piecesIndexes.add(new BoardPosition(Board.SIZE - 3, move.from().y()));
+                } else { // queen side castling
+                    boardPieces[move.from().y()][3] = boardPieces[move.from().y()][0];
+                    boardPieces[move.from().y()][0] = null;
+                    piecesIndexes.remove(new BoardPosition(0, move.from().y()));
+                    piecesIndexes.add(new BoardPosition(3, move.from().y()));
+                }
+                break;
+            default:
+                break;
         }
-        boardPieces[move.to().y()][move.to().x()] = pieceToPut;
-    }
-
-    private void updatePiecesIndexes(Move move) {
-        piecesIndexes.remove(new BoardPosition(move.from().x(), move.from().y()));
-        piecesIndexes.add(new BoardPosition(move.to().x(), move.to().y()));
+        possibleEnPassant = (pieceToMove.isPawn() && Math.abs(move.from().y() - move.to().y()) == 2) ? move.to() : null;
     }
 
     public static Board initializeDefaultBoard() {
@@ -132,8 +138,8 @@ public class Board {
         return boardPieces;
     }
 
-    private static List<BoardPosition> initializePiecesIndexes(BoardPiece[][] boardPieces) {
-        List<BoardPosition> piecesIndexes = new ArrayList<>();
+    private static Set<BoardPosition> initializePiecesIndexes(BoardPiece[][] boardPieces) {
+        Set<BoardPosition> piecesIndexes = new HashSet<>();
         for (int i = 0; i < boardPieces.length; i++) {
             for (int j = 0; j < boardPieces[i].length; j++) {
                 if (boardPieces[i][j] != null) {
@@ -145,6 +151,23 @@ public class Board {
             }
         }
         return piecesIndexes;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (int y = 0; y < boardPieces.length; y++) {
+            for (int x = 0; x < boardPieces[y].length; x++) {
+                BoardPiece piece = boardPieces[y][x];
+                if (piece == null) {
+                    sb.append(". ");
+                } else {
+                    sb.append(piece.getFen()).append(" ");
+                }
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
     }
 
     public BoardPiece[][] getBoardPieces() {
@@ -187,7 +210,7 @@ public class Board {
         return possibleEnPassant;
     }
 
-    public List<BoardPosition> getPiecesIndexes() {
+    public Set<BoardPosition> getPiecesIndexes() {
         return piecesIndexes;
     }
 

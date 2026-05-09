@@ -26,3 +26,5 @@ refactor BoardPiece (also maybe add starting row for colors)
 write unmove function in Board Class
         
 using a color enum would make things A LOT SIMPLER especially for move function in board (home rank, back rank, ... could all be put into color enum)
+
+maybe replace Move class with an interface (especially CastlingMove class is annoying with inheritance)

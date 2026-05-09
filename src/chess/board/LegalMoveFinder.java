@@ -18,7 +18,7 @@ public class LegalMoveFinder {
             if(isMovePossible(isWhiteToMove, board)){
                 legalMoves.add(move);
             }
-            board.unmove(move);
+//            board.unmove(move);
         }
         return legalMoves;
     }
