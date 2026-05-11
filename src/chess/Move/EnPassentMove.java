@@ -10,4 +10,8 @@ public class EnPassentMove extends Move {
     public EnPassentMove(int fromX, int fromY, int toX, int toY) {
         super(new BoardPosition(fromX, fromY), new BoardPosition(toX, toY));
     }
+
+    public EnPassentMove(String from, String to) {
+        super(new BoardPosition(from), new BoardPosition(to));
+    }
 }
