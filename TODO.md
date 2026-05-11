@@ -17,9 +17,8 @@ copy method in classes or constructor to copy instances
 
 calculate legal moves in mimimax
 
-right now CastlingRights class is used 2 times // todo change
-- in board to know if pieces have moved
-- for legal move finding to know if moves can be made
+
+replace board piece getting (getBoardPieces) with getBoardPiece
 
 refactor BoardPiece (also maybe add starting row for colors)
 
@@ -28,3 +27,8 @@ write unmove function in Board Class
 using a color enum would make things A LOT SIMPLER especially for move function in board (home rank, back rank, ... could all be put into color enum)
 
 maybe replace Move class with an interface (especially CastlingMove class is annoying with inheritance)
+
+implement uci protocoll
+
+
+*refactor pseudoLegalMoveFinder*

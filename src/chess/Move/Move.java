@@ -14,6 +14,16 @@ public class Move {
         this.to = to;
     }
 
+    public Move(int fromX, int fromY, int toX, int toY) {
+        this.from = new BoardPosition(fromX, fromY);
+        this.to = new BoardPosition(toX, toY);
+    }
+
+    public Move(String from, String to) {
+        this.from = new BoardPosition(from);
+        this.to = new BoardPosition(to);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;

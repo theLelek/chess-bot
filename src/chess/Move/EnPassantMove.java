@@ -2,16 +2,16 @@ package chess.Move;
 
 import chess.BoardPosition;
 
-public class CastlingMove extends Move {
-    public CastlingMove(BoardPosition from, BoardPosition to) {
+public class EnPassantMove extends Move {
+    public EnPassantMove(BoardPosition from, BoardPosition to) {
         super(from, to);
     }
 
-    public CastlingMove(int fromX, int fromY, int toX, int toY) {
+    public EnPassantMove(int fromX, int fromY, int toX, int toY) {
         super(new BoardPosition(fromX, fromY), new BoardPosition(toX, toY));
     }
 
-    public CastlingMove(String from, String to) {
+    public EnPassantMove(String from, String to) {
         super(new BoardPosition(from), new BoardPosition(to));
     }
 }

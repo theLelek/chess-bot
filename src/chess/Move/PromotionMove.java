@@ -14,6 +14,16 @@ public class PromotionMove extends Move {
         this.promotionPiece = promotionPiece;
     }
 
+    public PromotionMove(int fromX, int fromY, int toX, int toY, BoardPiece promotionPiece) {
+        super(new BoardPosition(fromX, fromY), new BoardPosition(toX, toY));
+        this.promotionPiece = promotionPiece;
+    }
+
+    public PromotionMove(String from, String to, BoardPiece promotionPiece) {
+        super(from, to);
+        this.promotionPiece = promotionPiece;
+    }
+
     public BoardPiece getPromotionPiece() {
         return promotionPiece;
     }
