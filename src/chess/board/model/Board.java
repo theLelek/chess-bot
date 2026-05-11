@@ -2,7 +2,7 @@ package chess.board.model;
 
 import chess.BoardPosition;
 import chess.Move.CastlingMove;
-import chess.Move.EnPassentMove;
+import chess.Move.EnPassantMove;
 import chess.Move.Move;
 import chess.Move.PromotionMove;
 
@@ -68,7 +68,7 @@ public class Board {
         }
     }
 
-    private void updatePieces(Move move) {
+    private void updatePieces(Move move) { // TODO because of wrong usage of possibleEnPassant
         BoardPiece pieceToMove = boardPieces[move.from().y()][move.from().x()];
         BoardPiece pieceToCapture = boardPieces[move.to().y()][move.to().x()];
         boardPieces[move.from().y()][move.from().x()] = null;
@@ -79,7 +79,7 @@ public class Board {
             case PromotionMove m:
                 boardPieces[move.to().y()][move.to().x()] = m.getPromotionPiece();
                 break;
-            case EnPassentMove _:
+            case EnPassantMove _:
                 boardPieces[possibleEnPassant.y()][possibleEnPassant.x()] = null;
                 piecesIndexes.remove(new BoardPosition(possibleEnPassant.x(), possibleEnPassant.y()));
                 break;
