@@ -18,7 +18,7 @@ public class Board {
     private boolean isWhiteToMove;
     private final CastlingRights castlingRightsWhite;
     private final CastlingRights castlingRightsBlack;
-    private BoardPosition enPassantTargetSquare; // TODO is currently stored 2 times
+    private BoardPosition enPassantTargetSquare;
     private int halfmoveClock;
     private int fullmoveNumber;
 

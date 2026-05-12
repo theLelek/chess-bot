@@ -74,7 +74,7 @@ public class PseudoLegalMoveFinder {
         }
     }
 
-    private static void addPseudoLegalMoves(Board board, BoardPosition position, List<Move> legalMoves) {
+    private static void addPseudoLegalMoves(Board board, BoardPosition position, List<Move> legalMoves) { // TODO refactor
         BoardPiece currentPiece = board.getBoardPieces()[position.y()][position.x()];
         PieceMoveRules currentPieceMoveRules = currentPiece.getMoveRules();
 
