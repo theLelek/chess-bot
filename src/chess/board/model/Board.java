@@ -172,10 +172,10 @@ public class Board {
         return sb.toString();
     }
 
-    public BoardPosition getEnPassantPosition() {
+    public BoardPosition getEnPassantPiecePosition() {
         if (enPassantTargetSquare == null) return null;
         Color color = (isWhiteToMove) ? Color.WHITE : Color.BLACK;
-        return new BoardPosition(enPassantTargetSquare.x(), enPassantTargetSquare.y() + color.getMovingDirection());
+        return new BoardPosition(enPassantTargetSquare.x(), enPassantTargetSquare.y() - color.getMovingDirection());
     }
 
     public BoardPiece[][] getBoardPieces() {
