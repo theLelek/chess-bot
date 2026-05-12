@@ -135,22 +135,20 @@ public class PseudoLegalMoveFinder {
     }
 
     private static void getPseudoLegalEnPassantMoves(Board board, boolean isWhiteToMove, List<Move> legalMoves) {
-        int movingDirection = (isWhiteToMove) ? 1 : -1;
-        if (board.getPossibleEnPassant() == null || board.getBoardPieces()[board.getPossibleEnPassant().y() - movingDirection][board.getPossibleEnPassant().x()].isWhite() == isWhiteToMove) {
+        Color color = (isWhiteToMove) ? Color.WHITE : Color.BLACK;
+        if (board.getEnPassantTargetSquare() == null) {
             return;
         }
+        BoardPosition enPassantPosition = board.getEnPassantPiecePosition();
 
-        int xEnPassant = board.getPossibleEnPassant().x();
-        int yEnPassant = board.getPossibleEnPassant().y();
-
-        BoardPiece pieceToMove1 = board.getBoardPiece(new BoardPosition(xEnPassant - 1, yEnPassant));
-        if (xEnPassant - 1 >= 0 && pieceToMove1.isPawn() && pieceToMove1.isWhite() == isWhiteToMove) {
-            legalMoves.add(new EnPassantMove(new BoardPosition(xEnPassant - 1, yEnPassant), new BoardPosition(xEnPassant, yEnPassant + movingDirection)));
+        BoardPosition pieceToMoveFrom1 = new BoardPosition(enPassantPosition.x() - 1, enPassantPosition.y());
+        if (pieceToMoveFrom1.x() >= 0 && board.getBoardPiece(pieceToMoveFrom1) != null && board.getBoardPiece(pieceToMoveFrom1).isPawn() && board.getBoardPiece(pieceToMoveFrom1).isWhite() == isWhiteToMove) {
+            legalMoves.add(new EnPassantMove(pieceToMoveFrom1, new BoardPosition(board.getEnPassantTargetSquare().x(), board.getEnPassantTargetSquare().y())));
         }
 
-        BoardPiece pieceToMove2 = board.getBoardPiece(new BoardPosition(xEnPassant + 1, yEnPassant));
-        if (xEnPassant + 1 < Board.SIZE && pieceToMove2.isPawn() && pieceToMove2.isWhite() == isWhiteToMove) {
-            legalMoves.add(new EnPassantMove(new BoardPosition(xEnPassant + 1, yEnPassant), new BoardPosition(xEnPassant, yEnPassant + movingDirection)));
+        BoardPosition pieceToMoveFrom2 = new BoardPosition(enPassantPosition.x() + 1, enPassantPosition.y());
+        if (pieceToMoveFrom2.x() < Board.SIZE && board.getBoardPiece(pieceToMoveFrom2) != null && board.getBoardPiece(pieceToMoveFrom2).isPawn() && board.getBoardPiece(pieceToMoveFrom2).isWhite() == isWhiteToMove) {
+            legalMoves.add(new EnPassantMove(pieceToMoveFrom2, new BoardPosition(board.getEnPassantTargetSquare().x(), board.getEnPassantTargetSquare().y())));
         }
     }
 }
