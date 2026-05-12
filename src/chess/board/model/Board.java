@@ -1,6 +1,7 @@
 package chess.board.model;
 
 import chess.BoardPosition;
+import chess.Color;
 import chess.Move.CastlingMove;
 import chess.Move.EnPassantMove;
 import chess.Move.Move;
@@ -17,17 +18,17 @@ public class Board {
     private boolean isWhiteToMove;
     private final CastlingRights castlingRightsWhite;
     private final CastlingRights castlingRightsBlack;
-    private BoardPosition possibleEnPassant; // TODO is currently stored 2 times
+    private BoardPosition enPassantTargetSquare; // TODO is currently stored 2 times
     private int halfmoveClock;
     private int fullmoveNumber;
 
-    public Board(BoardPiece[][] boardPieces, Set<BoardPosition> piecesIndexes, boolean isWhiteToMove, CastlingRights castlingRightsWhite, CastlingRights castlingRightsBlack, BoardPosition possibleEnPassant, int halfmoveClock, int fullmoveNumber) {
+    public Board(BoardPiece[][] boardPieces, Set<BoardPosition> piecesIndexes, boolean isWhiteToMove, CastlingRights castlingRightsWhite, CastlingRights castlingRightsBlack, BoardPosition enPassantTargetSquare, int halfmoveClock, int fullmoveNumber) {
         this.boardPieces = boardPieces;
         this.piecesIndexes = piecesIndexes;
         this.isWhiteToMove = isWhiteToMove;
         this.castlingRightsWhite = castlingRightsWhite;
         this.castlingRightsBlack = castlingRightsBlack;
-        this.possibleEnPassant = possibleEnPassant;
+        this.enPassantTargetSquare = enPassantTargetSquare;
         this.halfmoveClock = halfmoveClock;
         this.fullmoveNumber = fullmoveNumber;
     }
@@ -75,13 +76,15 @@ public class Board {
         boardPieces[move.to().y()][move.to().x()] = pieceToMove;
         piecesIndexes.remove(move.from());
         piecesIndexes.add(move.to());
+        Color colorToMove = (pieceToMove.isWhite()) ? Color.WHITE : Color.BLACK;
+
         switch (move) {
             case PromotionMove m:
                 boardPieces[move.to().y()][move.to().x()] = m.getPromotionPiece();
                 break;
             case EnPassantMove _:
-                boardPieces[possibleEnPassant.y()][possibleEnPassant.x()] = null;
-                piecesIndexes.remove(new BoardPosition(possibleEnPassant.x(), possibleEnPassant.y()));
+                boardPieces[move.from().y()][move.to().x()] = null;
+                piecesIndexes.remove(new BoardPosition(move.to().x(), move.from().y()));
                 break;
             case CastlingMove m:
                 if (m.to().x() == Board.SIZE - 2) { // king side castling
@@ -99,7 +102,7 @@ public class Board {
             default:
                 break;
         }
-        possibleEnPassant = (pieceToMove.isPawn() && Math.abs(move.from().y() - move.to().y()) == 2) ? move.to() : null;
+        enPassantTargetSquare = (pieceToMove.isPawn() && Math.abs(move.from().y() - move.to().y()) == 2) ? new BoardPosition(move.to().x(), move.to().y() - colorToMove.getMovingDirection()) : null; // todo of by 1
     }
 
     public static Board initializeDefaultBoard() {
@@ -116,8 +119,7 @@ public class Board {
         var enPassantTarget = (! fenParts[3].equals("-")) ? new BoardPosition(fenParts[3]) : null;
         var halfMoveClock = Integer.parseInt(fenParts[4]);
         var fullMoveNumber = Integer.parseInt(fenParts[5]);
-        Board board = new Board(boardPieces, piecesIndexes, isWhiteToMove, castlingRightsWhite, castlingRightsBlack, enPassantTarget, halfMoveClock, fullMoveNumber);
-        return board;
+        return new Board(boardPieces, piecesIndexes, isWhiteToMove, castlingRightsWhite, castlingRightsBlack, enPassantTarget, halfMoveClock, fullMoveNumber);
     }
 
     private static BoardPiece[][] initializeBoardPiecesFromFen(String piecePlacements) {
@@ -170,6 +172,12 @@ public class Board {
         return sb.toString();
     }
 
+    public BoardPosition getEnPassantPosition() {
+        if (enPassantTargetSquare == null) return null;
+        Color color = (isWhiteToMove) ? Color.WHITE : Color.BLACK;
+        return new BoardPosition(enPassantTargetSquare.x(), enPassantTargetSquare.y() + color.getMovingDirection());
+    }
+
     public BoardPiece[][] getBoardPieces() {
         return boardPieces;
     }
@@ -206,8 +214,8 @@ public class Board {
         this.fullmoveNumber = fullmoveNumber;
     }
 
-    public BoardPosition getPossibleEnPassant() {
-        return possibleEnPassant;
+    public BoardPosition getEnPassantTargetSquare() {
+        return enPassantTargetSquare;
     }
 
     public Set<BoardPosition> getPiecesIndexes() {
@@ -217,4 +225,5 @@ public class Board {
     public BoardPiece getBoardPiece(BoardPosition currentPosition) {
         return this.boardPieces[currentPosition.y()][currentPosition.x()];
     }
+
 }
