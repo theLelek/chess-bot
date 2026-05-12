@@ -31,4 +31,9 @@ maybe replace Move class with an interface (especially CastlingMove class is ann
 implement uci protocoll
 
 
-*refactor pseudoLegalMoveFinder*
+
+move more logic out of BoardPiece enum
+
+add getColor to boardPiece enum
+
+in BoardPosition add function to check if its in bounds 
