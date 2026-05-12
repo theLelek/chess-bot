@@ -20,27 +20,26 @@ public class PseudoLegalMoveFinder {
             if (currentPiece.isWhite() != isWhiteToMove) {
                 continue;
             }
-            // TODO pawn moves on last row will be removed and put into pseudolegalPromotions
             // pawn
             if (currentPiece == BoardPiece.BLACK_PAWN || currentPiece == BoardPiece.WHITE_PAWN) {
-                getPseudoLegalPawnMoves(board, boardPosition, legalMoves);
+                addPseudoLegalPawnMoves(board, boardPosition, legalMoves);
             // general
             } else {
-                getPseudoLegalMoves(board, boardPosition, legalMoves);
+                addPseudoLegalMoves(board, boardPosition, legalMoves);
             }
         }
-        getPseudoLegalCastlingMoves(board, isWhiteToMove, legalMoves);
-        getPseudoLegalPromotionMoves(board, isWhiteToMove, legalMoves);
-        getPseudoLegalEnPassantMoves(board, isWhiteToMove, legalMoves);
+        addPseudoLegalCastlingMoves(board, isWhiteToMove, legalMoves);
+        addPseudoLegalPromotionMoves(board, isWhiteToMove, legalMoves);
+        addPseudoLegalEnPassantMoves(board, isWhiteToMove, legalMoves);
         return legalMoves;
     }
 
-    private static void getPseudoLegalPawnMoves(Board board, BoardPosition position, List<Move> legalMoves) {
+    private static void addPseudoLegalPawnMoves(Board board, BoardPosition position, List<Move> legalMoves) {
         BoardPiece currentPiece = board.getBoardPiece(position);
-        int direction = (currentPiece.isWhite()) ? -1 : 1;
+        Color color = (currentPiece.isWhite()) ? Color.WHITE : Color.BLACK;
+        int direction = color.getMovingDirection();
         int startingY = (currentPiece.isWhite()) ? 6 : 1;
         int forwardY = position.y() + direction;
-        boolean isPromoting = currentPiece.isWhite() && forwardY == 0 || currentPiece.isBlack() && forwardY == Board.SIZE - 1;
 
         if (forwardY < 0 || forwardY >= Board.SIZE) {
             return;
@@ -75,7 +74,7 @@ public class PseudoLegalMoveFinder {
         }
     }
 
-    private static void getPseudoLegalMoves(Board board, BoardPosition position, List<Move> legalMoves) {
+    private static void addPseudoLegalMoves(Board board, BoardPosition position, List<Move> legalMoves) {
         BoardPiece currentPiece = board.getBoardPieces()[position.y()][position.x()];
         PieceMoveRules currentPieceMoveRules = currentPiece.getMoveRules();
 
@@ -100,7 +99,7 @@ public class PseudoLegalMoveFinder {
         }
     }
 
-    private static void getPseudoLegalPromotionMoves(Board board, boolean isWhiteToMove, List<Move> legalMoves) {
+    private static void addPseudoLegalPromotionMoves(Board board, boolean isWhiteToMove, List<Move> legalMoves) {
         Color color = (isWhiteToMove) ? Color.WHITE : Color.BLACK;
         int promotionRow = color.getBackRank();
         for (int i = legalMoves.size() - 1; i >= 0; i--) {
@@ -115,7 +114,7 @@ public class PseudoLegalMoveFinder {
         }
     }
 
-    private static void getPseudoLegalCastlingMoves(Board board, boolean isWhiteToMove, List<Move> legalMoves) {
+    private static void addPseudoLegalCastlingMoves(Board board, boolean isWhiteToMove, List<Move> legalMoves) {
         CastlingRights rights = isWhiteToMove ? board.getCastlingRightsWhite() : board.getCastlingRightsBlack();
         String rank = isWhiteToMove ? "1" : "8";
         Color color = (isWhiteToMove) ? Color.WHITE : Color.BLACK;
@@ -134,8 +133,7 @@ public class PseudoLegalMoveFinder {
         }
     }
 
-    private static void getPseudoLegalEnPassantMoves(Board board, boolean isWhiteToMove, List<Move> legalMoves) {
-        Color color = (isWhiteToMove) ? Color.WHITE : Color.BLACK;
+    private static void addPseudoLegalEnPassantMoves(Board board, boolean isWhiteToMove, List<Move> legalMoves) {
         if (board.getEnPassantTargetSquare() == null) {
             return;
         }
