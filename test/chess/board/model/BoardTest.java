@@ -5,10 +5,6 @@ import chess.Move.Move;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import javax.management.modelmbean.ModelMBean;
-
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 class BoardTest {
@@ -28,7 +24,7 @@ class BoardTest {
         assertTrue(board.getPiecesIndexes().contains(new BoardPosition("e4")));
         assertTrue(board.getCastlingRightsWhite().canCastleKingSide() && board.getCastlingRightsWhite().canCastleQueenSide());
         assertTrue(board.getCastlingRightsBlack().canCastleKingSide() && board.getCastlingRightsBlack().canCastleQueenSide());
-        assertEquals(new BoardPosition("e4"), board.getPossibleEnPassant());
+        assertEquals(new BoardPosition("e3"), board.getEnPassantTargetSquare());
         assertEquals(0, board.getHalfmoveClock());
         assertEquals(1, board.getFullmoveNumber());
         assertTrue(board.isBlackToMove());
@@ -45,7 +41,7 @@ class BoardTest {
         assertTrue(board.getCastlingRightsWhite().canCastleKingSide() && board.getCastlingRightsWhite().canCastleQueenSide());
         assertTrue(board.getCastlingRightsBlack().canCastleKingSide() && board.getCastlingRightsBlack().canCastleQueenSide());
 
-        assertEquals(new BoardPosition("e5"), board.getPossibleEnPassant());
+        assertEquals(new BoardPosition("e6"), board.getEnPassantTargetSquare());
         assertEquals(0, board.getHalfmoveClock());
         assertEquals(2, board.getFullmoveNumber());
         assertTrue(board.isWhiteToMove());

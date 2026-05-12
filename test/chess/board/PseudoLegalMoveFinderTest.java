@@ -204,7 +204,7 @@ public class PseudoLegalMoveFinderTest {
     private static List<EnPassantMove> filterByEnPassantMove(List<Move> legalMoves) {
         List<EnPassantMove> enPassantMoves = new ArrayList<>();
         for (Move move : legalMoves) {
-            if (move instanceof PromotionMove) {
+            if (move instanceof EnPassantMove) {
                 enPassantMoves.add((EnPassantMove) move);
             }
         }
