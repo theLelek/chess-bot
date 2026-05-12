@@ -5,25 +5,27 @@ import chess.Move.CastlingMove;
 public enum Color {
 
     WHITE(
-            7, 0,
+            7, 0, -1,
             new CastlingMove(4, 7, 6, 7), // kingside
             new CastlingMove(4, 7, 2, 7)  // queenside
     ),
 
     BLACK(
-            0, 7,
+            0, 7, 1,
             new CastlingMove(4, 0, 6, 0), // kingside
             new CastlingMove(4, 0, 2, 0)  // queenside
     );
 
     private final int startingRow;
     private final int promotionRow;
+    private final int movingDirection;
     private final CastlingMove castlingMoveKingSide;
     private final CastlingMove castlingMoveQueenSide;
 
-    Color(int startingRow, int promotionRow, CastlingMove castlingMoveKingSide, CastlingMove castlingMoveQueenSide) {
+    Color(int startingRow, int promotionRow, int movingDirection, CastlingMove castlingMoveKingSide, CastlingMove castlingMoveQueenSide) {
         this.startingRow = startingRow;
         this.promotionRow = promotionRow;
+        this.movingDirection = movingDirection;
         this.castlingMoveKingSide = castlingMoveKingSide;
         this.castlingMoveQueenSide = castlingMoveQueenSide;
     }
@@ -42,5 +44,9 @@ public enum Color {
 
     public int getPromotionRow() {
         return promotionRow;
+    }
+
+    public int getMovingDirection() {
+        return movingDirection;
     }
 }
