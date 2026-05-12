@@ -164,6 +164,31 @@ public class PseudoLegalMoveFinderTest {
         Assertions.assertTrue(areLegalMovesEqual(enPassantMoves, expected));
     }
 
+    @Test
+    void black_canCaptureEnPassant_whenPawnMovesTwoSquaresPast() {
+        Board board = Board.initializeFromFen("8/8/8/8/3Pp3/8/8/4K2k b - d3 0 1");
+        List<Move> legalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, false);
+        List<EnPassantMove> enPassantMoves = filterByEnPassantMove(legalMoves);
+        List<EnPassantMove> expected = Arrays.asList(new EnPassantMove("e4", "d3"));
+        Assertions.assertTrue(areLegalMovesEqual(enPassantMoves, expected));
+    }
+
+    @Test
+    void no_enPassant_whenPawnDidNotMoveTwoSquares() {
+        Board board = Board.initializeFromFen("8/8/8/4p3/3P4/8/8/4K2k w - - 0 1");
+        List<Move> legalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, true);
+        List<EnPassantMove> enPassantMoves = filterByEnPassantMove(legalMoves);
+        Assertions.assertTrue(enPassantMoves.isEmpty());
+    }
+
+    @Test
+    void no_enPassant_whenPawnsAreNotAdjacent() {
+        Board board = Board.initializeFromFen("8/8/8/8/2p1P3/8/8/4K2k w - c6 0 1");
+        List<Move> legalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, true);
+        List<EnPassantMove> enPassantMoves = filterByEnPassantMove(legalMoves);
+        Assertions.assertTrue(enPassantMoves.isEmpty());
+    }
+
     private boolean areLegalMovesEqual(List<? extends Move> moves1, List<? extends Move> moves2) {
         return moves1.size() == moves2.size() &&
                 moves1.containsAll(moves2) &&
