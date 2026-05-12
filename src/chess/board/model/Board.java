@@ -45,9 +45,10 @@ public class Board {
     }
 
     private void updateCastlingRights(Move move) {
+        Color color = (isWhiteToMove) ? Color.WHITE : Color.BLACK;
         BoardPiece pieceToMove = getBoardPiece(move.from());
-        int homeRank = BoardPiece.getHomeRank(isWhiteToMove);
-        int backRank = BoardPiece.getBackRank(isWhiteToMove);
+        int homeRank = color.getHomeRank();
+        int backRank = color.getBackRank();
         CastlingRights castlingRights = (isWhiteToMove) ? castlingRightsWhite : castlingRightsBlack;
         CastlingRights castlingRightsOpponent = (isWhiteToMove) ? castlingRightsBlack : castlingRightsWhite;
 

@@ -16,15 +16,15 @@ public enum Color {
             new CastlingMove(4, 0, 2, 0)  // queenside
     );
 
-    private final int startingRow;
-    private final int promotionRow;
+    private final int homeRank;
+    private final int backRank;
     private final int movingDirection;
     private final CastlingMove castlingMoveKingSide;
     private final CastlingMove castlingMoveQueenSide;
 
-    Color(int startingRow, int promotionRow, int movingDirection, CastlingMove castlingMoveKingSide, CastlingMove castlingMoveQueenSide) {
-        this.startingRow = startingRow;
-        this.promotionRow = promotionRow;
+    Color(int homeRank, int backRank, int movingDirection, CastlingMove castlingMoveKingSide, CastlingMove castlingMoveQueenSide) {
+        this.homeRank = homeRank;
+        this.backRank = backRank;
         this.movingDirection = movingDirection;
         this.castlingMoveKingSide = castlingMoveKingSide;
         this.castlingMoveQueenSide = castlingMoveQueenSide;
@@ -38,12 +38,12 @@ public enum Color {
         return castlingMoveQueenSide;
     }
 
-    public int getStartingRow() {
-        return startingRow;
+    public int getHomeRank() {
+        return homeRank;
     }
 
-    public int getPromotionRow() {
-        return promotionRow;
+    public int getBackRank() {
+        return backRank;
     }
 
     public int getMovingDirection() {

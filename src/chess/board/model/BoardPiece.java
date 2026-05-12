@@ -80,22 +80,6 @@ public enum BoardPiece {
         return fen == 'p' || fen == 'P';
     }
 
-    public int getHomeRank() {
-        return (isWhite()) ? Board.SIZE - 1 : 0;
-    }
-
-    public static int getHomeRank(boolean isWhiteToMove) {
-        return (isWhiteToMove) ? Board.SIZE - 1 : 0;
-    }
-
-    public int getBackRank() {
-        return (isWhite()) ? 0: Board.SIZE - 1;
-    }
-
-    public static int getBackRank(boolean isWhiteToMove) {
-        return (isWhiteToMove) ? 0 : Board.SIZE - 1;
-    }
-
     public static BoardPiece getByFen(char fen) {
         for (BoardPiece piece : BoardPiece.values()) {
             if (piece.fen == fen) {

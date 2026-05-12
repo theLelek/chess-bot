@@ -102,7 +102,7 @@ public class PseudoLegalMoveFinder {
 
     private static void getPseudoLegalPromotionMoves(Board board, boolean isWhiteToMove, List<Move> legalMoves) {
         Color color = (isWhiteToMove) ? Color.WHITE : Color.BLACK;
-        int promotionRow = color.getPromotionRow();
+        int promotionRow = color.getBackRank();
         for (int i = legalMoves.size() - 1; i >= 0; i--) {
             BoardPiece piece = board.getBoardPiece(legalMoves.get(i).from());
             if (piece != BoardPiece.BLACK_PAWN && piece != BoardPiece.WHITE_PAWN) {
