@@ -2,13 +2,13 @@ import java.util.*;
 
 public class Test {
     public static void main(String[] args) {
-        Map<Integer, Integer> map = new HashMap<>();
-        map.put(123, 12);
-        map.put(1, 12);
-        map.put(123, 0);
+        long bitBoard = 0;
+        bitBoard |= (1L << 5); // place piece on 0
+        bitBoard &= ~(1L << 5); // removes piece on 5
+        boolean occupied = (bitBoard & (1L << 5)) != 0; // check if bit in 5 is occupied
+        bitBoard ^= (1L << 5); // reversed bit
 
-        System.out.println();
-
+        
 
 
     }
