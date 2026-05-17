@@ -22,6 +22,27 @@ public class Board {
     private int halfmoveClock;
     private int fullmoveNumber;
 
+
+    private long whitePawns;
+    private long whiteKnights;
+    private long whiteBishops;
+    private long whiteRooks;
+    private long whiteQueens;
+    private long whiteKing;
+
+    private long blackPawns;
+    private long blackKnights;
+    private long blackBishops;
+    private long blackRooks;
+    private long blackQueens;
+    private long blackKing;
+
+    // Occupancy bitboards
+    private long whitePieces;
+    private long blackPieces;
+    private long allPieces;
+
+
     public Board(BoardPiece[][] boardPieces, Set<BoardPosition> piecesIndexes, boolean isWhiteToMove, CastlingRights castlingRightsWhite, CastlingRights castlingRightsBlack, BoardPosition enPassantTargetSquare, int halfmoveClock, int fullmoveNumber) {
         this.boardPieces = boardPieces;
         this.piecesIndexes = piecesIndexes;
@@ -172,10 +193,82 @@ public class Board {
         return sb.toString();
     }
 
+    private static long setBit(long bitboard, int square) {
+        return bitboard | (1L << square);
+    }
+
+    private static long clearBit(long bb, int square) {
+        return bb & ~(1L << square);
+    }
+
+    private static boolean getBit(long bb, int square) {
+        return (bb & (1L << square)) != 0;
+    }
+
     public BoardPosition getEnPassantPiecePosition() {
         if (enPassantTargetSquare == null) return null;
         Color color = (isWhiteToMove) ? Color.WHITE : Color.BLACK;
         return new BoardPosition(enPassantTargetSquare.x(), enPassantTargetSquare.y() - color.getMovingDirection());
+    }
+
+    public long getWhitePawns() {
+        return whitePawns;
+    }
+
+    public long getWhiteKnights() {
+        return whiteKnights;
+    }
+
+    public long getWhiteBishops() {
+        return whiteBishops;
+    }
+
+    public long getWhiteRooks() {
+        return whiteRooks;
+    }
+
+    public long getWhiteQueens() {
+        return whiteQueens;
+    }
+
+    public long getWhiteKing() {
+        return whiteKing;
+    }
+
+    public long getBlackPawns() {
+        return blackPawns;
+    }
+
+    public long getBlackKnights() {
+        return blackKnights;
+    }
+
+    public long getBlackBishops() {
+        return blackBishops;
+    }
+
+    public long getBlackRooks() {
+        return blackRooks;
+    }
+
+    public long getBlackQueens() {
+        return blackQueens;
+    }
+
+    public long getBlackKing() {
+        return blackKing;
+    }
+
+    public long getWhitePieces() {
+        return whitePieces;
+    }
+
+    public long getBlackPieces() {
+        return blackPieces;
+    }
+
+    public long getAllPieces() {
+        return allPieces;
     }
 
     public BoardPiece[][] getBoardPieces() {
