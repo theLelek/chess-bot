@@ -88,4 +88,22 @@ class BoardPositionTest {
     void getFromString_emptyString_throwsException() {
         assertThrows(IllegalArgumentException.class, () -> new BoardPosition(""));
     }
+
+    @Test
+    void getBitBoardSquare() {
+        BoardPosition boardPosition = new BoardPosition(5, 5);
+        assertEquals(21, boardPosition.getBitBoardSquare());
+    }
+
+    @Test
+    void bitBoardSquareConstructor() {
+        BoardPosition boardPosition1 = new BoardPosition(0);
+        assertEquals(new BoardPosition("a1"), boardPosition1);
+
+        BoardPosition boardPosition2 = new BoardPosition(63);
+        assertEquals(new BoardPosition("h8"), boardPosition2);
+
+        BoardPosition boardPosition3 = new BoardPosition(12);
+        assertEquals(new BoardPosition("e2"), boardPosition3);
+    }
 }

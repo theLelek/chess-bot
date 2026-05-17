@@ -29,6 +29,34 @@ public class BoardPosition {
         }
     }
 
+    public BoardPosition(int bitBoardSquare) {
+        this.x = bitBoardSquare % 8;
+        this.y = 7 - (bitBoardSquare / 8);
+    }
+
+    public BoardPosition copy() {
+        return new BoardPosition(x, y);
+    }
+
+    public BoardPosition move(int[] direction) throws IndexOutOfBoundsException {
+        if (x + direction[0] < 0 || y + direction[1] < 0 || x + direction[0] >= Board.SIZE || y + direction[1] >= Board.SIZE) {
+            throw new IndexOutOfBoundsException("Move index out of bounds");
+        }
+        return new BoardPosition(x + direction[0], y + direction[1]);
+    }
+
+    public int getBitBoardSquare() {
+        return (7 - y) * 8 + x;
+    }
+
+    public int x() {
+        return x;
+    }
+
+    public int y() {
+        return y;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
@@ -45,26 +73,6 @@ public class BoardPosition {
     public String toString() {
         return (char) (x + 97) + String.valueOf(Math.abs(y - Board.SIZE));
     }
-
-    public BoardPosition copy() {
-        return new BoardPosition(x, y);
-    }
-
-    public BoardPosition move(int[] direction) throws IndexOutOfBoundsException {
-        if (x + direction[0] < 0 || y + direction[1] < 0 || x + direction[0] >= Board.SIZE || y + direction[1] >= Board.SIZE) {
-            throw new IndexOutOfBoundsException("Move index out of bounds");
-        }
-        return new BoardPosition(x + direction[0], y + direction[1]);
-    }
-
-    public int x() {
-        return x;
-    }
-
-    public int y() {
-        return y;
-    }
-
 
     public static class Builder {
 
