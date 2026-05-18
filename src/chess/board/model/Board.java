@@ -50,7 +50,8 @@ public class Board {
         var enPassantTarget = (! fenParts[3].equals("-")) ? new BoardPosition(fenParts[3]) : null;
         var halfMoveClock = Integer.parseInt(fenParts[4]);
         var fullMoveNumber = Integer.parseInt(fenParts[5]);
-        return new Board(boardPieces, piecesIndexes, isWhiteToMove, castlingRightsWhite, castlingRightsBlack, enPassantTarget, halfMoveClock, fullMoveNumber, null); // todo change
+        var position = Position.initializeFromFen(fenParts[0]);
+        return new Board(boardPieces, piecesIndexes, isWhiteToMove, castlingRightsWhite, castlingRightsBlack, enPassantTarget, halfMoveClock, fullMoveNumber, position);
     }
 
     private static BoardPiece[][] initializeBoardPiecesFromFen(String piecePlacements) {
