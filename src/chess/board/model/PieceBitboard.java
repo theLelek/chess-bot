@@ -6,14 +6,14 @@ public enum PieceBitboard {
     WHITE_KNIGHTS(1),
     WHITE_BISHOPS(2),
     WHITE_ROOKS(3),
-    WHITE_QUEENS(4),
+    WHITE_QUEEN(4),
     WHITE_KING(5),
 
     BLACK_PAWNS(6),
     BLACK_KNIGHTS(7),
     BLACK_BISHOPS(8),
     BLACK_ROOKS(9),
-    BLACK_QUEENS(10),
+    BLACK_QUEEN(10),
     BLACK_KING(11),
 
     WHITE_PIECES(12),
@@ -38,7 +38,7 @@ public enum PieceBitboard {
             case 'R':
                 return PieceBitboard.WHITE_ROOKS;
             case 'Q':
-                return PieceBitboard.WHITE_QUEENS;
+                return PieceBitboard.WHITE_QUEEN;
             case 'K':
                 return PieceBitboard.WHITE_KING;
 
@@ -51,7 +51,7 @@ public enum PieceBitboard {
             case 'r':
                 return PieceBitboard.BLACK_ROOKS;
             case 'q':
-                return PieceBitboard.BLACK_QUEENS;
+                return PieceBitboard.BLACK_QUEEN;
             case 'k':
                 return PieceBitboard.BLACK_KING;
 
