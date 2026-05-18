@@ -1,116 +1,47 @@
 package chess.board.model;
 
+import chess.BoardPosition;
+
 public class Position {
 
-    private long whitePawns;
-    private long whiteKnights;
-    private long whiteBishops;
-    private long whiteRooks;
-    private long whiteQueens;
-    private long whiteKing;
+    private final long[] bitboards = new long[PieceBitboard.values().length];
 
-    private long blackPawns;
-    private long blackKnights;
-    private long blackBishops;
-    private long blackRooks;
-    private long blackQueens;
-    private long blackKing;
-
-    private long whitePieces;
-    private long blackPieces;
-    private long allPieces;
-
-    public Position(long whitePawns, long whiteKnights, long whiteBishops, long whiteRooks, long whiteQueens, long whiteKing, long blackPawns, long blackKnights, long blackBishops, long blackRooks, long blackQueens, long blackKing, long whitePieces, long blackPieces, long allPieces) {
-        this.whitePawns = whitePawns;
-        this.whiteKnights = whiteKnights;
-        this.whiteBishops = whiteBishops;
-        this.whiteRooks = whiteRooks;
-        this.whiteQueens = whiteQueens;
-        this.whiteKing = whiteKing;
-        this.blackPawns = blackPawns;
-        this.blackKnights = blackKnights;
-        this.blackBishops = blackBishops;
-        this.blackRooks = blackRooks;
-        this.blackQueens = blackQueens;
-        this.blackKing = blackKing;
-        this.whitePieces = whitePieces;
-        this.blackPieces = blackPieces;
-        this.allPieces = allPieces;
+    public static Position initializeFromFen(String fen) {
+        Position position = new Position();
+        String[] lines = fen.split("/");
+        for (int i = 0; i < lines.length; i++) {
+            int column = 0;
+            for (int j = 0; j < lines[i].length(); j++) {
+                char currentChar =  lines[i].charAt(j);
+                BoardPosition currentPosition = new BoardPosition(column, i);
+                if (Character.isDigit(currentChar)) {
+                    column += Integer.parseInt(String.valueOf(currentChar));
+                    continue;
+                }
+                position.setBit(PieceBitboard.fromFen(currentChar), currentPosition.getBitBoardSquare()); // todo add general bitboards
+                column++;
+            }
+        }
+        return position;
     }
 
-    public Position() {
-
+    public void setBit(PieceBitboard pieceBitboard, int square) {
+        bitboards[pieceBitboard.getIndex()] |= (1L << square);
     }
 
-    private static long setBit(long bitboard, int square) {
-        return bitboard | (1L << square);
+    public void clearBit(PieceBitboard pieceBitboard, int square) {
+        bitboards[pieceBitboard.getIndex()] &= ~(1L << square);
     }
 
-    private static long clearBit(long bb, int square) {
-        return bb & ~(1L << square);
+    public boolean getBit(PieceBitboard pieceBitboard, int square) {
+        return (bitboards[pieceBitboard.getIndex()] & (1L << square)) != 0;
     }
 
-    private static boolean getBit(long bb, int square) {
-        return (bb & (1L << square)) != 0;
+    public long getBitboard(PieceBitboard pieceBitboard) {
+        return bitboards[pieceBitboard.getIndex()];
     }
 
-    public long getWhitePawns() {
-        return whitePawns;
-    }
-
-    public long getWhiteKnights() {
-        return whiteKnights;
-    }
-
-    public long getWhiteBishops() {
-        return whiteBishops;
-    }
-
-    public long getWhiteRooks() {
-        return whiteRooks;
-    }
-
-    public long getWhiteQueens() {
-        return whiteQueens;
-    }
-
-    public long getWhiteKing() {
-        return whiteKing;
-    }
-
-    public long getBlackPawns() {
-        return blackPawns;
-    }
-
-    public long getBlackKnights() {
-        return blackKnights;
-    }
-
-    public long getBlackBishops() {
-        return blackBishops;
-    }
-
-    public long getBlackRooks() {
-        return blackRooks;
-    }
-
-    public long getBlackQueens() {
-        return blackQueens;
-    }
-
-    public long getBlackKing() {
-        return blackKing;
-    }
-
-    public long getWhitePieces() {
-        return whitePieces;
-    }
-
-    public long getBlackPieces() {
-        return blackPieces;
-    }
-
-    public long getAllPieces() {
-        return allPieces;
+    public void setBitboard(PieceBitboard pieceBitboard, long value) {
+        bitboards[pieceBitboard.getIndex()] = value;
     }
 }
