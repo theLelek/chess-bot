@@ -12,17 +12,36 @@ public class Position {
         for (int i = 0; i < lines.length; i++) {
             int column = 0;
             for (int j = 0; j < lines[i].length(); j++) {
-                char currentChar =  lines[i].charAt(j);
+                char currentChar = lines[i].charAt(j);
                 BoardPosition currentPosition = new BoardPosition(column, i);
                 if (Character.isDigit(currentChar)) {
                     column += Integer.parseInt(String.valueOf(currentChar));
                     continue;
                 }
                 position.setBit(PieceBitboard.fromFen(currentChar), currentPosition.getBitBoardSquare()); // todo add general bitboards
+                position.setBit(PieceBitboard.ALL_PIECES, currentPosition.getBitBoardSquare());
+                if (Character.isUpperCase(currentChar)) { // white TODO refactor not sure yet where to put fen color check function bc BoardPiece will probably be removed in the future
+                    position.setBit(PieceBitboard.WHITE_PIECES, currentPosition.getBitBoardSquare());
+                } else { // black
+                    position.setBit(PieceBitboard.BLACK_PIECES, currentPosition.getBitBoardSquare());
+                }
                 column++;
             }
         }
         return position;
+    }
+
+    public void printBitBoard(long bitboard) {
+        for (int rank = 7; rank >= 0; rank--) {
+            for (int file = 0; file < Board.SIZE; file++) {
+                int square = rank * Board.SIZE + file;
+                boolean isSet = (bitboard & (1L << square)) != 0;
+
+                System.out.print(isSet ? "1 " : "0 ");
+            }
+            System.out.println();
+        }
+        System.out.println();
     }
 
     public void setBit(PieceBitboard pieceBitboard, int square) {
@@ -43,5 +62,9 @@ public class Position {
 
     public void setBitboard(PieceBitboard pieceBitboard, long value) {
         bitboards[pieceBitboard.getIndex()] = value;
+    }
+
+    public long[] getBitboards() {
+        return bitboards;
     }
 }
