@@ -15,28 +15,28 @@ class BoardEvaluation {
 
     public static int evaluate(Board board) {
         int value = 0;
-        for (BoardPosition position : board.getPiecesIndexes()) {
-            BoardPiece piece = board.getBoardPieces()[position.y()][position.x()];
-            switch (piece) {
-                case WHITE_PAWN -> value += PAWN_VALUE;
-                case BLACK_PAWN -> value -= PAWN_VALUE;
-
-                case WHITE_KNIGHT -> value += KNIGHT_VALUE;
-                case BLACK_KNIGHT -> value -= KNIGHT_VALUE;
-
-                case WHITE_BISHOP -> value += BISHOP_VALUE;
-                case BLACK_BISHOP -> value -= BISHOP_VALUE;
-
-                case WHITE_ROOK -> value += ROOK_VALUE;
-                case BLACK_ROOK -> value -= ROOK_VALUE;
-
-                case WHITE_QUEEN -> value += QUEEN_VALUE;
-                case BLACK_QUEEN -> value -= QUEEN_VALUE;
-
-                case WHITE_KING -> value += KING_VALUE;
-                case BLACK_KING -> value -= KING_VALUE;
-            }
-        }
+//        for (BoardPosition position : board.getPiecesIndexes()) {
+//            BoardPiece piece = board.getBoardPieces()[position.y()][position.x()];
+//            switch (piece) {
+//                case WHITE_PAWN -> value += PAWN_VALUE;
+//                case BLACK_PAWN -> value -= PAWN_VALUE;
+//
+//                case WHITE_KNIGHT -> value += KNIGHT_VALUE;
+//                case BLACK_KNIGHT -> value -= KNIGHT_VALUE;
+//
+//                case WHITE_BISHOP -> value += BISHOP_VALUE;
+//                case BLACK_BISHOP -> value -= BISHOP_VALUE;
+//
+//                case WHITE_ROOK -> value += ROOK_VALUE;
+//                case BLACK_ROOK -> value -= ROOK_VALUE;
+//
+//                case WHITE_QUEEN -> value += QUEEN_VALUE;
+//                case BLACK_QUEEN -> value -= QUEEN_VALUE;
+//
+//                case WHITE_KING -> value += KING_VALUE;
+//                case BLACK_KING -> value -= KING_VALUE;
+//            }
+//        }
         return value;
     }
 }

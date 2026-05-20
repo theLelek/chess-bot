@@ -205,10 +205,6 @@ public class Board {
         return enPassantTargetSquare;
     }
 
-    public Set<BoardPosition> getPiecesIndexes() {
-        return piecesIndexes;
-    }
-
     public Position getPosition() {
         return position;
     }
