@@ -49,7 +49,7 @@ public enum BoardPiece {
             case BLACK_ROOKS -> BoardPiece.BLACK_ROOK;
             case BLACK_QUEEN -> BoardPiece.BLACK_QUEEN;
             case BLACK_KING -> BoardPiece.BLACK_KING;
-            default -> throw new IllegalStateException("Unexpected value: " + pieceBitboard);
+            default -> null;
         };
     }
 
