@@ -25,12 +25,28 @@ public enum BoardPiece {
         this.moveRules = moveRules;
     }
 
-    public char getFen() {
-        return fen;
+    public static BoardPiece getByFen(char fen) {
+        for (BoardPiece piece : BoardPiece.values()) {
+            if (piece.fen == fen) {
+                return piece;
+            }
+        }
+        return null;
     }
 
-    public PieceMoveRules getMoveRules() {
-        return moveRules;
+    public boolean hasSameColor(BoardPiece currentPiece) {
+        if (currentPiece == null) {
+            throw new IllegalArgumentException();
+        }
+        return this.isWhite() == currentPiece.isWhite();
+
+    }
+
+    public boolean hasOppositeColor(BoardPiece currentPiece) {
+        if(currentPiece == null) {
+            return false;
+        }
+        return this.isBlack() == currentPiece.isWhite();
     }
 
     public boolean isWhite() {
@@ -42,18 +58,12 @@ public enum BoardPiece {
         return !isWhite();
     }
 
-    public boolean hasSameColor(BoardPiece currentPiece) {
-        if(currentPiece == null) {
-            throw new IllegalArgumentException();
-        }
-        return this.isWhite() == currentPiece.isWhite();
+    public char getFen() {
+        return fen;
     }
 
-    public boolean hasOppositeColor(BoardPiece currentPiece) {
-        if(currentPiece == null) {
-            return false;
-        }
-        return this.isBlack() == currentPiece.isWhite();
+    public PieceMoveRules getMoveRules() {
+        return moveRules;
     }
 
     public boolean isRook() {
@@ -78,14 +88,5 @@ public enum BoardPiece {
 
     public boolean isPawn() {
         return fen == 'p' || fen == 'P';
-    }
-
-    public static BoardPiece getByFen(char fen) {
-        for (BoardPiece piece : BoardPiece.values()) {
-            if (piece.fen == fen) {
-                return piece;
-            }
-        }
-        return null;
     }
 }
