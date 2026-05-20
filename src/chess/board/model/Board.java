@@ -14,7 +14,6 @@ public class Board {
     public static final int SIZE = 8;
 
     private final BoardPiece[][] boardPieces;
-    private final Set<BoardPosition> piecesIndexes; // TODO O(n) for removing elements find faster way
     private boolean isWhiteToMove;
     private final CastlingRights castlingRightsWhite;
     private final CastlingRights castlingRightsBlack;
@@ -24,9 +23,8 @@ public class Board {
 
     private final Position position;
 
-    public Board(BoardPiece[][] boardPieces, Set<BoardPosition> piecesIndexes, boolean isWhiteToMove, CastlingRights castlingRightsWhite, CastlingRights castlingRightsBlack, BoardPosition enPassantTargetSquare, int halfmoveClock, int fullmoveNumber, Position position) {
+    public Board(BoardPiece[][] boardPieces, boolean isWhiteToMove, CastlingRights castlingRightsWhite, CastlingRights castlingRightsBlack, BoardPosition enPassantTargetSquare, int halfmoveClock, int fullmoveNumber, Position position) {
         this.boardPieces = boardPieces;
-        this.piecesIndexes = piecesIndexes;
         this.isWhiteToMove = isWhiteToMove;
         this.castlingRightsWhite = castlingRightsWhite;
         this.castlingRightsBlack = castlingRightsBlack;
@@ -43,7 +41,6 @@ public class Board {
     public static Board initializeFromFen(String fen) {
         String[] fenParts = fen.split(" ");
         var boardPieces = initializeBoardPiecesFromFen(fenParts[0]);
-        var piecesIndexes = initializePiecesIndexes(boardPieces);
         var isWhiteToMove = fenParts[1].equals("w");
         var castlingRightsWhite = CastlingRights.fromFen(fenParts[2], true);
         var castlingRightsBlack = CastlingRights.fromFen(fenParts[2], false);
@@ -51,7 +48,7 @@ public class Board {
         var halfMoveClock = Integer.parseInt(fenParts[4]);
         var fullMoveNumber = Integer.parseInt(fenParts[5]);
         var position = Position.initializeFromFen(fenParts[0]);
-        return new Board(boardPieces, piecesIndexes, isWhiteToMove, castlingRightsWhite, castlingRightsBlack, enPassantTarget, halfMoveClock, fullMoveNumber, position);
+        return new Board(boardPieces, isWhiteToMove, castlingRightsWhite, castlingRightsBlack, enPassantTarget, halfMoveClock, fullMoveNumber, position);
     }
 
     private static BoardPiece[][] initializeBoardPiecesFromFen(String piecePlacements) {
@@ -70,21 +67,6 @@ public class Board {
             }
         }
         return boardPieces;
-    }
-
-    private static Set<BoardPosition> initializePiecesIndexes(BoardPiece[][] boardPieces) {
-        Set<BoardPosition> piecesIndexes = new HashSet<>();
-        for (int i = 0; i < boardPieces.length; i++) {
-            for (int j = 0; j < boardPieces[i].length; j++) {
-                if (boardPieces[i][j] != null) {
-                    BoardPosition boardPosition = new BoardPosition.Builder()
-                            .y(i)
-                            .x(j).build();
-                    piecesIndexes.add(boardPosition);
-                }
-            }
-        }
-        return piecesIndexes;
     }
 
     public void move(Move move) {
@@ -128,8 +110,6 @@ public class Board {
         BoardPiece pieceToMove = boardPieces[move.from().y()][move.from().x()];
         setBoardPiece(move.from(), null);
         setBoardPiece(move.to(), pieceToMove);
-        piecesIndexes.remove(move.from());
-        piecesIndexes.add(move.to());
         Color colorToMove = (pieceToMove.isWhite()) ? Color.WHITE : Color.BLACK;
 
         switch (move) {
@@ -138,19 +118,14 @@ public class Board {
                 break;
             case EnPassantMove _:
                 setBoardPiece(move.from(), null);
-                piecesIndexes.remove(new BoardPosition(move.to().x(), move.from().y()));
                 break;
             case CastlingMove m:
                 if (m.to().x() == Board.SIZE - 2) { // king side castling
                     boardPieces[move.from().y()][Board.SIZE - 3] = boardPieces[move.from().y()][Board.SIZE - 1];
                     boardPieces[move.from().y()][Board.SIZE - 1] = null;
-                    piecesIndexes.remove(new BoardPosition(Board.SIZE - 1, move.from().y()));
-                    piecesIndexes.add(new BoardPosition(Board.SIZE - 3, move.from().y()));
                 } else { // queen side castling
                     boardPieces[move.from().y()][3] = boardPieces[move.from().y()][0];
                     boardPieces[move.from().y()][0] = null;
-                    piecesIndexes.remove(new BoardPosition(0, move.from().y()));
-                    piecesIndexes.add(new BoardPosition(3, move.from().y()));
                 }
                 break;
             default:
