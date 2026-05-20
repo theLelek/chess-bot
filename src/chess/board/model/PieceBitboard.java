@@ -20,7 +20,6 @@ public enum PieceBitboard {
     BLACK_PIECES(13),
     ALL_PIECES(14);
 
-
     private final int index;
 
     PieceBitboard(int index) {
@@ -28,37 +27,31 @@ public enum PieceBitboard {
     }
 
     public static PieceBitboard fromFen(char fen) {
-        switch (fen) {
-            case 'P':
-                return PieceBitboard.WHITE_PAWNS;
-            case 'N':
-                return PieceBitboard.WHITE_KNIGHTS;
-            case 'B':
-                return PieceBitboard.WHITE_BISHOPS;
-            case 'R':
-                return PieceBitboard.WHITE_ROOKS;
-            case 'Q':
-                return PieceBitboard.WHITE_QUEEN;
-            case 'K':
-                return PieceBitboard.WHITE_KING;
+        return switch (fen) {
+            case 'P' -> PieceBitboard.WHITE_PAWNS;
+            case 'N' -> PieceBitboard.WHITE_KNIGHTS;
+            case 'B' -> PieceBitboard.WHITE_BISHOPS;
+            case 'R' -> PieceBitboard.WHITE_ROOKS;
+            case 'Q' -> PieceBitboard.WHITE_QUEEN;
+            case 'K' -> PieceBitboard.WHITE_KING;
+            case 'p' -> PieceBitboard.BLACK_PAWNS;
+            case 'n' -> PieceBitboard.BLACK_KNIGHTS;
+            case 'b' -> PieceBitboard.BLACK_BISHOPS;
+            case 'r' -> PieceBitboard.BLACK_ROOKS;
+            case 'q' -> PieceBitboard.BLACK_QUEEN;
+            case 'k' -> PieceBitboard.BLACK_KING;
+            default -> throw new IllegalArgumentException(
+                    "Invalid FEN piece: ' + fen");
+        };
+    }
 
-            case 'p':
-                return PieceBitboard.BLACK_PAWNS;
-            case 'n':
-                return PieceBitboard.BLACK_KNIGHTS;
-            case 'b':
-                return PieceBitboard.BLACK_BISHOPS;
-            case 'r':
-                return PieceBitboard.BLACK_ROOKS;
-            case 'q':
-                return PieceBitboard.BLACK_QUEEN;
-            case 'k':
-                return PieceBitboard.BLACK_KING;
-
-            default:
-                throw new IllegalArgumentException(
-                        "Invalid FEN piece: ' + fen");
+    public static PieceBitboard fromIndex(int index) {
+        for (PieceBitboard pieceBitboard : PieceBitboard.values()) {
+            if (pieceBitboard.getIndex() == index) {
+                return pieceBitboard;
+            }
         }
+        return null;
     }
 
     public int getIndex() {
