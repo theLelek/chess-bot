@@ -48,12 +48,25 @@ public class Position {
         bitboards[pieceBitboard.getIndex()] |= (1L << square);
     }
 
+    public void setBit(PieceBitboard pieceBitboard, BoardPosition boardPosition) {
+        setBit(pieceBitboard, boardPosition.getBitBoardSquare());
+    }
+
+
     public void clearBit(PieceBitboard pieceBitboard, int square) {
         bitboards[pieceBitboard.getIndex()] &= ~(1L << square);
     }
 
+    public void clearBit(PieceBitboard pieceBitboard, BoardPosition boardPosition) {
+        clearBit(pieceBitboard, boardPosition.getBitBoardSquare());
+    }
+
     public boolean getBit(PieceBitboard pieceBitboard, int square) {
         return (bitboards[pieceBitboard.getIndex()] & (1L << square)) != 0;
+    }
+
+    public boolean getBit(PieceBitboard pieceBitboard, BoardPosition boardPosition) {
+        return getBit(pieceBitboard, boardPosition.getBitBoardSquare());
     }
 
     public long getBitboard(PieceBitboard pieceBitboard) {
