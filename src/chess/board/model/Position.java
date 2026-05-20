@@ -52,6 +52,13 @@ public class Position {
         setBit(pieceBitboard, boardPosition.getBitBoardSquare());
     }
 
+    public void setBit(BoardPosition boardPosition) {
+        setBit(PieceBitboard.ALL_PIECES, boardPosition);
+    }
+
+    public void setBit(int square) {
+        setBit(PieceBitboard.ALL_PIECES, square);
+    }
 
     public void clearBit(PieceBitboard pieceBitboard, int square) {
         bitboards[pieceBitboard.getIndex()] &= ~(1L << square);
@@ -59,6 +66,14 @@ public class Position {
 
     public void clearBit(PieceBitboard pieceBitboard, BoardPosition boardPosition) {
         clearBit(pieceBitboard, boardPosition.getBitBoardSquare());
+    }
+
+    public void clearBit(BoardPosition boardPosition) {
+        clearBit(PieceBitboard.ALL_PIECES, boardPosition);
+    }
+
+    public void clearBit(int square) {
+        clearBit(PieceBitboard.ALL_PIECES, square);
     }
 
     public boolean getBit(PieceBitboard pieceBitboard, int square) {
@@ -69,6 +84,14 @@ public class Position {
         return getBit(pieceBitboard, boardPosition.getBitBoardSquare());
     }
 
+    public boolean getBit(BoardPosition boardPosition) {
+        return getBit(PieceBitboard.ALL_PIECES, boardPosition);
+    }
+
+    public boolean getBit(int square) {
+        return getBit(PieceBitboard.ALL_PIECES, square);
+    }
+
     public long getBitboard(PieceBitboard pieceBitboard) {
         return bitboards[pieceBitboard.getIndex()];
     }
@@ -76,6 +99,7 @@ public class Position {
     public void setBitboard(PieceBitboard pieceBitboard, long value) {
         bitboards[pieceBitboard.getIndex()] = value;
     }
+    // todo maybe add toogleBit helper
 
     public long[] getBitboards() {
         return bitboards;
