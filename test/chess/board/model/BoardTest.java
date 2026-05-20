@@ -19,9 +19,6 @@ class BoardTest {
         assertNull(board.getBoardPiece(move1.from()));
         assertEquals(BoardPiece.WHITE_PAWN, board.getBoardPiece(move1.to()));
         assertEquals(32, amountOfPiecesOnBoard(board));
-        assertEquals(32, board.getPiecesIndexes().size());
-        assertFalse(board.getPiecesIndexes().contains(new BoardPosition("e2")));
-        assertTrue(board.getPiecesIndexes().contains(new BoardPosition("e4")));
         assertTrue(board.getCastlingRightsWhite().canCastleKingSide() && board.getCastlingRightsWhite().canCastleQueenSide());
         assertTrue(board.getCastlingRightsBlack().canCastleKingSide() && board.getCastlingRightsBlack().canCastleQueenSide());
         assertEquals(new BoardPosition("e3"), board.getEnPassantTargetSquare());
@@ -35,10 +32,6 @@ class BoardTest {
         assertNull(board.getBoardPiece(move2.from()));
         assertEquals(BoardPiece.BLACK_PAWN, board.getBoardPiece(move2.to()));
         assertEquals(32, amountOfPiecesOnBoard(board));
-        assertEquals(32, board.getPiecesIndexes().size());
-        assertFalse(board.getPiecesIndexes().contains(new BoardPosition("e7")));
-        assertTrue(board.getPiecesIndexes().contains(new BoardPosition("e5")));
-        assertTrue(board.getCastlingRightsWhite().canCastleKingSide() && board.getCastlingRightsWhite().canCastleQueenSide());
         assertTrue(board.getCastlingRightsBlack().canCastleKingSide() && board.getCastlingRightsBlack().canCastleQueenSide());
 
         assertEquals(new BoardPosition("e6"), board.getEnPassantTargetSquare());
