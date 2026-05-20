@@ -65,7 +65,7 @@ public class Board {
                     boardCounter += Integer.parseInt(String.valueOf(currentChar));
                     continue;
                 }
-                boardPieces[i][boardCounter] = BoardPiece.getByFen(currentChar);
+                boardPieces[i][boardCounter] = BoardPiece.fromFen(currentChar);
                 boardCounter++;
             }
         }
@@ -232,5 +232,9 @@ public class Board {
 
     public Set<BoardPosition> getPiecesIndexes() {
         return piecesIndexes;
+    }
+
+    public Position getPosition() {
+        return position;
     }
 }
