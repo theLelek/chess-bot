@@ -7,7 +7,7 @@ import chess.board.model.PieceBitboard;
 public enum Color {
 
     WHITE(
-            7, 0, -1,
+            7, 0, 6, -1,
             new CastlingMove(4, 7, 6, 7),
             new CastlingMove(4, 7, 2, 7),
             PieceBitboard.WHITE_PIECES,
@@ -15,7 +15,7 @@ public enum Color {
     ),
 
     BLACK(
-            0, 7, 1,
+            0, 7, 1, 1,
             new CastlingMove(4, 0, 6, 0),
             new CastlingMove(4, 0, 2, 0),
             PieceBitboard.BLACK_PIECES,
@@ -24,15 +24,17 @@ public enum Color {
 
     private final int homeRank;
     private final int backRank;
+    private final int pawnStartingRow;
     private final int movingDirection;
     private final CastlingMove castlingMoveKingSide;
     private final CastlingMove castlingMoveQueenSide;
     private final PieceBitboard ownPieceBitboard;
     private final PieceBitboard opponentPieceBitboard;
 
-    Color(int homeRank, int backRank, int movingDirection, CastlingMove castlingMoveKingSide, CastlingMove castlingMoveQueenSide, PieceBitboard ownPieceBitboard, PieceBitboard opponentPieceBitboard) {
+    Color(int homeRank, int backRank, int pawnStartingRow, int movingDirection, CastlingMove castlingMoveKingSide, CastlingMove castlingMoveQueenSide, PieceBitboard ownPieceBitboard, PieceBitboard opponentPieceBitboard) {
         this.homeRank = homeRank;
         this.backRank = backRank;
+        this.pawnStartingRow = pawnStartingRow;
         this.movingDirection = movingDirection;
         this.castlingMoveKingSide = castlingMoveKingSide;
         this.castlingMoveQueenSide = castlingMoveQueenSide;
@@ -66,5 +68,9 @@ public enum Color {
 
     public PieceBitboard getOwnPieceBitboard() {
         return ownPieceBitboard;
+    }
+
+    public int getPawnStartingRow() {
+        return pawnStartingRow;
     }
 }
