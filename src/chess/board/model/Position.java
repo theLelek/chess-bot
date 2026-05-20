@@ -18,12 +18,12 @@ public class Position {
                     column += Integer.parseInt(String.valueOf(currentChar));
                     continue;
                 }
-                position.setBit(PieceBitboard.fromFen(currentChar), currentPosition.getBitBoardSquare());
-                position.setBit(PieceBitboard.ALL_PIECES, currentPosition.getBitBoardSquare());
+                position.setBit(PieceBitboard.fromFen(currentChar), currentPosition);
+                position.setBit(PieceBitboard.ALL_PIECES, currentPosition);
                 if (Character.isUpperCase(currentChar)) { // white TODO refactor not sure yet where to put fen color check function bc BoardPiece will probably be removed in the future
-                    position.setBit(PieceBitboard.WHITE_PIECES, currentPosition.getBitBoardSquare());
+                    position.setBit(PieceBitboard.WHITE_PIECES, currentPosition);
                 } else { // black
-                    position.setBit(PieceBitboard.BLACK_PIECES, currentPosition.getBitBoardSquare());
+                    position.setBit(PieceBitboard.BLACK_PIECES, currentPosition);
                 }
                 column++;
             }

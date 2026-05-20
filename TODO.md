@@ -39,3 +39,5 @@ add getColor to boardPiece enum
 in BoardPosition add function to check if its in bounds 
 
 implement zobrist hash
+
+maybe remove BoardPiece enum
