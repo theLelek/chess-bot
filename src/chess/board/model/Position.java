@@ -31,7 +31,7 @@ public class Position {
         return position;
     }
 
-    public void printBitBoard(long bitboard) {
+    public static void printBitBoard(long bitboard) {
         for (int rank = 7; rank >= 0; rank--) {
             for (int file = 0; file < Board.SIZE; file++) {
                 int square = rank * Board.SIZE + file;
