@@ -25,13 +25,32 @@ public enum BoardPiece {
         this.moveRules = moveRules;
     }
 
-    public static BoardPiece getByFen(char fen) {
+    public static BoardPiece fromFen(char fen) {
         for (BoardPiece piece : BoardPiece.values()) {
             if (piece.fen == fen) {
                 return piece;
             }
         }
         return null;
+    }
+
+    public static BoardPiece fromPieceBitBoard(PieceBitboard pieceBitboard) {
+        return switch (pieceBitboard) {
+            case WHITE_PAWNS -> BoardPiece.WHITE_PAWN;
+            case WHITE_KNIGHTS -> BoardPiece.WHITE_KNIGHT;
+            case WHITE_BISHOPS -> BoardPiece.WHITE_BISHOP;
+            case WHITE_ROOKS -> BoardPiece.WHITE_ROOK;
+            case WHITE_QUEEN -> BoardPiece.WHITE_QUEEN;
+            case WHITE_KING -> BoardPiece.WHITE_KING;
+
+            case BLACK_PAWNS -> BoardPiece.BLACK_PAWN;
+            case BLACK_KNIGHTS -> BoardPiece.BLACK_KNIGHT;
+            case BLACK_BISHOPS -> BoardPiece.BLACK_BISHOP;
+            case BLACK_ROOKS -> BoardPiece.BLACK_ROOK;
+            case BLACK_QUEEN -> BoardPiece.BLACK_QUEEN;
+            case BLACK_KING -> BoardPiece.BLACK_KING;
+            default -> throw new IllegalStateException("Unexpected value: " + pieceBitboard);
+        };
     }
 
     public boolean hasSameColor(BoardPiece currentPiece) {
