@@ -40,4 +40,4 @@ in BoardPosition add function to check if its in bounds
 
 implement zobrist hash
 
-merge PieceBitBoard into BoardPiece
+merge PieceBitBoard into BoardPiece - maybe use 2 enums 1 extra enum for perfomance elements like all pieces, all white pieces, all black pieces
