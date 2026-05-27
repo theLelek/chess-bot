@@ -10,8 +10,9 @@ class BitBoardStateTest {
 
     @Test
     void initializeFromFen_onlyWhitePawns() {
-        String fen = "8/8/8/8/8/8/PPPPPPPP/8";
-        BitBoardState bitBoardState = BitBoardState.initializeFromFen(fen);
+        String fen = "8/8/8/8/8/8/PPPPPPPP/8 w KQkq - 0 1";
+        Board board = Board.initializeFromFen(fen);
+        BitBoardState bitBoardState = board.getBitBoardState();
         assertEquals(65280, bitBoardState.getBitboard(BoardPiece.WHITE_PAWN));
         assertEquals(65280, bitBoardState.getBitboard(OccupancyBitboard.WHITE_PIECES));
         assertEquals(65280, bitBoardState.getBitboard(OccupancyBitboard.ALL_PIECES));
@@ -19,9 +20,9 @@ class BitBoardStateTest {
 
     @Test
     void initializeFromFen_defaultPosition() {
-        BitBoardState bitBoardState = BitBoardState.initializeFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
-//        bitBoardState.printBitBoard(bitBoardState.getBitboards()[OccupancyBitboard.BLACK_QUEEN.getIndex()]);
-//        bitBoardState.printBitBoard(1152921504606846976L);
+        String fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+        Board board = Board.initializeFromFen(fen);
+        BitBoardState bitBoardState = board.getBitBoardState();
         assertEquals(65280, bitBoardState.getBitboard(BoardPiece.WHITE_PAWN));
         assertEquals(129, bitBoardState.getBitboard(BoardPiece.WHITE_ROOK));
         assertEquals(66, bitBoardState.getBitboard(BoardPiece.WHITE_KNIGHT));
