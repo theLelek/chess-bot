@@ -1,7 +1,7 @@
 package chess.Move;
 
 import chess.BoardPosition;
-import chess.board.model.BoardPiece;
+import chess.board.BoardPiece;
 
 import java.util.Objects;
 

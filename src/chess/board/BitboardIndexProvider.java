@@ -1,4 +1,4 @@
-package chess.board.model;
+package chess.board;
 
 @FunctionalInterface
 public interface BitboardIndexProvider {

@@ -1,11 +1,9 @@
 package chess.board;
 
-import chess.BoardPosition;
 import chess.Move.Move;
+import chess.PseudoLegalMoveFinder;
 import chess.board.model.Board;
-import chess.board.model.BoardPiece;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 

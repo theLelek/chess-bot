@@ -2,6 +2,7 @@ package chess.board.model;
 
 import chess.BoardPosition;
 import chess.Move.Move;
+import chess.board.BoardPiece;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

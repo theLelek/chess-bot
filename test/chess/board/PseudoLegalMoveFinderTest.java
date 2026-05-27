@@ -6,6 +6,7 @@ import chess.Move.CastlingMove;
 import chess.Move.EnPassantMove;
 import chess.Move.Move;
 import chess.Move.PromotionMove;
+import chess.PseudoLegalMoveFinder;
 import chess.board.model.Board;
 import org.junit.jupiter.api.*;
 

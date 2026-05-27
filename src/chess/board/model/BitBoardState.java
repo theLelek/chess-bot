@@ -1,13 +1,16 @@
 package chess.board.model;
 
 import chess.BoardPosition;
+import chess.board.BitboardIndexProvider;
+import chess.board.BoardPiece;
+import chess.board.OccupancyBitboard;
 
-public class Position {
+public class BitBoardState {
 
-    private final long[] bitboards = new long[BoardPiece.values().length + PieceBitboard.values().length];
+    private final long[] bitboards = new long[BoardPiece.values().length + OccupancyBitboard.values().length];
 
-    public static Position initializeFromFen(String fen) {
-        Position position = new Position();
+    public static BitBoardState initializeFromFen(String fen) {
+        BitBoardState bitBoardState = new BitBoardState();
         String[] lines = fen.split("/");
         for (int i = 0; i < lines.length; i++) {
             int column = 0;
@@ -18,17 +21,17 @@ public class Position {
                     column += Integer.parseInt(String.valueOf(currentChar));
                     continue;
                 }
-                position.setBit(BoardPiece.fromFen(currentChar), currentPosition);
-                position.setBit(PieceBitboard.ALL_PIECES, currentPosition);
+                bitBoardState.setBit(BoardPiece.fromFen(currentChar), currentPosition);
+                bitBoardState.setBit(OccupancyBitboard.ALL_PIECES, currentPosition);
                 if (Character.isUpperCase(currentChar)) { // white TODO refactor not sure yet where to put fen color check function bc BoardPiece will probably be removed in the future
-                    position.setBit(PieceBitboard.WHITE_PIECES, currentPosition);
+                    bitBoardState.setBit(OccupancyBitboard.WHITE_PIECES, currentPosition);
                 } else { // black
-                    position.setBit(PieceBitboard.BLACK_PIECES, currentPosition);
+                    bitBoardState.setBit(OccupancyBitboard.BLACK_PIECES, currentPosition);
                 }
                 column++;
             }
         }
-        return position;
+        return bitBoardState;
     }
 
     public static void printBitBoard(long bitboard) {
@@ -53,11 +56,11 @@ public class Position {
     }
 
     public void setBit(BoardPosition boardPosition) {
-        setBit(PieceBitboard.ALL_PIECES, boardPosition);
+        setBit(OccupancyBitboard.ALL_PIECES, boardPosition);
     }
 
     public void setBit(int square) {
-        setBit(PieceBitboard.ALL_PIECES, square);
+        setBit(OccupancyBitboard.ALL_PIECES, square);
     }
 
     public void clearBit(BitboardIndexProvider bitboardIndexProvider, int square) {
@@ -69,11 +72,11 @@ public class Position {
     }
 
     public void clearBit(BoardPosition boardPosition) {
-        clearBit(PieceBitboard.ALL_PIECES, boardPosition);
+        clearBit(OccupancyBitboard.ALL_PIECES, boardPosition);
     }
 
     public void clearBit(int square) {
-        clearBit(PieceBitboard.ALL_PIECES, square);
+        clearBit(OccupancyBitboard.ALL_PIECES, square);
     }
 
     public boolean getBit(BitboardIndexProvider bitboardIndexProvider, int square) {
@@ -85,11 +88,11 @@ public class Position {
     }
 
     public boolean getBit(BoardPosition boardPosition) {
-        return getBit(PieceBitboard.ALL_PIECES, boardPosition);
+        return getBit(OccupancyBitboard.ALL_PIECES, boardPosition);
     }
 
     public boolean getBit(int square) {
-        return getBit(PieceBitboard.ALL_PIECES, square);
+        return getBit(OccupancyBitboard.ALL_PIECES, square);
     }
 
     public long getBitboard(BitboardIndexProvider bitboardIndexProvider) {
