@@ -5,30 +5,26 @@ import chess.board.BitboardIndexProvider;
 import chess.board.BoardPiece;
 import chess.board.OccupancyBitboard;
 
+import java.util.ArrayList;
+
 public class BitBoardState {
 
     private final long[] bitboards = new long[BoardPiece.values().length + OccupancyBitboard.values().length];
 
-    public static BitBoardState initializeFromFen(String fen) {
+    public static BitBoardState initializeFromPieceList(BoardPiece[] pieceList) {
         BitBoardState bitBoardState = new BitBoardState();
-        String[] lines = fen.split("/");
-        for (int i = 0; i < lines.length; i++) {
-            int column = 0;
-            for (int j = 0; j < lines[i].length(); j++) {
-                char currentChar = lines[i].charAt(j);
-                BoardPosition currentPosition = new BoardPosition(column, i);
-                if (Character.isDigit(currentChar)) {
-                    column += Integer.parseInt(String.valueOf(currentChar));
-                    continue;
-                }
-                bitBoardState.setBit(BoardPiece.fromFen(currentChar), currentPosition);
-                bitBoardState.setBit(OccupancyBitboard.ALL_PIECES, currentPosition);
-                if (Character.isUpperCase(currentChar)) { // white TODO refactor not sure yet where to put fen color check function bc BoardPiece will probably be removed in the future
-                    bitBoardState.setBit(OccupancyBitboard.WHITE_PIECES, currentPosition);
-                } else { // black
-                    bitBoardState.setBit(OccupancyBitboard.BLACK_PIECES, currentPosition);
-                }
-                column++;
+        for (int i = 0; i < pieceList.length; i++) {
+            BoardPiece piece = pieceList[i];
+            if (piece == null) {
+                continue;
+            }
+            BoardPosition square = new BoardPosition(i);
+            bitBoardState.setBit(piece, square);
+            bitBoardState.setBit(OccupancyBitboard.ALL_PIECES, square);
+            if (piece.isWhite()) {
+                bitBoardState.setBit(OccupancyBitboard.WHITE_PIECES, square);
+            } else {
+                bitBoardState.setBit(OccupancyBitboard.BLACK_PIECES, square);
             }
         }
         return bitBoardState;

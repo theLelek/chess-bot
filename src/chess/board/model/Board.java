@@ -8,6 +8,9 @@ import chess.Move.Move;
 import chess.Move.PromotionMove;
 import chess.board.BoardPiece;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Board {
 
     public static final int SIZE = 8;
@@ -19,6 +22,8 @@ public class Board {
     private BoardPosition enPassantTargetSquare;
     private int halfmoveClock;
     private int fullmoveNumber;
+
+    private final BoardPiece[] pieceList = new BoardPiece[Board.SIZE * Board.SIZE]; // todo
 
     private final BitBoardState bitBoardState;
 
@@ -46,8 +51,9 @@ public class Board {
         var enPassantTarget = (! fenParts[3].equals("-")) ? new BoardPosition(fenParts[3]) : null;
         var halfMoveClock = Integer.parseInt(fenParts[4]);
         var fullMoveNumber = Integer.parseInt(fenParts[5]);
-        var position = BitBoardState.initializeFromFen(fenParts[0]);
-        return new Board(boardPieces, isWhiteToMove, castlingRightsWhite, castlingRightsBlack, enPassantTarget, halfMoveClock, fullMoveNumber, position);
+        var pieceList = initializePieceList(fenParts[0]);
+        var bitboardState = BitBoardState.initializeFromPieceList(pieceList);
+        return new Board(boardPieces, isWhiteToMove, castlingRightsWhite, castlingRightsBlack, enPassantTarget, halfMoveClock, fullMoveNumber, bitboardState);
     }
 
     private static BoardPiece[][] initializeBoardPiecesFromFen(String piecePlacements) {
@@ -66,6 +72,27 @@ public class Board {
             }
         }
         return boardPieces;
+    }
+
+    private static BoardPiece[] initializePieceList(String fen) {
+        BoardPiece[] pieceList = new BoardPiece[64];
+        String[] lines = fen.split("/");
+
+        for (int i = 0; i < lines.length; i++) {
+            int column = 0;
+            for (int j = 0; j < lines[i].length(); j++) {
+                char currentChar = lines[i].charAt(j);
+                BoardPosition currentPosition = new BoardPosition(column, i);
+                if (Character.isDigit(currentChar)) {
+                    column += currentChar - '0';
+                } else {
+                    BoardPiece piece = BoardPiece.fromFen(currentChar);
+                    pieceList[currentPosition.getBitBoardSquare()] = piece;
+                    column++;
+                }
+            }
+        }
+        return pieceList;
     }
 
     public void move(Move move) {
@@ -205,6 +232,14 @@ public class Board {
     }
 
     public BitBoardState getPosition() {
+        return bitBoardState;
+    }
+
+    public BoardPiece[] getPieceList() {
+        return pieceList;
+    }
+
+    public BitBoardState getBitBoardState() {
         return bitBoardState;
     }
 }
