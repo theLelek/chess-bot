@@ -4,7 +4,7 @@ import chess.BoardPosition;
 
 public class Position {
 
-    private final long[] bitboards = new long[PieceBitboard.values().length];
+    private final long[] bitboards = new long[BoardPiece.values().length + PieceBitboard.values().length];
 
     public static Position initializeFromFen(String fen) {
         Position position = new Position();
@@ -18,7 +18,7 @@ public class Position {
                     column += Integer.parseInt(String.valueOf(currentChar));
                     continue;
                 }
-                position.setBit(PieceBitboard.fromFen(currentChar), currentPosition);
+                position.setBit(BoardPiece.fromFen(currentChar), currentPosition);
                 position.setBit(PieceBitboard.ALL_PIECES, currentPosition);
                 if (Character.isUpperCase(currentChar)) { // white TODO refactor not sure yet where to put fen color check function bc BoardPiece will probably be removed in the future
                     position.setBit(PieceBitboard.WHITE_PIECES, currentPosition);
@@ -44,12 +44,12 @@ public class Position {
         System.out.println();
     }
 
-    public void setBit(PieceBitboard pieceBitboard, int square) {
-        bitboards[pieceBitboard.getBitboardIndex()] |= (1L << square);
+    public void setBit(BitboardIndexProvider bitboardIndexProvider, int square) {
+        bitboards[bitboardIndexProvider.getBitboardIndex()] |= (1L << square);
     }
 
-    public void setBit(PieceBitboard pieceBitboard, BoardPosition boardPosition) {
-        setBit(pieceBitboard, boardPosition.getBitBoardSquare());
+    public void setBit(BitboardIndexProvider bitboardIndexProvider, BoardPosition boardPosition) {
+        setBit(bitboardIndexProvider, boardPosition.getBitBoardSquare());
     }
 
     public void setBit(BoardPosition boardPosition) {
@@ -60,12 +60,12 @@ public class Position {
         setBit(PieceBitboard.ALL_PIECES, square);
     }
 
-    public void clearBit(PieceBitboard pieceBitboard, int square) {
-        bitboards[pieceBitboard.getBitboardIndex()] &= ~(1L << square);
+    public void clearBit(BitboardIndexProvider bitboardIndexProvider, int square) {
+        bitboards[bitboardIndexProvider.getBitboardIndex()] &= ~(1L << square);
     }
 
-    public void clearBit(PieceBitboard pieceBitboard, BoardPosition boardPosition) {
-        clearBit(pieceBitboard, boardPosition.getBitBoardSquare());
+    public void clearBit(BitboardIndexProvider bitboardIndexProvider, BoardPosition boardPosition) {
+        clearBit(bitboardIndexProvider, boardPosition.getBitBoardSquare());
     }
 
     public void clearBit(BoardPosition boardPosition) {
@@ -76,12 +76,12 @@ public class Position {
         clearBit(PieceBitboard.ALL_PIECES, square);
     }
 
-    public boolean getBit(PieceBitboard pieceBitboard, int square) {
-        return (bitboards[pieceBitboard.getBitboardIndex()] & (1L << square)) != 0;
+    public boolean getBit(BitboardIndexProvider bitboardIndexProvider, int square) {
+        return (bitboards[bitboardIndexProvider.getBitboardIndex()] & (1L << square)) != 0;
     }
 
-    public boolean getBit(PieceBitboard pieceBitboard, BoardPosition boardPosition) {
-        return getBit(pieceBitboard, boardPosition.getBitBoardSquare());
+    public boolean getBit(BitboardIndexProvider bitboardIndexProvider, BoardPosition boardPosition) {
+        return getBit(bitboardIndexProvider, boardPosition.getBitBoardSquare());
     }
 
     public boolean getBit(BoardPosition boardPosition) {
@@ -92,18 +92,19 @@ public class Position {
         return getBit(PieceBitboard.ALL_PIECES, square);
     }
 
-    public long getBitboard(PieceBitboard pieceBitboard) {
-        return bitboards[pieceBitboard.getBitboardIndex()];
+    public long getBitboard(BitboardIndexProvider bitboardIndexProvider) {
+        return bitboards[bitboardIndexProvider.getBitboardIndex()];
     }
 
     public long getBitboard(int index) {
         return bitboards[index];
     }
 
-    public void setBitboard(PieceBitboard pieceBitboard, long value) {
-        bitboards[pieceBitboard.getBitboardIndex()] = value;
+    public void setBitboard(BitboardIndexProvider bitboardIndexProvider, long value) {
+        bitboards[bitboardIndexProvider.getBitboardIndex()] = value;
     }
-    // todo maybe add toogleBit helper
+
+    // todo maybe add toggleBit helper
 
     public long[] getBitboards() {
         return bitboards;

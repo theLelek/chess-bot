@@ -12,13 +12,13 @@ public enum PieceBitboard implements BitboardIndexProvider {
         this.bitboardIndex = bitboardIndex;
     }
 
-    public static PieceBitboard fromIndex(int index) {
+    public static PieceBitboard fromBitboardIndex(int index) {
         for (PieceBitboard pieceBitboard : PieceBitboard.values()) {
             if (pieceBitboard.getBitboardIndex() == index) {
                 return pieceBitboard;
             }
         }
-        return null;
+        throw new IllegalArgumentException("Invalid bitboard index: " + index);
     }
 
     public int getBitboardIndex() {
