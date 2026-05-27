@@ -40,7 +40,7 @@ public enum BoardPiece implements BitboardIndexProvider {
                 return piece;
             }
         }
-        return null;
+        throw new IllegalArgumentException("Invalid fen for board piece: " + fen);
     }
 
     public boolean hasSameColor(BoardPiece currentPiece) {
