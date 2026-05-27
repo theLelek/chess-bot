@@ -1,6 +1,7 @@
 package chess;
 
 import chess.Move.CastlingMove;
+import chess.board.model.BoardPiece;
 import chess.board.model.PieceBitboard;
 
 
@@ -12,12 +13,12 @@ public enum Color {
             new CastlingMove(4, 7, 2, 7),
             PieceBitboard.WHITE_PIECES,
             PieceBitboard.BLACK_PIECES,
-            PieceBitboard.WHITE_PAWNS,
-            PieceBitboard.WHITE_KNIGHTS,
-            PieceBitboard.WHITE_BISHOPS,
-            PieceBitboard.WHITE_ROOKS,
-            PieceBitboard.WHITE_QUEEN,
-            PieceBitboard.WHITE_KING
+            BoardPiece.WHITE_PAWN,
+            BoardPiece.WHITE_KNIGHT,
+            BoardPiece.WHITE_BISHOP,
+            BoardPiece.WHITE_ROOK,
+            BoardPiece.WHITE_QUEEN,
+            BoardPiece.WHITE_KING
 
     ),
 
@@ -27,12 +28,12 @@ public enum Color {
             new CastlingMove(4, 0, 2, 0),
             PieceBitboard.BLACK_PIECES,
             PieceBitboard.WHITE_PIECES,
-            PieceBitboard.BLACK_PAWNS,
-            PieceBitboard.BLACK_KNIGHTS,
-            PieceBitboard.BLACK_BISHOPS,
-            PieceBitboard.BLACK_ROOKS,
-            PieceBitboard.BLACK_QUEEN,
-            PieceBitboard.BLACK_KING
+            BoardPiece.BLACK_PAWN,
+            BoardPiece.BLACK_KNIGHT,
+            BoardPiece.BLACK_BISHOP,
+            BoardPiece.BLACK_ROOK,
+            BoardPiece.BLACK_QUEEN,
+            BoardPiece.BLACK_KING
     );
 
     private final int homeRank;
@@ -45,14 +46,15 @@ public enum Color {
 
     private final PieceBitboard ownPieceBitboard;
     private final PieceBitboard opponentPieceBitboard;
-    private final PieceBitboard pawnsBitboard;
-    private final PieceBitboard knightsBitboard;
-    private final PieceBitboard bishopsBitboard;
-    private final PieceBitboard rooksBitboard;
-    private final PieceBitboard queenBitboard;
-    private final PieceBitboard kingBitboard;
 
-    Color(int homeRank, int backRank, int pawnStartingRow, int movingDirection, CastlingMove castlingMoveKingSide, CastlingMove castlingMoveQueenSide, PieceBitboard ownPieceBitboard, PieceBitboard opponentPieceBitboard, PieceBitboard pawnsBitboard, PieceBitboard knightsBitboard, PieceBitboard bishopsBitboard, PieceBitboard rooksBitboard, PieceBitboard queenBitboard, PieceBitboard kingBitboard) {
+    private final BoardPiece pawnBoardPiece;
+    private final BoardPiece knightBoardPiece;
+    private final BoardPiece bishopBoardPiece;
+    private final BoardPiece rookBoardPiece;
+    private final BoardPiece queenBoardPiece;
+    private final BoardPiece kingBoardPiece;
+
+    Color(int homeRank, int backRank, int pawnStartingRow, int movingDirection, CastlingMove castlingMoveKingSide, CastlingMove castlingMoveQueenSide, PieceBitboard ownPieceBitboard, PieceBitboard opponentPieceBitboard, BoardPiece pawnBoardPiece, BoardPiece knightBoardPiece, BoardPiece bishopBoardPiece, BoardPiece rookBoardPiece, BoardPiece queenBoardPiece, BoardPiece kingBoardPiece) {
         this.homeRank = homeRank;
         this.backRank = backRank;
         this.pawnStartingRow = pawnStartingRow;
@@ -61,12 +63,12 @@ public enum Color {
         this.castlingMoveQueenSide = castlingMoveQueenSide;
         this.ownPieceBitboard = ownPieceBitboard;
         this.opponentPieceBitboard = opponentPieceBitboard;
-        this.pawnsBitboard = pawnsBitboard;
-        this.knightsBitboard = knightsBitboard;
-        this.bishopsBitboard = bishopsBitboard;
-        this.rooksBitboard = rooksBitboard;
-        this.queenBitboard = queenBitboard;
-        this.kingBitboard = kingBitboard;
+        this.pawnBoardPiece = pawnBoardPiece;
+        this.knightBoardPiece = knightBoardPiece;
+        this.bishopBoardPiece = bishopBoardPiece;
+        this.rookBoardPiece = rookBoardPiece;
+        this.queenBoardPiece = queenBoardPiece;
+        this.kingBoardPiece = kingBoardPiece;
     }
 
     public CastlingMove getCastlingMoveKingSide() {
@@ -101,27 +103,27 @@ public enum Color {
         return pawnStartingRow;
     }
 
-    public PieceBitboard getPawnsBitboard() {
-        return pawnsBitboard;
+    public BoardPiece getPawnBoardPiece() {
+        return pawnBoardPiece;
     }
 
-    public PieceBitboard getKnightsBitboard() {
-        return knightsBitboard;
+    public BoardPiece getKnightBoardPiece() {
+        return knightBoardPiece;
     }
 
-    public PieceBitboard getBishopsBitboard() {
-        return bishopsBitboard;
+    public BoardPiece getBishopBoardPiece() {
+        return bishopBoardPiece;
     }
 
-    public PieceBitboard getRooksBitboard() {
-        return rooksBitboard;
+    public BoardPiece getRookBoardPiece() {
+        return rookBoardPiece;
     }
 
-    public PieceBitboard getQueenBitboard() {
-        return queenBitboard;
+    public BoardPiece getQueenBoardPiece() {
+        return queenBoardPiece;
     }
 
-    public PieceBitboard getKingBitboard() {
-        return kingBitboard;
+    public BoardPiece getKingBoardPiece() {
+        return kingBoardPiece;
     }
 }
