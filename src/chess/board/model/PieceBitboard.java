@@ -1,6 +1,6 @@
 package chess.board.model;
 
-public enum PieceBitboard {
+public enum PieceBitboard implements BitboardIndexProvider {
 
     WHITE_PAWNS(0),
     WHITE_KNIGHTS(1),
@@ -20,10 +20,10 @@ public enum PieceBitboard {
     BLACK_PIECES(13),
     ALL_PIECES(14);
 
-    private final int index;
+    private final int bitboardIndex;
 
-    PieceBitboard(int index) {
-        this.index = index;
+    PieceBitboard(int bitboardIndex) {
+        this.bitboardIndex = bitboardIndex;
     }
 
     public static PieceBitboard fromFen(char fen) {
@@ -47,14 +47,14 @@ public enum PieceBitboard {
 
     public static PieceBitboard fromIndex(int index) {
         for (PieceBitboard pieceBitboard : PieceBitboard.values()) {
-            if (pieceBitboard.getIndex() == index) {
+            if (pieceBitboard.getBitboardIndex() == index) {
                 return pieceBitboard;
             }
         }
         return null;
     }
 
-    public int getIndex() {
-        return index;
+    public int getBitboardIndex() {
+        return bitboardIndex;
     }
 }
