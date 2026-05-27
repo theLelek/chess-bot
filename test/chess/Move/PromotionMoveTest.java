@@ -1,11 +1,9 @@
 package chess.Move;
 
 import chess.BoardPosition;
-import chess.board.model.BoardPiece;
+import chess.board.BoardPiece;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class PromotionMoveTest {
 

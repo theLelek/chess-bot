@@ -6,8 +6,7 @@ import chess.Move.CastlingMove;
 import chess.Move.EnPassantMove;
 import chess.Move.Move;
 import chess.Move.PromotionMove;
-
-import java.util.*;
+import chess.board.BoardPiece;
 
 public class Board {
 
@@ -21,9 +20,9 @@ public class Board {
     private int halfmoveClock;
     private int fullmoveNumber;
 
-    private final Position position;
+    private final BitBoardState bitBoardState;
 
-    public Board(BoardPiece[][] boardPieces, boolean isWhiteToMove, CastlingRights castlingRightsWhite, CastlingRights castlingRightsBlack, BoardPosition enPassantTargetSquare, int halfmoveClock, int fullmoveNumber, Position position) {
+    public Board(BoardPiece[][] boardPieces, boolean isWhiteToMove, CastlingRights castlingRightsWhite, CastlingRights castlingRightsBlack, BoardPosition enPassantTargetSquare, int halfmoveClock, int fullmoveNumber, BitBoardState bitBoardState) {
         this.boardPieces = boardPieces;
         this.isWhiteToMove = isWhiteToMove;
         this.castlingRightsWhite = castlingRightsWhite;
@@ -31,7 +30,7 @@ public class Board {
         this.enPassantTargetSquare = enPassantTargetSquare;
         this.halfmoveClock = halfmoveClock;
         this.fullmoveNumber = fullmoveNumber;
-        this.position = position;
+        this.bitBoardState = bitBoardState;
     }
 
     public static Board initializeDefaultBoard() {
@@ -47,7 +46,7 @@ public class Board {
         var enPassantTarget = (! fenParts[3].equals("-")) ? new BoardPosition(fenParts[3]) : null;
         var halfMoveClock = Integer.parseInt(fenParts[4]);
         var fullMoveNumber = Integer.parseInt(fenParts[5]);
-        var position = Position.initializeFromFen(fenParts[0]);
+        var position = BitBoardState.initializeFromFen(fenParts[0]);
         return new Board(boardPieces, isWhiteToMove, castlingRightsWhite, castlingRightsBlack, enPassantTarget, halfMoveClock, fullMoveNumber, position);
     }
 
@@ -205,7 +204,7 @@ public class Board {
         return enPassantTargetSquare;
     }
 
-    public Position getPosition() {
-        return position;
+    public BitBoardState getPosition() {
+        return bitBoardState;
     }
 }

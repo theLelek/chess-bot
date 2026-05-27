@@ -1,8 +1,8 @@
 package chess;
 
 import chess.Move.CastlingMove;
-import chess.board.model.BoardPiece;
-import chess.board.model.PieceBitboard;
+import chess.board.BoardPiece;
+import chess.board.OccupancyBitboard;
 
 
 public enum Color {
@@ -11,8 +11,8 @@ public enum Color {
             7, 0, 6, -1,
             new CastlingMove(4, 7, 6, 7),
             new CastlingMove(4, 7, 2, 7),
-            PieceBitboard.WHITE_PIECES,
-            PieceBitboard.BLACK_PIECES,
+            OccupancyBitboard.WHITE_PIECES,
+            OccupancyBitboard.BLACK_PIECES,
             BoardPiece.WHITE_PAWN,
             BoardPiece.WHITE_KNIGHT,
             BoardPiece.WHITE_BISHOP,
@@ -26,8 +26,8 @@ public enum Color {
             0, 7, 1, 1,
             new CastlingMove(4, 0, 6, 0),
             new CastlingMove(4, 0, 2, 0),
-            PieceBitboard.BLACK_PIECES,
-            PieceBitboard.WHITE_PIECES,
+            OccupancyBitboard.BLACK_PIECES,
+            OccupancyBitboard.WHITE_PIECES,
             BoardPiece.BLACK_PAWN,
             BoardPiece.BLACK_KNIGHT,
             BoardPiece.BLACK_BISHOP,
@@ -44,8 +44,8 @@ public enum Color {
     private final CastlingMove castlingMoveKingSide;
     private final CastlingMove castlingMoveQueenSide;
 
-    private final PieceBitboard ownPieceBitboard;
-    private final PieceBitboard opponentPieceBitboard;
+    private final OccupancyBitboard ownOccupancyBitboard;
+    private final OccupancyBitboard opponentOccupancyBitboard;
 
     private final BoardPiece pawnBoardPiece;
     private final BoardPiece knightBoardPiece;
@@ -54,15 +54,15 @@ public enum Color {
     private final BoardPiece queenBoardPiece;
     private final BoardPiece kingBoardPiece;
 
-    Color(int homeRank, int backRank, int pawnStartingRow, int movingDirection, CastlingMove castlingMoveKingSide, CastlingMove castlingMoveQueenSide, PieceBitboard ownPieceBitboard, PieceBitboard opponentPieceBitboard, BoardPiece pawnBoardPiece, BoardPiece knightBoardPiece, BoardPiece bishopBoardPiece, BoardPiece rookBoardPiece, BoardPiece queenBoardPiece, BoardPiece kingBoardPiece) {
+    Color(int homeRank, int backRank, int pawnStartingRow, int movingDirection, CastlingMove castlingMoveKingSide, CastlingMove castlingMoveQueenSide, OccupancyBitboard ownOccupancyBitboard, OccupancyBitboard opponentOccupancyBitboard, BoardPiece pawnBoardPiece, BoardPiece knightBoardPiece, BoardPiece bishopBoardPiece, BoardPiece rookBoardPiece, BoardPiece queenBoardPiece, BoardPiece kingBoardPiece) {
         this.homeRank = homeRank;
         this.backRank = backRank;
         this.pawnStartingRow = pawnStartingRow;
         this.movingDirection = movingDirection;
         this.castlingMoveKingSide = castlingMoveKingSide;
         this.castlingMoveQueenSide = castlingMoveQueenSide;
-        this.ownPieceBitboard = ownPieceBitboard;
-        this.opponentPieceBitboard = opponentPieceBitboard;
+        this.ownOccupancyBitboard = ownOccupancyBitboard;
+        this.opponentOccupancyBitboard = opponentOccupancyBitboard;
         this.pawnBoardPiece = pawnBoardPiece;
         this.knightBoardPiece = knightBoardPiece;
         this.bishopBoardPiece = bishopBoardPiece;
@@ -91,12 +91,12 @@ public enum Color {
         return movingDirection;
     }
 
-    public PieceBitboard getOpponentPieceBitboard() {
-        return opponentPieceBitboard;
+    public OccupancyBitboard getOpponentPieceBitboard() {
+        return opponentOccupancyBitboard;
     }
 
-    public PieceBitboard getOwnPieceBitboard() {
-        return ownPieceBitboard;
+    public OccupancyBitboard getOwnPieceBitboard() {
+        return ownOccupancyBitboard;
     }
 
     public int getPawnStartingRow() {

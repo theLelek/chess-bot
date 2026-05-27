@@ -1,6 +1,4 @@
-package chess.board.model;
-
-import chess.board.PieceMoveRules;
+package chess.board;
 
 public enum BoardPiece implements BitboardIndexProvider {
     WHITE_PAWN('P', PieceMoveRules.WHITE_PAWN, 0),

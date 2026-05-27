@@ -1,8 +1,6 @@
 package chess.move_generation;
 
-import chess.BoardPosition;
 import chess.board.model.Board;
-import chess.board.model.BoardPiece;
 
 class BoardEvaluation {
 
