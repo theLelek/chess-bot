@@ -2,27 +2,38 @@ package chess.board.model;
 
 import chess.board.PieceMoveRules;
 
-public enum BoardPiece {
-    WHITE_ROOK('R', PieceMoveRules.ROOK),
-    WHITE_KNIGHT('N', PieceMoveRules.KNIGHT),
-    WHITE_BISHOP('B',  PieceMoveRules.BISHOP),
-    WHITE_QUEEN('Q', PieceMoveRules.QUEEN),
-    WHITE_KING('K',  PieceMoveRules.KING),
-    WHITE_PAWN('P', PieceMoveRules.WHITE_PAWN),
+public enum BoardPiece implements BitboardIndexProvider {
+    WHITE_PAWN('P', PieceMoveRules.WHITE_PAWN, 0),
+    WHITE_KNIGHT('N', PieceMoveRules.KNIGHT, 1),
+    WHITE_BISHOP('B', PieceMoveRules.BISHOP, 2),
+    WHITE_ROOK('R', PieceMoveRules.ROOK, 3),
+    WHITE_QUEEN('Q', PieceMoveRules.QUEEN, 4),
+    WHITE_KING('K', PieceMoveRules.KING, 5),
 
-    BLACK_ROOK('r', PieceMoveRules.ROOK),
-    BLACK_KNIGHT('n', PieceMoveRules.KNIGHT),
-    BLACK_BISHOP('b', PieceMoveRules.BISHOP),
-    BLACK_QUEEN('q', PieceMoveRules.QUEEN),
-    BLACK_KING('k', PieceMoveRules.KING),
-    BLACK_PAWN('p', PieceMoveRules.BLACK_PAWN);
+    BLACK_PAWN('p', PieceMoveRules.BLACK_PAWN, 6),
+    BLACK_KNIGHT('n', PieceMoveRules.KNIGHT, 7),
+    BLACK_BISHOP('b', PieceMoveRules.BISHOP, 8),
+    BLACK_ROOK('r', PieceMoveRules.ROOK, 9),
+    BLACK_QUEEN('q', PieceMoveRules.QUEEN, 10),
+    BLACK_KING('k', PieceMoveRules.KING, 11);
 
     private final char fen;
     private final PieceMoveRules moveRules;
+    private final int bitboardIndex;
 
-    BoardPiece(char fen, PieceMoveRules moveRules) {
+    BoardPiece(char fen, PieceMoveRules moveRules, int bitboardIndex) {
         this.fen = fen;
         this.moveRules = moveRules;
+        this.bitboardIndex = bitboardIndex;
+    }
+
+    public static BoardPiece fromBitboardIndex(int index) {
+        for (BoardPiece boardPiece : BoardPiece.values()) {
+            if (boardPiece.getBitboardIndex() == index) {
+                return boardPiece;
+            }
+        }
+        throw new IllegalArgumentException("Invalid bitboard index: " + index);
     }
 
     public static BoardPiece fromFen(char fen) {
@@ -107,5 +118,9 @@ public enum BoardPiece {
 
     public boolean isPawn() {
         return fen == 'p' || fen == 'P';
+    }
+
+    public int getBitboardIndex() {
+        return bitboardIndex;
     }
 }
