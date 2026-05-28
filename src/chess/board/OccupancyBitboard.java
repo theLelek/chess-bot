@@ -1,5 +1,7 @@
 package chess.board;
 
+import chess.Color;
+
 public enum OccupancyBitboard implements BitboardIndexProvider {
 
     WHITE_PIECES(12),
@@ -10,6 +12,10 @@ public enum OccupancyBitboard implements BitboardIndexProvider {
 
     OccupancyBitboard(int bitboardIndex) {
         this.bitboardIndex = bitboardIndex;
+    }
+
+    public static OccupancyBitboard fromColor(Color color) {
+        return (color == Color.WHITE) ? WHITE_PIECES : BLACK_PIECES;
     }
 
     public static OccupancyBitboard fromBitboardIndex(int index) {
