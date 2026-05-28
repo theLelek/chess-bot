@@ -112,48 +112,23 @@ public class Board {
 
     private void updatePieces(Move move) {
         BoardPiece pieceToMove = pieceList[move.from().getBitBoardSquare()];
-        BoardPiece pieceToCapture = pieceList[move.to().getBitBoardSquare()];
         Color color = (pieceToMove.isWhite()) ? Color.WHITE : Color.BLACK;
 
         switch (move) {
             case PromotionMove m:
-                updatePiecesPromotionMove(m);
-               break;
+                updatePieceNormal(move.from(), move.to(), m.getPromotionPiece());
+                break;
             case EnPassantMove m:
                 updatePiecesEnPassantMove(m);
-               break;
+                break;
             case CastlingMove m:
                 updatePiecesCastlingMove(m);
                 break;
             default:
-                updatePieceNormal(move);
+                updatePieceNormal(move.from(), move.to(), pieceList[move.from().getBitBoardSquare()]);
                 break;
         }
         enPassantTargetSquare = (pieceToMove.isPawn() && Math.abs(move.from().y() - move.to().y()) == 2) ? new BoardPosition(move.to().x(), move.to().y() - color.getMovingDirection()) : null;
-    }
-
-    private void updatePiecesPromotionMove(PromotionMove move) {
-        BoardPiece pieceToMove = pieceList[move.from().getBitBoardSquare()];
-        BoardPiece pieceToCapture = pieceList[move.to().getBitBoardSquare()];
-        Color color = (isWhiteToMove) ? Color.WHITE : Color.BLACK;
-        BoardPiece promotionPiece = move.getPromotionPiece();
-
-        // remove pawn on move.from()
-        bitBoardState.clearBit(pieceToMove, move.from());
-        bitBoardState.clearBit(OccupancyBitboard.ALL_PIECES, move.from());
-        bitBoardState.clearBit(color.getOwnOccupancyBitboard(), move.from());
-
-        // place promotion piece on move.to()
-        bitBoardState.setBit(promotionPiece, move.to());
-        bitBoardState.setBit(OccupancyBitboard.ALL_PIECES, move.from());
-        bitBoardState.setBit(color.getOwnOccupancyBitboard(), move.from());
-
-        // remove piece to capture if it exists
-        if (pieceToMove != null) {
-            bitBoardState.clearBit(pieceToMove, move.to());
-            bitBoardState.clearBit(OccupancyBitboard.ALL_PIECES, move.to());
-            bitBoardState.clearBit(color.getOwnOccupancyBitboard(), move.to());
-        }
     }
 
     private void updatePiecesEnPassantMove(EnPassantMove move) {
@@ -161,18 +136,19 @@ public class Board {
         Color color = (isWhiteToMove) ? Color.WHITE : Color.BLACK;
         BoardPosition enPassantPiecePosition = getEnPassantPiecePosition();
 
-        updatePieceNormal(move);
+        updatePieceNormal(move.from(), move.to(), pieceList[move.to().getBitBoardSquare()]);
 
         // remove pawn to be captured
         bitBoardState.clearBit(color.getOpponentPawn(), enPassantPiecePosition);
         bitBoardState.clearBit(color.getOpponentOccupancyBitboard(), enPassantPiecePosition);
         bitBoardState.clearBit(OccupancyBitboard.ALL_PIECES, enPassantPiecePosition);
+        pieceList[enPassantPiecePosition.getBitBoardSquare()] = null;
     }
 
     private void updatePiecesCastlingMove(CastlingMove move) {
         Color color = isWhiteToMove ? Color.WHITE : Color.BLACK;
 
-        updatePieceNormal(move);
+        updatePieceNormal(move.from(), move.to(), pieceList[move.to().getBitBoardSquare()]);
 
         // move rooks
         boolean isKingSideCastling = move.to().x() == Board.SIZE - 2;
@@ -183,52 +159,38 @@ public class Board {
         bitBoardState.setBit(color.getRook(), rookTo);
         bitBoardState.setBit(OccupancyBitboard.ALL_PIECES, rookTo);
         bitBoardState.setBit(color.getOwnOccupancyBitboard(), rookTo);
+        pieceList[rookTo.getBitBoardSquare()] = pieceList[rookFrom.getBitBoardSquare()];
 
         bitBoardState.clearBit(color.getRook(), rookFrom);
         bitBoardState.clearBit(OccupancyBitboard.ALL_PIECES, rookFrom);
         bitBoardState.clearBit(color.getOwnOccupancyBitboard(), rookFrom);
+        pieceList[rookFrom.getBitBoardSquare()] = null;
     }
 
-    private void updatePieceNormal(Move move) {
-        BoardPiece pieceToMove = pieceList[move.from().getBitBoardSquare()];
-        BoardPiece pieceToCapture = pieceList[move.to().getBitBoardSquare()];
+    private void updatePieceNormal(BoardPosition from, BoardPosition to, BoardPiece pieceToBecome) {
+        BoardPiece pieceToMove = pieceList[from.getBitBoardSquare()];
         Color color = (isWhiteToMove) ? Color.WHITE : Color.BLACK;
 
-        // remove piece on move.from()
-        bitBoardState.clearBit(pieceToMove, move.from());
-        bitBoardState.clearBit(OccupancyBitboard.ALL_PIECES, move.from());
-        bitBoardState.clearBit(color.getOwnOccupancyBitboard(), move.from());
-        pieceList[move.from().getBitBoardSquare()] = null;
+        // remove piece on from
+        bitBoardState.clearBit(pieceToMove, from);
+        bitBoardState.clearBit(OccupancyBitboard.ALL_PIECES, from);
+        bitBoardState.clearBit(color.getOwnOccupancyBitboard(), from);
+        pieceList[from.getBitBoardSquare()] = null;
 
-        // place piece on move.to()
-        bitBoardState.setBit(pieceToMove, move.to());
-        bitBoardState.setBit(OccupancyBitboard.ALL_PIECES, move.to());
-        bitBoardState.setBit(color.getOwnOccupancyBitboard(), move.to());
-        pieceList[move.to().getBitBoardSquare()] = pieceToMove;
+        // place piece on to
+        bitBoardState.setBit(pieceToBecome, to);
+        bitBoardState.setBit(OccupancyBitboard.ALL_PIECES, to);
+        bitBoardState.setBit(color.getOwnOccupancyBitboard(), to);
+        pieceList[to.getBitBoardSquare()] = pieceToBecome;
 
+        // capture piece if it exists
+        BoardPiece pieceToCapture = pieceList[to.getBitBoardSquare()];
         if (pieceToCapture != null) {
-            bitBoardState.clearBit(pieceToCapture, move.to());
-            bitBoardState.clearBit(OccupancyBitboard.ALL_PIECES, move.to());
-            bitBoardState.clearBit(color.getOwnOccupancyBitboard(), move.to());
+            bitBoardState.clearBit(pieceToCapture, to);
+            bitBoardState.clearBit(OccupancyBitboard.ALL_PIECES, to);
+            bitBoardState.clearBit(color.getOwnOccupancyBitboard(), to);
         }
     }
-
-//    @Override
-//    public String toString() {
-//        StringBuilder sb = new StringBuilder();
-//        for (int y = 0; y < boardPieces.length; y++) {
-//            for (int x = 0; x < boardPieces[y].length; x++) {
-//                BoardPiece piece = boardPieces[y][x];
-//                if (piece == null) {
-//                    sb.append(". ");
-//                } else {
-//                    sb.append(piece.getFen()).append(" ");
-//                }
-//            }
-//            sb.append("\n");
-//        }
-//        return sb.toString();
-//    }
 
     public BoardPosition getEnPassantPiecePosition() { // todo test
         if (enPassantTargetSquare == null) throw new RuntimeException("No en passant target square set");
