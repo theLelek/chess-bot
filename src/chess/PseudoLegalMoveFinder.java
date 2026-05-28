@@ -86,28 +86,28 @@ public class PseudoLegalMoveFinder {
 
         // forward 1
         BoardPosition forward1 = new BoardPosition(boardPosition.x(), forwardY);
-        if (! bitBoardState.getBit(forward1)) {
+        if (! bitBoardState.getBit(OccupancyBitboard.ALL_PIECES, forward1)) {
             legalMoves.add(new Move(boardPosition, forward1));
         }
 
         // forward 2
         if (boardPosition.y() == startingY
-                && ! bitBoardState.getBit(new BoardPosition(boardPosition.x(), forwardY))
-                && ! bitBoardState.getBit(new BoardPosition(boardPosition.x(), forwardY + direction))) {
+                && ! bitBoardState.getBit(OccupancyBitboard.ALL_PIECES, new BoardPosition(boardPosition.x(), forwardY))
+                && ! bitBoardState.getBit(OccupancyBitboard.ALL_PIECES, new BoardPosition(boardPosition.x(), forwardY + direction))) {
             legalMoves.add(new Move(boardPosition, new BoardPosition(boardPosition.x(), forwardY + direction)));
         }
 
         // diagonal
         if (boardPosition.x() - 1 >= 0) {
             BoardPosition diagonalPiecePosition = new BoardPosition(boardPosition.x() - 1, forwardY);
-            if (bitBoardState.getBit(diagonalPiecePosition) && bitBoardState.getBit(opponentPieceBitBoard, diagonalPiecePosition)) {
+            if (bitBoardState.getBit(OccupancyBitboard.ALL_PIECES, diagonalPiecePosition) && bitBoardState.getBit(opponentPieceBitBoard, diagonalPiecePosition)) {
                 legalMoves.add(new Move(boardPosition, diagonalPiecePosition));
             }
         }
 
         if (boardPosition.x() + 1 < Board.SIZE) {
             BoardPosition diagonalPiecePosition = new BoardPosition(boardPosition.x() + 1, forwardY);
-            if (bitBoardState.getBit(diagonalPiecePosition) && bitBoardState.getBit(opponentPieceBitBoard, diagonalPiecePosition)) {
+            if (bitBoardState.getBit(OccupancyBitboard.ALL_PIECES, diagonalPiecePosition) && bitBoardState.getBit(opponentPieceBitBoard, diagonalPiecePosition)) {
                 legalMoves.add(new Move(boardPosition, diagonalPiecePosition));
             }
         }
@@ -135,15 +135,15 @@ public class PseudoLegalMoveFinder {
         String rank = isWhiteToMove ? "1" : "8";
 
         if (rights.canCastleKingSide()
-                && ! bitBoardState.getBit(new BoardPosition("f" + rank))
-                && ! bitBoardState.getBit(new BoardPosition("g" + rank))) {
+                && ! bitBoardState.getBit(OccupancyBitboard.ALL_PIECES, new BoardPosition("f" + rank))
+                && ! bitBoardState.getBit(OccupancyBitboard.ALL_PIECES, new BoardPosition("g" + rank))) {
             legalMoves.add(color.getCastlingMoveKingSide());
         }
 
         if (rights.canCastleQueenSide()
-                && ! bitBoardState.getBit(new BoardPosition("d" + rank))
-                && ! bitBoardState.getBit(new BoardPosition("c" + rank))
-                && ! bitBoardState.getBit(new BoardPosition("b" + rank))) {
+                && ! bitBoardState.getBit(OccupancyBitboard.ALL_PIECES, new BoardPosition("d" + rank))
+                && ! bitBoardState.getBit(OccupancyBitboard.ALL_PIECES, new BoardPosition("c" + rank))
+                && ! bitBoardState.getBit(OccupancyBitboard.ALL_PIECES, new BoardPosition("b" + rank))) {
             legalMoves.add(color.getCastlingMoveQueenSide());
         }
     }
