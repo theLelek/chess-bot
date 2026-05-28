@@ -7,15 +7,12 @@ import chess.Move.EnPassantMove;
 import chess.Move.Move;
 import chess.Move.PromotionMove;
 import chess.board.BoardPiece;
-
-import java.util.ArrayList;
-import java.util.List;
+import chess.board.OccupancyBitboard;
 
 public class Board {
 
     public static final int SIZE = 8;
 
-    private final BoardPiece[][] boardPieces;
     private boolean isWhiteToMove;
     private final CastlingRights castlingRightsWhite;
     private final CastlingRights castlingRightsBlack;
@@ -23,12 +20,10 @@ public class Board {
     private int halfmoveClock;
     private int fullmoveNumber;
 
-    private final BoardPiece[] pieceList = new BoardPiece[Board.SIZE * Board.SIZE]; // todo
-
     private final BitBoardState bitBoardState;
+    private final BoardPiece[] pieceList;
 
-    public Board(BoardPiece[][] boardPieces, boolean isWhiteToMove, CastlingRights castlingRightsWhite, CastlingRights castlingRightsBlack, BoardPosition enPassantTargetSquare, int halfmoveClock, int fullmoveNumber, BitBoardState bitBoardState) {
-        this.boardPieces = boardPieces;
+    public Board(boolean isWhiteToMove, CastlingRights castlingRightsWhite, CastlingRights castlingRightsBlack, BoardPosition enPassantTargetSquare, int halfmoveClock, int fullmoveNumber, BitBoardState bitBoardState, BoardPiece[] pieceList) {
         this.isWhiteToMove = isWhiteToMove;
         this.castlingRightsWhite = castlingRightsWhite;
         this.castlingRightsBlack = castlingRightsBlack;
@@ -36,6 +31,7 @@ public class Board {
         this.halfmoveClock = halfmoveClock;
         this.fullmoveNumber = fullmoveNumber;
         this.bitBoardState = bitBoardState;
+        this.pieceList = pieceList;
     }
 
     public static Board initializeDefaultBoard() {
@@ -44,7 +40,6 @@ public class Board {
 
     public static Board initializeFromFen(String fen) {
         String[] fenParts = fen.split(" ");
-        var boardPieces = initializeBoardPiecesFromFen(fenParts[0]);
         var isWhiteToMove = fenParts[1].equals("w");
         var castlingRightsWhite = CastlingRights.fromFen(fenParts[2], true);
         var castlingRightsBlack = CastlingRights.fromFen(fenParts[2], false);
@@ -53,29 +48,11 @@ public class Board {
         var fullMoveNumber = Integer.parseInt(fenParts[5]);
         var pieceList = initializePieceList(fenParts[0]);
         var bitboardState = BitBoardState.initializeFromPieceList(pieceList);
-        return new Board(boardPieces, isWhiteToMove, castlingRightsWhite, castlingRightsBlack, enPassantTarget, halfMoveClock, fullMoveNumber, bitboardState);
-    }
-
-    private static BoardPiece[][] initializeBoardPiecesFromFen(String piecePlacements) {
-        BoardPiece[][] boardPieces = new BoardPiece[SIZE][SIZE];
-        String[] lines = piecePlacements.split("/");
-        for (int i = lines.length -1; i >= 0; i--) {
-            int boardCounter = 0;
-            for (int j = 0; j < lines[i].length(); j++) {
-                char currentChar =  lines[i].charAt(j);
-                if (Character.isDigit(currentChar)) {
-                    boardCounter += Integer.parseInt(String.valueOf(currentChar));
-                    continue;
-                }
-                boardPieces[i][boardCounter] = BoardPiece.fromFen(currentChar);
-                boardCounter++;
-            }
-        }
-        return boardPieces;
+        return new Board(isWhiteToMove, castlingRightsWhite, castlingRightsBlack, enPassantTarget, halfMoveClock, fullMoveNumber, bitboardState, pieceList);
     }
 
     private static BoardPiece[] initializePieceList(String fen) {
-        BoardPiece[] pieceList = new BoardPiece[64];
+        BoardPiece[] pieceList = new BoardPiece[Board.SIZE * Board.SIZE];
         String[] lines = fen.split("/");
 
         for (int i = 0; i < lines.length; i++) {
@@ -96,8 +73,8 @@ public class Board {
     }
 
     public void move(Move move) {
-        BoardPiece pieceToMove = getBoardPiece(move.from());
-        BoardPiece pieceToCapture = getBoardPiece(move.to());
+        BoardPiece pieceToMove = pieceList[move.from().getBitBoardSquare()];
+        BoardPiece pieceToCapture = pieceList[move.to().getBitBoardSquare()];
 
         updateCastlingRights(move);
         halfmoveClock = (pieceToMove.isPawn() || pieceToCapture != null) ? 0 : halfmoveClock + 1;
@@ -108,7 +85,8 @@ public class Board {
 
     private void updateCastlingRights(Move move) {
         Color color = (isWhiteToMove) ? Color.WHITE : Color.BLACK;
-        BoardPiece pieceToMove = getBoardPiece(move.from());
+        BoardPiece pieceToMove = pieceList[move.from().getBitBoardSquare()];
+
         int homeRank = color.getHomeRank();
         int backRank = color.getBackRank();
         CastlingRights castlingRights = (isWhiteToMove) ? castlingRightsWhite : castlingRightsBlack;
@@ -133,66 +111,129 @@ public class Board {
     }
 
     private void updatePieces(Move move) {
-        BoardPiece pieceToMove = boardPieces[move.from().y()][move.from().x()];
-        setBoardPiece(move.from(), null);
-        setBoardPiece(move.to(), pieceToMove);
-        Color colorToMove = (pieceToMove.isWhite()) ? Color.WHITE : Color.BLACK;
+        BoardPiece pieceToMove = pieceList[move.from().getBitBoardSquare()];
+        BoardPiece pieceToCapture = pieceList[move.to().getBitBoardSquare()];
+        Color color = (pieceToMove.isWhite()) ? Color.WHITE : Color.BLACK;
 
         switch (move) {
             case PromotionMove m:
-                setBoardPiece(move.to(), m.getPromotionPiece());
-                break;
-            case EnPassantMove _:
-                setBoardPiece(move.from(), null);
-                break;
+                updatePiecesPromotionMove(m);
+               break;
+            case EnPassantMove m:
+                updatePiecesEnPassantMove(m);
+               break;
             case CastlingMove m:
-                if (m.to().x() == Board.SIZE - 2) { // king side castling
-                    boardPieces[move.from().y()][Board.SIZE - 3] = boardPieces[move.from().y()][Board.SIZE - 1];
-                    boardPieces[move.from().y()][Board.SIZE - 1] = null;
-                } else { // queen side castling
-                    boardPieces[move.from().y()][3] = boardPieces[move.from().y()][0];
-                    boardPieces[move.from().y()][0] = null;
-                }
+                updatePiecesCastlingMove(m);
                 break;
             default:
+                updatePieceNormal(move);
                 break;
         }
-        enPassantTargetSquare = (pieceToMove.isPawn() && Math.abs(move.from().y() - move.to().y()) == 2) ? new BoardPosition(move.to().x(), move.to().y() - colorToMove.getMovingDirection()) : null;
+        enPassantTargetSquare = (pieceToMove.isPawn() && Math.abs(move.from().y() - move.to().y()) == 2) ? new BoardPosition(move.to().x(), move.to().y() - color.getMovingDirection()) : null;
     }
 
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        for (int y = 0; y < boardPieces.length; y++) {
-            for (int x = 0; x < boardPieces[y].length; x++) {
-                BoardPiece piece = boardPieces[y][x];
-                if (piece == null) {
-                    sb.append(". ");
-                } else {
-                    sb.append(piece.getFen()).append(" ");
-                }
-            }
-            sb.append("\n");
+    private void updatePiecesPromotionMove(PromotionMove move) {
+        BoardPiece pieceToMove = pieceList[move.from().getBitBoardSquare()];
+        BoardPiece pieceToCapture = pieceList[move.to().getBitBoardSquare()];
+        Color color = (isWhiteToMove) ? Color.WHITE : Color.BLACK;
+        BoardPiece promotionPiece = move.getPromotionPiece();
+
+        // remove pawn on move.from()
+        bitBoardState.clearBit(pieceToMove, move.from());
+        bitBoardState.clearBit(OccupancyBitboard.ALL_PIECES, move.from());
+        bitBoardState.clearBit(color.getOwnOccupancyBitboard(), move.from());
+
+        // place promotion piece on move.to()
+        bitBoardState.setBit(promotionPiece, move.to());
+        bitBoardState.setBit(OccupancyBitboard.ALL_PIECES, move.from());
+        bitBoardState.setBit(color.getOwnOccupancyBitboard(), move.from());
+
+        // remove piece to capture if it exists
+        if (pieceToMove != null) {
+            bitBoardState.clearBit(pieceToMove, move.to());
+            bitBoardState.clearBit(OccupancyBitboard.ALL_PIECES, move.to());
+            bitBoardState.clearBit(color.getOwnOccupancyBitboard(), move.to());
         }
-        return sb.toString();
     }
 
-    public BoardPosition getEnPassantPiecePosition() {
-        if (enPassantTargetSquare == null) return null;
+    private void updatePiecesEnPassantMove(EnPassantMove move) {
+        BoardPiece pieceToMove = pieceList[move.from().getBitBoardSquare()];
+        Color color = (isWhiteToMove) ? Color.WHITE : Color.BLACK;
+        BoardPosition enPassantPiecePosition = getEnPassantPiecePosition();
+
+        updatePieceNormal(move);
+
+        // remove pawn to be captured
+        bitBoardState.clearBit(color.getOpponentPawn(), enPassantPiecePosition);
+        bitBoardState.clearBit(color.getOpponentOccupancyBitboard(), enPassantPiecePosition);
+        bitBoardState.clearBit(OccupancyBitboard.ALL_PIECES, enPassantPiecePosition);
+    }
+
+    private void updatePiecesCastlingMove(CastlingMove move) {
+        Color color = isWhiteToMove ? Color.WHITE : Color.BLACK;
+
+        updatePieceNormal(move);
+
+        // move rooks
+        boolean isKingSideCastling = move.to().x() == Board.SIZE - 2;
+
+        BoardPosition rookFrom = new BoardPosition(isKingSideCastling ? Board.SIZE - 1 : 0, move.to().y());
+        BoardPosition rookTo = new BoardPosition(isKingSideCastling ? Board.SIZE - 3 : Board.SIZE - 4, move.to().y());
+
+        bitBoardState.setBit(color.getRook(), rookTo);
+        bitBoardState.setBit(OccupancyBitboard.ALL_PIECES, rookTo);
+        bitBoardState.setBit(color.getOwnOccupancyBitboard(), rookTo);
+
+        bitBoardState.clearBit(color.getRook(), rookFrom);
+        bitBoardState.clearBit(OccupancyBitboard.ALL_PIECES, rookFrom);
+        bitBoardState.clearBit(color.getOwnOccupancyBitboard(), rookFrom);
+    }
+
+    private void updatePieceNormal(Move move) {
+        BoardPiece pieceToMove = pieceList[move.from().getBitBoardSquare()];
+        BoardPiece pieceToCapture = pieceList[move.to().getBitBoardSquare()];
+        Color color = (isWhiteToMove) ? Color.WHITE : Color.BLACK;
+
+        // remove piece on move.from()
+        bitBoardState.clearBit(pieceToMove, move.from());
+        bitBoardState.clearBit(OccupancyBitboard.ALL_PIECES, move.from());
+        bitBoardState.clearBit(color.getOwnOccupancyBitboard(), move.from());
+        pieceList[move.from().getBitBoardSquare()] = null;
+
+        // place piece on move.to()
+        bitBoardState.setBit(pieceToMove, move.to());
+        bitBoardState.setBit(OccupancyBitboard.ALL_PIECES, move.to());
+        bitBoardState.setBit(color.getOwnOccupancyBitboard(), move.to());
+        pieceList[move.to().getBitBoardSquare()] = pieceToMove;
+
+        if (pieceToCapture != null) {
+            bitBoardState.clearBit(pieceToCapture, move.to());
+            bitBoardState.clearBit(OccupancyBitboard.ALL_PIECES, move.to());
+            bitBoardState.clearBit(color.getOwnOccupancyBitboard(), move.to());
+        }
+    }
+
+//    @Override
+//    public String toString() {
+//        StringBuilder sb = new StringBuilder();
+//        for (int y = 0; y < boardPieces.length; y++) {
+//            for (int x = 0; x < boardPieces[y].length; x++) {
+//                BoardPiece piece = boardPieces[y][x];
+//                if (piece == null) {
+//                    sb.append(". ");
+//                } else {
+//                    sb.append(piece.getFen()).append(" ");
+//                }
+//            }
+//            sb.append("\n");
+//        }
+//        return sb.toString();
+//    }
+
+    public BoardPosition getEnPassantPiecePosition() { // todo test
+        if (enPassantTargetSquare == null) throw new RuntimeException("No en passant target square set");
         Color color = (isWhiteToMove) ? Color.WHITE : Color.BLACK;
         return new BoardPosition(enPassantTargetSquare.x(), enPassantTargetSquare.y() - color.getMovingDirection());
-    }
-
-    public BoardPiece[][] getBoardPieces() {
-        return boardPieces;
-    }
-
-    public BoardPiece getBoardPiece(BoardPosition currentPosition) {
-        return boardPieces[currentPosition.y()][currentPosition.x()];
-    }
-
-    public void setBoardPiece(BoardPosition currentPosition, BoardPiece piece) {
-        boardPieces[currentPosition.y()][currentPosition.x()] = piece;
     }
 
     public boolean isWhiteToMove() {

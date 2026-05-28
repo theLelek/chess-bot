@@ -14,10 +14,6 @@ public enum OccupancyBitboard implements BitboardIndexProvider {
         this.bitboardIndex = bitboardIndex;
     }
 
-    public static OccupancyBitboard fromColor(Color color) {
-        return (color == Color.WHITE) ? WHITE_PIECES : BLACK_PIECES;
-    }
-
     public static OccupancyBitboard fromBitboardIndex(int index) {
         for (OccupancyBitboard occupancyBitboard : OccupancyBitboard.values()) {
             if (occupancyBitboard.getBitboardIndex() == index) {
