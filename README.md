@@ -1,14 +1,15 @@
-This repo contains a chess bot written fully in java. It is written from scratch without any libraries.
+This repo contains a chess bot written fully in Java.
 
-*Features*
-Bitboard-based board representation
-FEN support
---uci protocoll--
---Alpha-beta search--
---Iterative deepening--
---Move ordering--
---Transposition table--
---Zobrist hashing--
---Legal move generation--
+It is written from scratch without any libraries.
 
+## Features
 
+- Bitboard-based board representation
+- FEN support
+- Legal move generation
+- ~~UCI protocol~~
+- ~~Alpha-beta search~~
+- ~~Iterative deepening~~
+- ~~Move ordering~~
+- ~~Transposition table~~
+- ~~Zobrist hashing~~
