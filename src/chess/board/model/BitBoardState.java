@@ -51,14 +51,6 @@ public class BitBoardState {
         setBit(bitboardIndexProvider, boardPosition.getBitBoardSquare());
     }
 
-    public void setBit(BoardPosition boardPosition) {
-        setBit(OccupancyBitboard.ALL_PIECES, boardPosition);
-    }
-
-    public void setBit(int square) {
-        setBit(OccupancyBitboard.ALL_PIECES, square);
-    }
-
     public void clearBit(BitboardIndexProvider bitboardIndexProvider, int square) {
         bitboards[bitboardIndexProvider.getBitboardIndex()] &= ~(1L << square);
     }
@@ -67,28 +59,12 @@ public class BitBoardState {
         clearBit(bitboardIndexProvider, boardPosition.getBitBoardSquare());
     }
 
-    public void clearBit(BoardPosition boardPosition) {
-        clearBit(OccupancyBitboard.ALL_PIECES, boardPosition);
-    }
-
-    public void clearBit(int square) {
-        clearBit(OccupancyBitboard.ALL_PIECES, square);
-    }
-
     public boolean getBit(BitboardIndexProvider bitboardIndexProvider, int square) {
         return (bitboards[bitboardIndexProvider.getBitboardIndex()] & (1L << square)) != 0;
     }
 
     public boolean getBit(BitboardIndexProvider bitboardIndexProvider, BoardPosition boardPosition) {
         return getBit(bitboardIndexProvider, boardPosition.getBitBoardSquare());
-    }
-
-    public boolean getBit(BoardPosition boardPosition) {
-        return getBit(OccupancyBitboard.ALL_PIECES, boardPosition);
-    }
-
-    public boolean getBit(int square) {
-        return getBit(OccupancyBitboard.ALL_PIECES, square);
     }
 
     public long getBitboard(BitboardIndexProvider bitboardIndexProvider) {
