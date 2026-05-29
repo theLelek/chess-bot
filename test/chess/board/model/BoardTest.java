@@ -94,11 +94,12 @@ class BoardTest {
                 {null, null, null, null, null, null, null, null},
                 {null, null, null, BoardPiece.BLACK_PAWN, BoardPiece.WHITE_PAWN, null, BoardPiece.WHITE_BISHOP, null},
                 {null, BoardPiece.WHITE_PAWN, null, BoardPiece.WHITE_PAWN, null, null, null, null},
-                {null, null, null, BoardPiece.WHITE_QUEEN, null, null, null, null},
+                {BoardPiece.WHITE_KNIGHT, null, null, BoardPiece.WHITE_QUEEN, null, null, null, null},
                 {BoardPiece.WHITE_PAWN, null, BoardPiece.WHITE_PAWN, null, null, BoardPiece.WHITE_PAWN, BoardPiece.WHITE_PAWN, BoardPiece.WHITE_PAWN},
                 {BoardPiece.WHITE_ROOK, null, null, null, BoardPiece.WHITE_KING, null, null, BoardPiece.WHITE_ROOK}
         };
         assertArrayEquals(board2dToPieceList(expectedPieceList), board.getPieceList());
+
     }
 
     @Test
