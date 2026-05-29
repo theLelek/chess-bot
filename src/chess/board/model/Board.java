@@ -164,6 +164,7 @@ public class Board {
     private void updatePieceNormal(BoardPosition from, BoardPosition to, BoardPiece pieceToBecome) {
         BoardPiece pieceToMove = pieceList[from.getBitBoardSquare()];
         Color color = (isWhiteToMove) ? Color.WHITE : Color.BLACK;
+        BoardPiece pieceToCapture = pieceList[to.getBitBoardSquare()];
 
         // remove piece on from
         bitBoardState.clearBit(pieceToMove, from);
@@ -178,7 +179,6 @@ public class Board {
         pieceList[to.getBitBoardSquare()] = pieceToBecome;
 
         // capture piece if it exists
-        BoardPiece pieceToCapture = pieceList[to.getBitBoardSquare()];
         if (pieceToCapture != null) {
             bitBoardState.clearBit(pieceToCapture, to);
             bitBoardState.clearBit(OccupancyBitboard.ALL_PIECES, to);
