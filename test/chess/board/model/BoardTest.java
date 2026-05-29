@@ -4,6 +4,7 @@ import chess.BoardPosition;
 import chess.Move.CastlingMove;
 import chess.Move.Move;
 import chess.board.BoardPiece;
+import chess.board.OccupancyBitboard;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -15,9 +16,8 @@ import static org.junit.jupiter.api.Assertions.*;
 class BoardTest {
 
     @Test
-    void move_italienLine() {
+    void initializeFromFen_defaultPosition() {
         Board board = Board.initializeDefaultBoard();
-
         BoardPiece[][] expectedPieceList = new BoardPiece[][]{
                 {BoardPiece.BLACK_ROOK, BoardPiece.BLACK_KNIGHT, BoardPiece.BLACK_BISHOP, BoardPiece.BLACK_QUEEN, BoardPiece.BLACK_KING, BoardPiece.BLACK_BISHOP, BoardPiece.BLACK_KNIGHT, BoardPiece.BLACK_ROOK},
                 {BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN},
@@ -30,6 +30,21 @@ class BoardTest {
         };
         assertArrayEquals(board2dToPieceList(expectedPieceList), board.getPieceList());
 
+        BitBoardState bitBoardState = board.getBitBoardState();
+        assertEquals(65280, bitBoardState.getBitboard(BoardPiece.WHITE_PAWN));
+        assertEquals(129, bitBoardState.getBitboard(BoardPiece.WHITE_ROOK));
+        assertEquals(66, bitBoardState.getBitboard(BoardPiece.WHITE_KNIGHT));
+        assertEquals(36, bitBoardState.getBitboard(BoardPiece.WHITE_BISHOP));
+        assertEquals(8, bitBoardState.getBitboard(BoardPiece.WHITE_QUEEN));
+        assertEquals(16, bitBoardState.getBitboard(BoardPiece.WHITE_KING));
+
+        assertEquals(71776119061217280L, bitBoardState.getBitboard(BoardPiece.BLACK_PAWN));
+        assertEquals(-9151314442816847872L, bitBoardState.getBitboard(BoardPiece.BLACK_ROOK));
+        assertEquals(4755801206503243776L, bitBoardState.getBitboard(BoardPiece.BLACK_KNIGHT));
+        assertEquals(2594073385365405696L, bitBoardState.getBitboard(BoardPiece.BLACK_BISHOP));
+        assertEquals(576460752303423488L, bitBoardState.getBitboard(BoardPiece.BLACK_QUEEN));
+        assertEquals(1152921504606846976L, bitBoardState.getBitboard(BoardPiece.BLACK_KING));
+
         assertTrue(board.getCastlingRightsWhite().canCastleKingSide());
         assertTrue(board.getCastlingRightsWhite().canCastleQueenSide());
         assertTrue(board.getCastlingRightsBlack().canCastleQueenSide());
@@ -38,21 +53,27 @@ class BoardTest {
         assertEquals(0, board.getHalfmoveClock());
         assertEquals(1, board.getFullmoveNumber());
         assertNull(board.getEnPassantTargetSquare());
+    }
 
-        Move move1 = new Move("e2", "e4");
-        board.move(move1);
-        BoardPiece[][] expectedPieceListAfterMove1 = new BoardPiece[][]{
-                {BoardPiece.BLACK_ROOK, BoardPiece.BLACK_KNIGHT, BoardPiece.BLACK_BISHOP, BoardPiece.BLACK_QUEEN, BoardPiece.BLACK_KING, BoardPiece.BLACK_BISHOP, BoardPiece.BLACK_KNIGHT, BoardPiece.BLACK_ROOK},
-                {BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN},
+    @Test
+    void initializeFromFen_OnlyWhitePawns() {
+        Board board = Board.initializeFromFen("8/8/8/8/8/8/PPPPPPPP/8 w KQkq - 0 1");
+        BitBoardState bitBoardState = board.getBitBoardState();
+        assertEquals(65280, bitBoardState.getBitboard(BoardPiece.WHITE_PAWN));
+        assertEquals(65280, bitBoardState.getBitboard(OccupancyBitboard.WHITE_PIECES));
+        assertEquals(65280, bitBoardState.getBitboard(OccupancyBitboard.ALL_PIECES));
+
+        BoardPiece[][] expectedPieceList = new BoardPiece[][]{
                 {null, null, null, null, null, null, null, null},
                 {null, null, null, null, null, null, null, null},
-                {null, null, null, null, BoardPiece.WHITE_PAWN, null, null, null},
                 {null, null, null, null, null, null, null, null},
-                {BoardPiece.WHITE_PAWN, BoardPiece.WHITE_PAWN, BoardPiece.WHITE_PAWN, BoardPiece.WHITE_PAWN, null, BoardPiece.WHITE_PAWN, BoardPiece.WHITE_PAWN, BoardPiece.WHITE_PAWN},
-                {BoardPiece.WHITE_ROOK, BoardPiece.WHITE_KNIGHT, BoardPiece.WHITE_BISHOP, BoardPiece.WHITE_QUEEN, BoardPiece.WHITE_KING, BoardPiece.WHITE_BISHOP, BoardPiece.WHITE_KNIGHT, BoardPiece.WHITE_ROOK}
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {BoardPiece.WHITE_PAWN, BoardPiece.WHITE_PAWN, BoardPiece.WHITE_PAWN, BoardPiece.WHITE_PAWN, BoardPiece.WHITE_PAWN, BoardPiece.WHITE_PAWN, BoardPiece.WHITE_PAWN, BoardPiece.WHITE_PAWN},
+                {null, null, null, null, null, null, null, null},
         };
-
-        assertArrayEquals(board2dToPieceList(expectedPieceListAfterMove1), board.getPieceList());
+        assertArrayEquals(board2dToPieceList(expectedPieceList), board.getPieceList());
 
         assertTrue(board.getCastlingRightsWhite().canCastleKingSide());
         assertTrue(board.getCastlingRightsWhite().canCastleQueenSide());
@@ -61,149 +82,49 @@ class BoardTest {
 
         assertEquals(0, board.getHalfmoveClock());
         assertEquals(1, board.getFullmoveNumber());
-        assertEquals(new BoardPosition("e3"), board.getEnPassantTargetSquare());
-        assertEquals(new BoardPosition("e4"), board.getEnPassantPiecePosition());
+        assertNull(board.getEnPassantTargetSquare());
+    }
+
+    @Test
+    void move_italienLine() {
+        Board board = Board.initializeDefaultBoard();
+        Move move1 = new Move("e2", "e4");
+        board.move(move1);
+        assertEquals(Board.initializeFromFen("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1"), board);
 
         Move move2 = new Move("e7", "e5");
         board.move(move2);
-        BoardPiece[][] expectedPieceListAfterMove2 = new BoardPiece[][]{
-                {BoardPiece.BLACK_ROOK, BoardPiece.BLACK_KNIGHT, BoardPiece.BLACK_BISHOP, BoardPiece.BLACK_QUEEN, BoardPiece.BLACK_KING, BoardPiece.BLACK_BISHOP, BoardPiece.BLACK_KNIGHT, BoardPiece.BLACK_ROOK},
-                {BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN, null, BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN},
-                {null, null, null, null, null, null, null, null},
-                {null, null, null, null, BoardPiece.BLACK_PAWN, null, null, null},
-                {null, null, null, null, BoardPiece.WHITE_PAWN, null, null, null},
-                {null, null, null, null, null, null, null, null},
-                {BoardPiece.WHITE_PAWN, BoardPiece.WHITE_PAWN, BoardPiece.WHITE_PAWN, BoardPiece.WHITE_PAWN, null, BoardPiece.WHITE_PAWN, BoardPiece.WHITE_PAWN, BoardPiece.WHITE_PAWN},
-                {BoardPiece.WHITE_ROOK, BoardPiece.WHITE_KNIGHT, BoardPiece.WHITE_BISHOP, BoardPiece.WHITE_QUEEN, BoardPiece.WHITE_KING, BoardPiece.WHITE_BISHOP, BoardPiece.WHITE_KNIGHT, BoardPiece.WHITE_ROOK}
-        };
-        assertArrayEquals(board2dToPieceList(expectedPieceListAfterMove2), board.getPieceList());
-
-        assertTrue(board.getCastlingRightsWhite().canCastleKingSide());
-        assertTrue(board.getCastlingRightsWhite().canCastleQueenSide());
-        assertTrue(board.getCastlingRightsBlack().canCastleQueenSide());
-        assertTrue(board.getCastlingRightsBlack().canCastleKingSide());
-
-        assertEquals(0, board.getHalfmoveClock());
-        assertEquals(2, board.getFullmoveNumber());
-        assertEquals(new BoardPosition("e6"), board.getEnPassantTargetSquare());
-        assertEquals(new BoardPosition("e5"), board.getEnPassantPiecePosition());
+        assertEquals(Board.initializeFromFen("rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2"), board);
 
         Move move3 = new Move("g1", "f3");
         board.move(move3);
-        BoardPiece[][] expectedPieceListAfterMove3 = new BoardPiece[][]{
-                {BoardPiece.BLACK_ROOK, BoardPiece.BLACK_KNIGHT, BoardPiece.BLACK_BISHOP, BoardPiece.BLACK_QUEEN, BoardPiece.BLACK_KING, BoardPiece.BLACK_BISHOP, BoardPiece.BLACK_KNIGHT, BoardPiece.BLACK_ROOK},
-                {BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN, null, BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN},
-                {null, null, null, null, null, null, null, null},
-                {null, null, null, null, BoardPiece.BLACK_PAWN, null, null, null},
-                {null, null, null, null, BoardPiece.WHITE_PAWN, null, null, null},
-                {null, null, null, null, null, BoardPiece.WHITE_KNIGHT, null, null},
-                {BoardPiece.WHITE_PAWN, BoardPiece.WHITE_PAWN, BoardPiece.WHITE_PAWN, BoardPiece.WHITE_PAWN, null, BoardPiece.WHITE_PAWN, BoardPiece.WHITE_PAWN, BoardPiece.WHITE_PAWN},
-                {BoardPiece.WHITE_ROOK, BoardPiece.WHITE_KNIGHT, BoardPiece.WHITE_BISHOP, BoardPiece.WHITE_QUEEN, BoardPiece.WHITE_KING, BoardPiece.WHITE_BISHOP, null, BoardPiece.WHITE_ROOK}
-        };
-        assertArrayEquals(board2dToPieceList(expectedPieceListAfterMove3), board.getPieceList());
-
-        assertTrue(board.getCastlingRightsWhite().canCastleKingSide());
-        assertTrue(board.getCastlingRightsWhite().canCastleQueenSide());
-        assertTrue(board.getCastlingRightsBlack().canCastleQueenSide());
-        assertTrue(board.getCastlingRightsBlack().canCastleKingSide());
-
-        assertEquals(1, board.getHalfmoveClock());
-        assertEquals(2, board.getFullmoveNumber());
-        assertNull(board.getEnPassantTargetSquare());
+        assertEquals(Board.initializeFromFen("rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2"), board);
 
         Move move4 = new Move("b8", "c6");
         board.move(move4);
-        BoardPiece[][] expectedPieceListAfterMove4 = new BoardPiece[][]{
-                {BoardPiece.BLACK_ROOK, null, BoardPiece.BLACK_BISHOP, BoardPiece.BLACK_QUEEN, BoardPiece.BLACK_KING, BoardPiece.BLACK_BISHOP, BoardPiece.BLACK_KNIGHT, BoardPiece.BLACK_ROOK},
-                {BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN, null, BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN},
-                {null, null, BoardPiece.BLACK_KNIGHT, null, null, null, null, null},
-                {null, null, null, null, BoardPiece.BLACK_PAWN, null, null, null},
-                {null, null, null, null, BoardPiece.WHITE_PAWN, null, null, null},
-                {null, null, null, null, null, BoardPiece.WHITE_KNIGHT, null, null},
-                {BoardPiece.WHITE_PAWN, BoardPiece.WHITE_PAWN, BoardPiece.WHITE_PAWN, BoardPiece.WHITE_PAWN, null, BoardPiece.WHITE_PAWN, BoardPiece.WHITE_PAWN, BoardPiece.WHITE_PAWN},
-                {BoardPiece.WHITE_ROOK, BoardPiece.WHITE_KNIGHT, BoardPiece.WHITE_BISHOP, BoardPiece.WHITE_QUEEN, BoardPiece.WHITE_KING, BoardPiece.WHITE_BISHOP, null, BoardPiece.WHITE_ROOK}
-        };
-        assertArrayEquals(board2dToPieceList(expectedPieceListAfterMove4), board.getPieceList());
-
-        assertTrue(board.getCastlingRightsWhite().canCastleKingSide());
-        assertTrue(board.getCastlingRightsWhite().canCastleQueenSide());
-        assertTrue(board.getCastlingRightsBlack().canCastleQueenSide());
-        assertTrue(board.getCastlingRightsBlack().canCastleKingSide());
-
-        assertEquals(2, board.getHalfmoveClock());
-        assertEquals(3, board.getFullmoveNumber());
-        assertNull(board.getEnPassantTargetSquare());
+        assertEquals(Board.initializeFromFen("r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3"), board);
 
         Move move5 = new Move("f1", "c4");
-        board.move(move5);
-        BoardPiece[][] expectedPieceListAfterMove5 = new BoardPiece[][]{
-                {BoardPiece.BLACK_ROOK, null, BoardPiece.BLACK_BISHOP, BoardPiece.BLACK_QUEEN, BoardPiece.BLACK_KING, BoardPiece.BLACK_BISHOP, BoardPiece.BLACK_KNIGHT, BoardPiece.BLACK_ROOK},
-                {BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN, null, BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN},
-                {null, null, BoardPiece.BLACK_KNIGHT, null, null, null, null, null},
-                {null, null, null, null, BoardPiece.BLACK_PAWN, null, null, null},
-                {null, null, BoardPiece.WHITE_BISHOP, null, BoardPiece.WHITE_PAWN, null, null, null},
-                {null, null, null, null, null, BoardPiece.WHITE_KNIGHT, null, null},
-                {BoardPiece.WHITE_PAWN, BoardPiece.WHITE_PAWN, BoardPiece.WHITE_PAWN, BoardPiece.WHITE_PAWN, null, BoardPiece.WHITE_PAWN, BoardPiece.WHITE_PAWN, BoardPiece.WHITE_PAWN},
-                {BoardPiece.WHITE_ROOK, BoardPiece.WHITE_KNIGHT, BoardPiece.WHITE_BISHOP, BoardPiece.WHITE_QUEEN, BoardPiece.WHITE_KING, null, null, BoardPiece.WHITE_ROOK}
+        assertEquals(Board.initializeFromFen("r1bqkbnr/pppp1ppp/2n5/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3"), board);
+    }
+
+    void move_castling() {
+        Board board = Board.initializeFromFen("rnbqkbnr/ppp1pppp/8/3pP1B1/1P1P4/N2Q4/P1P2PPP/R3K2R w KQkq d6 0 4");
+        BoardPiece[][] expectedPieceList = new BoardPiece[][]{
+                {BoardPiece.BLACK_ROOK, BoardPiece.BLACK_KNIGHT, BoardPiece.BLACK_BISHOP, BoardPiece.BLACK_QUEEN, BoardPiece.BLACK_KING, BoardPiece.BLACK_BISHOP, BoardPiece.BLACK_KNIGHT, BoardPiece.BLACK_ROOK},
+                {BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN, null, BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, BoardPiece.BLACK_PAWN, BoardPiece.WHITE_PAWN, null, BoardPiece.WHITE_BISHOP, null},
+                {null, BoardPiece.WHITE_PAWN, null, BoardPiece.WHITE_PAWN, null, null, null, null},
+                {null, null, null, BoardPiece.WHITE_QUEEN, null, null, null, null},
+                {BoardPiece.WHITE_PAWN, null, BoardPiece.WHITE_PAWN, null, null, BoardPiece.WHITE_PAWN, BoardPiece.WHITE_PAWN, BoardPiece.WHITE_PAWN},
+                {BoardPiece.WHITE_ROOK, null, null, null, BoardPiece.WHITE_KING, null, null, BoardPiece.WHITE_ROOK}
         };
 
-        assertArrayEquals(board2dToPieceList(expectedPieceListAfterMove5), board.getPieceList());
 
-        assertTrue(board.getCastlingRightsWhite().canCastleKingSide());
-        assertTrue(board.getCastlingRightsWhite().canCastleQueenSide());
-        assertTrue(board.getCastlingRightsBlack().canCastleQueenSide());
-        assertTrue(board.getCastlingRightsBlack().canCastleKingSide());
-
-        assertEquals(3, board.getHalfmoveClock());
-        assertEquals(3, board.getFullmoveNumber());
-        assertNull(board.getEnPassantTargetSquare());
-
-        Move move6 = new Move("f8", "c5");
-        board.move(move6);
-        BoardPiece[][] expectedPieceListAfterMove6 = new BoardPiece[][]{
-                {BoardPiece.BLACK_ROOK, null, BoardPiece.BLACK_BISHOP, BoardPiece.BLACK_QUEEN, BoardPiece.BLACK_KING, null, BoardPiece.BLACK_KNIGHT, BoardPiece.BLACK_ROOK},
-                {BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN, null, BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN},
-                {null, null, BoardPiece.BLACK_KNIGHT, null, null, null, null, null},
-                {null, null, BoardPiece.BLACK_BISHOP, null, BoardPiece.BLACK_PAWN, null, null, null},
-                {null, null, BoardPiece.WHITE_BISHOP, null, BoardPiece.WHITE_PAWN, null, null, null},
-                {null, null, null, null, null, BoardPiece.WHITE_KNIGHT, null, null},
-                {BoardPiece.WHITE_PAWN, BoardPiece.WHITE_PAWN, BoardPiece.WHITE_PAWN, BoardPiece.WHITE_PAWN, null, BoardPiece.WHITE_PAWN, BoardPiece.WHITE_PAWN, BoardPiece.WHITE_PAWN},
-                {BoardPiece.WHITE_ROOK, BoardPiece.WHITE_KNIGHT, BoardPiece.WHITE_BISHOP, BoardPiece.WHITE_QUEEN, BoardPiece.WHITE_KING, null, null, BoardPiece.WHITE_ROOK}
-        };
-        assertArrayEquals(board2dToPieceList(expectedPieceListAfterMove6), board.getPieceList());
-
-        assertTrue(board.getCastlingRightsWhite().canCastleKingSide());
-        assertTrue(board.getCastlingRightsWhite().canCastleQueenSide());
-        assertTrue(board.getCastlingRightsBlack().canCastleQueenSide());
-        assertTrue(board.getCastlingRightsBlack().canCastleKingSide());
-
-        assertEquals(4, board.getHalfmoveClock());
-        assertEquals(4, board.getFullmoveNumber());
-        assertNull(board.getEnPassantTargetSquare());
-
-        Move move7 = new CastlingMove("e1", "g1");
-        board.move(move7);
-        BoardPiece[][] expectedPieceListAfterMove7 = new BoardPiece[][]{
-                {BoardPiece.BLACK_ROOK, null, BoardPiece.BLACK_BISHOP, BoardPiece.BLACK_QUEEN, BoardPiece.BLACK_KING, null, BoardPiece.BLACK_KNIGHT, BoardPiece.BLACK_ROOK},
-                {BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN, null, BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN},
-                {null, null, BoardPiece.BLACK_KNIGHT, null, null, null, null, null},
-                {null, null, BoardPiece.BLACK_BISHOP, null, BoardPiece.BLACK_PAWN, null, null, null},
-                {null, null, BoardPiece.WHITE_BISHOP, null, BoardPiece.WHITE_PAWN, null, null, null},
-                {null, null, null, null, null, BoardPiece.WHITE_KNIGHT, null, null},
-                {BoardPiece.WHITE_PAWN, BoardPiece.WHITE_PAWN, BoardPiece.WHITE_PAWN, BoardPiece.WHITE_PAWN, null, BoardPiece.WHITE_PAWN, BoardPiece.WHITE_PAWN, BoardPiece.WHITE_PAWN},
-                {BoardPiece.WHITE_ROOK, BoardPiece.WHITE_KNIGHT, BoardPiece.WHITE_BISHOP, BoardPiece.WHITE_QUEEN, null, BoardPiece.WHITE_ROOK, BoardPiece.WHITE_KING, null}
-        };
-        assertArrayEquals(board2dToPieceList(expectedPieceListAfterMove7), board.getPieceList());
-
-        assertFalse(board.getCastlingRightsWhite().canCastleKingSide());
-        assertFalse(board.getCastlingRightsWhite().canCastleQueenSide());
-        assertTrue(board.getCastlingRightsBlack().canCastleQueenSide());
-        assertTrue(board.getCastlingRightsBlack().canCastleKingSide());
-
-        assertEquals(5, board.getHalfmoveClock());
-        assertEquals(4, board.getFullmoveNumber());
-        assertNull(board.getEnPassantTargetSquare());
-
+        Move move = new CastlingMove("e1", "g1");
+        board.move(move);
+        assertEquals(Board.initializeFromFen("r1bqk1nr/pppp1ppp/2n5/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQ1RK1 b kq - 5 4"), board);
     }
 
     private static BoardPiece[] board2dToPieceList(BoardPiece[][] board){
