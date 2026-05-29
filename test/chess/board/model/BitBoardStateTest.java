@@ -9,19 +9,8 @@ import static org.junit.jupiter.api.Assertions.*;
 class BitBoardStateTest {
 
     @Test
-    void initializeFromFen_onlyWhitePawns() {
-        String fen = "8/8/8/8/8/8/PPPPPPPP/8 w KQkq - 0 1";
-        Board board = Board.initializeFromFen(fen);
-        BitBoardState bitBoardState = board.getBitBoardState();
-        assertEquals(65280, bitBoardState.getBitboard(BoardPiece.WHITE_PAWN));
-        assertEquals(65280, bitBoardState.getBitboard(OccupancyBitboard.WHITE_PIECES));
-        assertEquals(65280, bitBoardState.getBitboard(OccupancyBitboard.ALL_PIECES));
-    }
-
-    @Test
     void initializeFromFen_defaultPosition() {
-        String fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-        Board board = Board.initializeFromFen(fen);
+        Board board = Board.initializeDefaultBoard();
         BitBoardState bitBoardState = board.getBitBoardState();
         assertEquals(65280, bitBoardState.getBitboard(BoardPiece.WHITE_PAWN));
         assertEquals(129, bitBoardState.getBitboard(BoardPiece.WHITE_ROOK));
@@ -36,5 +25,15 @@ class BitBoardStateTest {
         assertEquals(2594073385365405696L, bitBoardState.getBitboard(BoardPiece.BLACK_BISHOP));
         assertEquals(576460752303423488L, bitBoardState.getBitboard(BoardPiece.BLACK_QUEEN));
         assertEquals(1152921504606846976L, bitBoardState.getBitboard(BoardPiece.BLACK_KING));
+    }
+
+    @Test
+    void initializeFromFen_onlyWhitePawns() {
+        String fen = "8/8/8/8/8/8/PPPPPPPP/8 w KQkq - 0 1";
+        Board board = Board.initializeFromFen(fen);
+        BitBoardState bitBoardState = board.getBitBoardState();
+        assertEquals(65280, bitBoardState.getBitboard(BoardPiece.WHITE_PAWN));
+        assertEquals(65280, bitBoardState.getBitboard(OccupancyBitboard.WHITE_PIECES));
+        assertEquals(65280, bitBoardState.getBitboard(OccupancyBitboard.ALL_PIECES));
     }
 }

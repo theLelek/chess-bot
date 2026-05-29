@@ -148,23 +148,14 @@ public class Board {
     private void updatePiecesCastlingMove(CastlingMove move) {
         Color color = isWhiteToMove ? Color.WHITE : Color.BLACK;
 
-        updatePieceNormal(move.from(), move.to(), pieceList[move.to().getBitBoardSquare()]);
+        updatePieceNormal(move.from(), move.to(), pieceList[move.from().getBitBoardSquare()]);
 
-        // move rooks
         boolean isKingSideCastling = move.to().x() == Board.SIZE - 2;
 
         BoardPosition rookFrom = new BoardPosition(isKingSideCastling ? Board.SIZE - 1 : 0, move.to().y());
         BoardPosition rookTo = new BoardPosition(isKingSideCastling ? Board.SIZE - 3 : Board.SIZE - 4, move.to().y());
 
-        bitBoardState.setBit(color.getRook(), rookTo);
-        bitBoardState.setBit(OccupancyBitboard.ALL_PIECES, rookTo);
-        bitBoardState.setBit(color.getOwnOccupancyBitboard(), rookTo);
-        pieceList[rookTo.getBitBoardSquare()] = pieceList[rookFrom.getBitBoardSquare()];
-
-        bitBoardState.clearBit(color.getRook(), rookFrom);
-        bitBoardState.clearBit(OccupancyBitboard.ALL_PIECES, rookFrom);
-        bitBoardState.clearBit(color.getOwnOccupancyBitboard(), rookFrom);
-        pieceList[rookFrom.getBitBoardSquare()] = null;
+        updatePieceNormal(rookFrom, rookTo, pieceList[rookFrom.getBitBoardSquare()]);
     }
 
     private void updatePieceNormal(BoardPosition from, BoardPosition to, BoardPiece pieceToBecome) {
