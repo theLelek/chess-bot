@@ -9,6 +9,9 @@ import chess.Move.PromotionMove;
 import chess.board.BoardPiece;
 import chess.board.OccupancyBitboard;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 public class Board {
 
     public static final int SIZE = 8;
@@ -187,6 +190,18 @@ public class Board {
         if (enPassantTargetSquare == null) throw new RuntimeException("No en passant target square set");
         Color color = (isWhiteToMove) ? Color.WHITE : Color.BLACK;
         return new BoardPosition(enPassantTargetSquare.x(), enPassantTargetSquare.y() - color.getMovingDirection());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Board board = (Board) o;
+        return isWhiteToMove == board.isWhiteToMove && halfmoveClock == board.halfmoveClock && fullmoveNumber == board.fullmoveNumber && Objects.equals(castlingRightsWhite, board.castlingRightsWhite) && Objects.equals(castlingRightsBlack, board.castlingRightsBlack) && Objects.equals(enPassantTargetSquare, board.enPassantTargetSquare) && Objects.equals(bitBoardState, board.bitBoardState) && Objects.deepEquals(pieceList, board.pieceList);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(isWhiteToMove, castlingRightsWhite, castlingRightsBlack, enPassantTargetSquare, halfmoveClock, fullmoveNumber, bitBoardState, Arrays.hashCode(pieceList));
     }
 
     public boolean isWhiteToMove() {

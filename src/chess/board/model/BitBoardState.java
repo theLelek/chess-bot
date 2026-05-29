@@ -6,6 +6,8 @@ import chess.board.BoardPiece;
 import chess.board.OccupancyBitboard;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Objects;
 
 public class BitBoardState {
 
@@ -41,6 +43,18 @@ public class BitBoardState {
             System.out.println();
         }
         System.out.println();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        BitBoardState that = (BitBoardState) o;
+        return Objects.deepEquals(bitboards, that.bitboards);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(bitboards);
     }
 
     public void setBit(BitboardIndexProvider bitboardIndexProvider, int square) {
