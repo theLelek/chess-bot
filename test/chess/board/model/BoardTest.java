@@ -86,6 +86,22 @@ class BoardTest {
     }
 
     @Test
+    void initializeFromFen2() {
+        Board board = Board.initializeFromFen("rnbqkbnr/ppp1pppp/8/3pP1B1/1P1P4/N2Q4/P1P2PPP/R3K2R w KQkq d6 0 4");
+        BoardPiece[][] expectedPieceList = new BoardPiece[][]{
+                {BoardPiece.BLACK_ROOK, BoardPiece.BLACK_KNIGHT, BoardPiece.BLACK_BISHOP, BoardPiece.BLACK_QUEEN, BoardPiece.BLACK_KING, BoardPiece.BLACK_BISHOP, BoardPiece.BLACK_KNIGHT, BoardPiece.BLACK_ROOK},
+                {BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN, null, BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, BoardPiece.BLACK_PAWN, BoardPiece.WHITE_PAWN, null, BoardPiece.WHITE_BISHOP, null},
+                {null, BoardPiece.WHITE_PAWN, null, BoardPiece.WHITE_PAWN, null, null, null, null},
+                {null, null, null, BoardPiece.WHITE_QUEEN, null, null, null, null},
+                {BoardPiece.WHITE_PAWN, null, BoardPiece.WHITE_PAWN, null, null, BoardPiece.WHITE_PAWN, BoardPiece.WHITE_PAWN, BoardPiece.WHITE_PAWN},
+                {BoardPiece.WHITE_ROOK, null, null, null, BoardPiece.WHITE_KING, null, null, BoardPiece.WHITE_ROOK}
+        };
+        assertArrayEquals(board2dToPieceList(expectedPieceList), board.getPieceList());
+    }
+
+    @Test
     void move_italienLine() {
         Board board = Board.initializeDefaultBoard();
         Move move1 = new Move("e2", "e4");
@@ -106,25 +122,6 @@ class BoardTest {
 
         Move move5 = new Move("f1", "c4");
         assertEquals(Board.initializeFromFen("r1bqkbnr/pppp1ppp/2n5/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3"), board);
-    }
-
-    void move_castling() {
-        Board board = Board.initializeFromFen("rnbqkbnr/ppp1pppp/8/3pP1B1/1P1P4/N2Q4/P1P2PPP/R3K2R w KQkq d6 0 4");
-        BoardPiece[][] expectedPieceList = new BoardPiece[][]{
-                {BoardPiece.BLACK_ROOK, BoardPiece.BLACK_KNIGHT, BoardPiece.BLACK_BISHOP, BoardPiece.BLACK_QUEEN, BoardPiece.BLACK_KING, BoardPiece.BLACK_BISHOP, BoardPiece.BLACK_KNIGHT, BoardPiece.BLACK_ROOK},
-                {BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN, null, BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN, BoardPiece.BLACK_PAWN},
-                {null, null, null, null, null, null, null, null},
-                {null, null, null, BoardPiece.BLACK_PAWN, BoardPiece.WHITE_PAWN, null, BoardPiece.WHITE_BISHOP, null},
-                {null, BoardPiece.WHITE_PAWN, null, BoardPiece.WHITE_PAWN, null, null, null, null},
-                {null, null, null, BoardPiece.WHITE_QUEEN, null, null, null, null},
-                {BoardPiece.WHITE_PAWN, null, BoardPiece.WHITE_PAWN, null, null, BoardPiece.WHITE_PAWN, BoardPiece.WHITE_PAWN, BoardPiece.WHITE_PAWN},
-                {BoardPiece.WHITE_ROOK, null, null, null, BoardPiece.WHITE_KING, null, null, BoardPiece.WHITE_ROOK}
-        };
-
-
-        Move move = new CastlingMove("e1", "g1");
-        board.move(move);
-        assertEquals(Board.initializeFromFen("r1bqk1nr/pppp1ppp/2n5/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQ1RK1 b kq - 5 4"), board);
     }
 
     private static BoardPiece[] board2dToPieceList(BoardPiece[][] board){
