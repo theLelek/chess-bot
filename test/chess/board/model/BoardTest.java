@@ -122,7 +122,32 @@ class BoardTest {
         assertEquals(Board.initializeFromFen("r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3"), board);
 
         Move move5 = new Move("f1", "c4");
+        board.move(move5);
         assertEquals(Board.initializeFromFen("r1bqkbnr/pppp1ppp/2n5/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3"), board);
+
+        Move move6 = new Move("f8", "c5");
+        board.move(move6);
+        assertEquals(Board.initializeFromFen("r1bqk1nr/pppp1ppp/2n5/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4"), board);
+
+        Move move7 = new CastlingMove("e1", "g1");
+        board.move(move7);
+        assertEquals(Board.initializeFromFen("r1bqk1nr/pppp1ppp/2n5/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQ1RK1 b kq - 5 4"), board);
+
+        Move move8 = new Move("g8", "f6");
+        board.move(move8);
+        assertEquals(Board.initializeFromFen("r1bqk2r/pppp1ppp/2n2n2/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQ1RK1 w kq - 6 5"), board);
+
+        Move move9 = new Move("b1", "c3");
+        board.move(move9);
+        assertEquals(Board.initializeFromFen("r1bqk2r/pppp1ppp/2n2n2/2b1p3/2B1P3/2N2N2/PPPP1PPP/R1BQ1RK1 b kq - 7 5"), board);
+    }
+
+    @Test
+    void move_queenSideCastle() {
+        Board board = Board.initializeFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/R3KBNR w KQkq - 0 1");
+        Move move1 = new CastlingMove("e1", "c1");
+        board.move(move1);
+        assertEquals(Board.initializeFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/2KR1BNR b kq - 1 1"), board);
     }
 
     private static BoardPiece[] board2dToPieceList(BoardPiece[][] board){

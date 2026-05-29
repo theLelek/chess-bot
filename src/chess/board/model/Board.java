@@ -156,7 +156,7 @@ public class Board {
         boolean isKingSideCastling = move.to().x() == Board.SIZE - 2;
 
         BoardPosition rookFrom = new BoardPosition(isKingSideCastling ? Board.SIZE - 1 : 0, move.to().y());
-        BoardPosition rookTo = new BoardPosition(isKingSideCastling ? Board.SIZE - 3 : Board.SIZE - 4, move.to().y());
+        BoardPosition rookTo = new BoardPosition(isKingSideCastling ? Board.SIZE - 3 : 3, move.to().y());
 
         updatePieceNormal(rookFrom, rookTo, pieceList[rookFrom.getBitBoardSquare()]);
     }
