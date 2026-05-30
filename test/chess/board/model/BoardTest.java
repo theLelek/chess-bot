@@ -1,11 +1,11 @@
 package chess.board.model;
 
-import chess.BoardPosition;
 import chess.Move.CastlingMove;
+import chess.Move.EnPassantMove;
 import chess.Move.Move;
+import chess.Move.PromotionMove;
 import chess.board.BoardPiece;
 import chess.board.OccupancyBitboard;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -53,6 +53,7 @@ class BoardTest {
         assertEquals(0, board.getHalfmoveClock());
         assertEquals(1, board.getFullmoveNumber());
         assertNull(board.getEnPassantTargetSquare());
+        assertTrue(board.isWhiteToMove());
     }
 
     @Test
@@ -143,12 +144,76 @@ class BoardTest {
     }
 
     @Test
-    void move_queenSideCastle() {
-        Board board = Board.initializeFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/R3KBNR w KQkq - 0 1");
+    void move_castle() {
+        // white king side castle
+        Board board1 = Board.initializeFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/R3KBNR w KQkq - 0 1");
         Move move1 = new CastlingMove("e1", "c1");
-        board.move(move1);
-        assertEquals(Board.initializeFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/2KR1BNR b kq - 1 1"), board);
+        board1.move(move1);
+        assertEquals(Board.initializeFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/2KR1BNR b kq - 1 1"), board1);
+
+        // white queen side castle
+        Board board2 = Board.initializeFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQK2R w KQkq - 0 1");
+        Move move2 = new CastlingMove("e1", "g1");
+        board2.move(move2);
+        assertEquals(Board.initializeFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQ1RK1 b kq - 1 1"), board2);
+
+        // black king side castle
+        Board board3 = Board.initializeFromFen("rnbqk2r/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1");
+        Move move3 = new CastlingMove("e8", "g8");
+        board3.move(move3);
+        assertEquals(Board.initializeFromFen("rnbq1rk1/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQ - 1 2"), board3);
+
+        // black queen side castle
+        Board board4 = Board.initializeFromFen("r3kbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1");
+        Move move4 = new CastlingMove("e8", "c8");
+        board4.move(move4);
+        assertEquals(Board.initializeFromFen("2kr1bnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQ - 1 2"), board4);
     }
+
+    @Test
+    void move_promotion() {
+        // white pawn promoting
+        Board board1 = Board.initializeFromFen("8/P7/8/8/8/8/8/k6K w - - 0 1");
+        Move move1 = new PromotionMove("a7", "a8", BoardPiece.WHITE_ROOK);
+        board1.move(move1);
+        assertEquals(Board.initializeFromFen("R7/8/8/8/8/8/8/k6K b - - 0 1"), board1);
+
+        // white pawn promoting while capturing black rook
+        Board board2 = Board.initializeFromFen("4r3/5P2/8/8/8/8/8/k6K w - - 0 1");
+        Move move2 = new PromotionMove("f7", "e8", BoardPiece.WHITE_QUEEN);
+        board2.move(move2);
+        assertEquals(Board.initializeFromFen("4Q3/8/8/8/8/8/8/k6K b - - 0 1"), board2);
+
+
+        // black pawn promoting
+        Board board3 = Board.initializeFromFen("3r4/8/8/3k4/8/6K1/3p4/R7 b - - 0 1");
+        Move move3 = new PromotionMove("d2", "d1", BoardPiece.BLACK_KNIGHT);
+        board3.move(move3);
+        assertEquals(Board.initializeFromFen("3r4/8/8/3k4/8/6K1/8/R2n4 w - - 0 2"), board3);
+
+        // black pawn promoting while capturing white bishop
+        Board board4 = Board.initializeFromFen("3r4/8/8/3k4/8/8/3p4/RKBn4 b - - 0 2");
+        Move move4 = new PromotionMove("d2", "c1", BoardPiece.BLACK_BISHOP);
+        board4.move(move4);
+        assertEquals(Board.initializeFromFen("3r4/8/8/3k4/8/8/8/RKbn4 w - - 0 3"), board4);
+    }
+
+    @Test
+    void move_enPassant() {
+        // basic en passant white to move
+        Board board1 = Board.initializeFromFen("8/7k/8/3pP3/8/8/8/RK6 w - d6 0 4");
+        Move move1 = new EnPassantMove("e5", "d6");
+        board1.move(move1);
+        assertEquals(Board.initializeFromFen("8/7k/3P4/8/8/8/8/RK6 b - - 0 4"), board1);
+
+        // basic en passant black to move
+
+        Board board2 = Board.initializeFromFen("8/7k/8/8/3Pp3/8/8/RK6 b - d3 0 4");
+        Move move2 = new EnPassantMove("e4", "d3");
+        board2.move(move2);
+        assertEquals(Board.initializeFromFen("8/7k/8/8/8/3p4/8/RK6 w - - 0 5"), board2);
+    }
+
 
     private static BoardPiece[] board2dToPieceList(BoardPiece[][] board){
         ArrayList<BoardPiece> result = new ArrayList<>();

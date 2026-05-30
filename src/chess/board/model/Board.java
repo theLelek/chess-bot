@@ -139,7 +139,7 @@ public class Board {
         Color color = (isWhiteToMove) ? Color.WHITE : Color.BLACK;
         BoardPosition enPassantPiecePosition = getEnPassantPiecePosition();
 
-        updatePieceNormal(move.from(), move.to(), pieceList[move.to().getBitBoardSquare()]);
+        updatePieceNormal(move.from(), move.to(), pieceList[move.from().getBitBoardSquare()]);
 
         // remove pawn to be captured
         bitBoardState.clearBit(color.getOpponentPawn(), enPassantPiecePosition);
