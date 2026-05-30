@@ -172,18 +172,18 @@ public class Board {
         bitBoardState.clearBit(color.getOwnOccupancyBitboard(), from);
         pieceList[from.getBitBoardSquare()] = null;
 
+        // capture piece if it exists
+        if (pieceToCapture != null) {
+            bitBoardState.clearBit(pieceToCapture, to);
+            bitBoardState.clearBit(OccupancyBitboard.ALL_PIECES, to);
+            bitBoardState.clearBit(color.getOpponentOccupancyBitboard(), to);
+        }
+
         // place piece on to
         bitBoardState.setBit(pieceToBecome, to);
         bitBoardState.setBit(OccupancyBitboard.ALL_PIECES, to);
         bitBoardState.setBit(color.getOwnOccupancyBitboard(), to);
         pieceList[to.getBitBoardSquare()] = pieceToBecome;
-
-        // capture piece if it exists
-        if (pieceToCapture != null) {
-            bitBoardState.clearBit(pieceToCapture, to);
-            bitBoardState.clearBit(OccupancyBitboard.ALL_PIECES, to);
-            bitBoardState.clearBit(color.getOwnOccupancyBitboard(), to);
-        }
     }
 
     public BoardPosition getEnPassantPiecePosition() { // todo test
