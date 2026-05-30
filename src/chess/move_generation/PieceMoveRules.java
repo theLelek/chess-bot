@@ -1,4 +1,4 @@
-package chess.board;
+package chess.move_generation;
 
 
 public enum PieceMoveRules {

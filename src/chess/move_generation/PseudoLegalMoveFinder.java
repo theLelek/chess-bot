@@ -1,11 +1,12 @@
-package chess;
+package chess.move_generation;
 
+import chess.BoardPosition;
+import chess.Color;
 import chess.Move.EnPassantMove;
 import chess.Move.Move;
 import chess.Move.PromotionMove;
 import chess.board.BoardPiece;
 import chess.board.OccupancyBitboard;
-import chess.board.PieceMoveRules;
 import chess.board.model.*;
 
 import java.util.ArrayList;

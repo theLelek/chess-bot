@@ -8,6 +8,7 @@ import chess.Move.Move;
 import chess.Move.PromotionMove;
 import chess.board.BoardPiece;
 import chess.board.OccupancyBitboard;
+import chess.board.UnmakeMoveInfo;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -17,8 +18,8 @@ public class Board {
     public static final int SIZE = 8;
 
     private boolean isWhiteToMove;
-    private final CastlingRights castlingRightsWhite;
-    private final CastlingRights castlingRightsBlack;
+    private CastlingRights castlingRightsWhite;
+    private CastlingRights castlingRightsBlack;
     private BoardPosition enPassantTargetSquare;
     private int halfmoveClock;
     private int fullmoveNumber;
@@ -75,7 +76,7 @@ public class Board {
         return pieceList;
     }
 
-    public void move(Move move) {
+    public void makeMove(Move move) {
         BoardPiece pieceToMove = pieceList[move.from().getBitBoardSquare()];
         BoardPiece pieceToCapture = pieceList[move.to().getBitBoardSquare()];
 
@@ -184,6 +185,20 @@ public class Board {
         bitBoardState.setBit(OccupancyBitboard.ALL_PIECES, to);
         bitBoardState.setBit(color.getOwnOccupancyBitboard(), to);
         pieceList[to.getBitBoardSquare()] = pieceToBecome;
+    }
+
+    public void unmakeMove(Move move, UnmakeMoveInfo unmakeMoveInfo) {
+        castlingRightsWhite = unmakeMoveInfo.castlingRightsWhite();
+        castlingRightsBlack = unmakeMoveInfo.castlingRightsBlack();
+        halfmoveClock = unmakeMoveInfo.halfMoveClock();
+        if (isWhiteToMove) fullmoveNumber--;
+
+        isWhiteToMove = ! isWhiteToMove;
+    }
+
+    private void outdatePieces(Move move, UnmakeMoveInfo unmakeMoveInfo) {
+
+
     }
 
     public BoardPosition getEnPassantPiecePosition() { // todo test
