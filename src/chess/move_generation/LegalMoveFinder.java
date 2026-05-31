@@ -1,11 +1,4 @@
-package chess.board;
-
-import chess.Move.Move;
-import chess.PseudoLegalMoveFinder;
-import chess.board.model.Board;
-
-import java.util.LinkedList;
-import java.util.List;
+package chess.move_generation;
 
 public class LegalMoveFinder {
 //    public List<Move> getLegalMoves(Board board, boolean isWhiteToMove) {

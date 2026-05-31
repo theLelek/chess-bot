@@ -1,5 +1,7 @@
 package chess.board;
 
+import chess.move_generation.PieceMoveRules;
+
 public enum BoardPiece implements BitboardIndexProvider {
     WHITE_PAWN('P', PieceMoveRules.WHITE_PAWN, 0),
     WHITE_KNIGHT('N', PieceMoveRules.KNIGHT, 1),

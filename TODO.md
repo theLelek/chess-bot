@@ -15,9 +15,7 @@ copy method in classes or constructor to copy instances
 
 replace board piece getting (getBoardPieces) with getBoardPiece
 
-add getColor to boardPiece enum
-in BoardPosition add function to check if its in bounds 
-
 implement zobrist hash
 implement uci protocoll
 
+maybe change Move class to bits

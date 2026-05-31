@@ -10,6 +10,9 @@ public class BoardPosition {
     private final int y;
 
     public BoardPosition(int x, int y) {
+        if (x < 0 || x >= Board.SIZE || y < 0 || y >= Board.SIZE) {
+            throw new IllegalArgumentException("Position out of bounds");
+        }
         this.x = x;
         this.y = y;
     }
@@ -24,14 +27,17 @@ public class BoardPosition {
         }
         this.x = str.charAt(0) - 97;
         this.y = Math.abs(str.charAt(1) - 48 - Board.SIZE);
-        if(this.x < 0 || this.x >= Board.SIZE || this.y < 0 || this.y >= Board.SIZE) {
-            throw new IllegalArgumentException();
+        if (this.x < 0 || this.x >= Board.SIZE || this.y < 0 || this.y >= Board.SIZE) {
+            throw new IllegalArgumentException("Position out of bounds");
         }
     }
 
     public BoardPosition(int bitBoardSquare) {
         this.x = bitBoardSquare % 8;
         this.y = 7 - (bitBoardSquare / 8);
+        if (x < 0 || x >= Board.SIZE || y < 0 || y >= Board.SIZE) {
+            throw new IllegalArgumentException("Position out of bounds");
+        }
     }
 
     public BoardPosition copy() {
@@ -40,7 +46,7 @@ public class BoardPosition {
 
     public BoardPosition move(int[] direction) throws IndexOutOfBoundsException {
         if (x + direction[0] < 0 || y + direction[1] < 0 || x + direction[0] >= Board.SIZE || y + direction[1] >= Board.SIZE) {
-            throw new IndexOutOfBoundsException("Move index out of bounds");
+            throw new IndexOutOfBoundsException("Position out of bounds");
         }
         return new BoardPosition(x + direction[0], y + direction[1]);
     }
