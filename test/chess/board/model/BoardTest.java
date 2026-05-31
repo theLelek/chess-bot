@@ -1,11 +1,13 @@
 package chess.board.model;
 
+import chess.BoardPosition;
 import chess.Move.CastlingMove;
 import chess.Move.EnPassantMove;
 import chess.Move.Move;
 import chess.Move.PromotionMove;
 import chess.board.BoardPiece;
 import chess.board.OccupancyBitboard;
+import chess.board.UnmakeMoveInfo;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -104,7 +106,7 @@ class BoardTest {
     }
 
     @Test
-    void makeMove_italienLine() {
+    void move_italienLine() {
         Board board = Board.initializeDefaultBoard();
         Move move1 = new Move("e2", "e4");
         board.makeMove(move1);
@@ -144,7 +146,7 @@ class BoardTest {
     }
 
     @Test
-    void makeMove_castle() {
+    void move_castle() {
         // white king side castle
         Board board1 = Board.initializeFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/R3KBNR w KQkq - 0 1");
         Move move1 = new CastlingMove("e1", "c1");
@@ -171,7 +173,7 @@ class BoardTest {
     }
 
     @Test
-    void makeMove_promotion() {
+    void move_promotion() {
         // white pawn promoting
         Board board1 = Board.initializeFromFen("8/P7/8/8/8/8/8/k6K w - - 0 1");
         Move move1 = new PromotionMove("a7", "a8", BoardPiece.WHITE_ROOK);
@@ -199,12 +201,15 @@ class BoardTest {
     }
 
     @Test
-    void makeMove_enPassant() {
+    void move_enPassant() {
         // basic en passant white to move
         Board board1 = Board.initializeFromFen("8/7k/8/3pP3/8/8/8/RK6 w - d6 0 4");
         Move move1 = new EnPassantMove("e5", "d6");
         board1.makeMove(move1);
         assertEquals(Board.initializeFromFen("8/7k/3P4/8/8/8/8/RK6 b - - 0 4"), board1);
+        board1.unmakeMove(move1, new UnmakeMoveInfo(null, board1.getCastlingRightsWhite(), board1.getCastlingRightsBlack(), new BoardPosition("d6"), 0));
+        assertEquals(Board.initializeFromFen("8/7k/8/3pP3/8/8/8/RK6 w - d6 0 4"), board1);
+
 
         // basic en passant black to move
 

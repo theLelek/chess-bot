@@ -139,6 +139,7 @@ public class Board {
     public void unmakeMove(Move move, UnmakeMoveInfo unmakeMoveInfo) {
         castlingRightsWhite = unmakeMoveInfo.castlingRightsWhite();
         castlingRightsBlack = unmakeMoveInfo.castlingRightsBlack();
+        enPassantTargetSquare = unmakeMoveInfo.enPassantTargetSquare();
         halfmoveClock = unmakeMoveInfo.halfMoveClock();
         if (isWhiteToMove) fullmoveNumber--;
         isWhiteToMove = ! isWhiteToMove;
