@@ -168,7 +168,7 @@ public class Board {
     }
 
     private void changePiecesCastlingMove(CastlingMove move, boolean undo) {
-        Color color = undo ? (isWhiteToMove ? Color.BLACK : Color.WHITE) : (isWhiteToMove ? Color.WHITE : Color.BLACK);
+        Color color = (isWhiteToMove) ? Color.WHITE : Color.BLACK;
 
         BoardPosition kingFrom = undo ? move.to() : move.from();
         BoardPosition kingTo = undo ? move.from() : move.to();
