@@ -18,3 +18,4 @@ replace board piece getting (getBoardPieces) with getBoardPiece
 implement zobrist hash
 implement uci protocoll
 
+maybe change Move class to bits
