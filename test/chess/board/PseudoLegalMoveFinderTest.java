@@ -13,9 +13,32 @@ import org.junit.jupiter.api.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Stack;
 
 
 public class PseudoLegalMoveFinderTest {
+
+    @Test
+    void perftTest() {
+        Board board = Board.initializeDefaultBoard();
+        List<Move> legalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, true);
+        System.out.println(perft(2, board, true, new Stack<>()));
+    }
+
+    private static int perft(int depth, Board board, boolean isWhiteToMove, Stack<UnmakeMoveInfo> unmakeMoveInfos) {
+        if (depth == 0) return 1;
+        List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, isWhiteToMove);
+
+        int count = 0;
+        for (Move move : pseudoLegalMoves) {
+            unmakeMoveInfos.push(new UnmakeMoveInfo(board, move));
+            board.makeMove(move);
+            count += perft(depth - 1, board, ! isWhiteToMove, unmakeMoveInfos);
+            board.unmakeMove(move, unmakeMoveInfos.pop());
+        }
+        return count;
+    }
+
     @Test
     @DisplayName("test find legal moves with black bishop at f8")
     public void testFindLegalMoves1() {
