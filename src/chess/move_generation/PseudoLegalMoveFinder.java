@@ -19,7 +19,7 @@ public class PseudoLegalMoveFinder {
         for (int i = 0; i < BoardPiece.values().length; i++) {
             // iterating through bitboards of pieces
             BoardPiece currentPiece = BoardPiece.values()[i];
-            if (currentPiece.isWhite() != isWhiteToMove) { // skips bitboards that only exist for performance optimizations
+            if (currentPiece.isWhite() != isWhiteToMove) {
                 continue;
             }
             addPseudoLegalMovesOfBitboard(board, currentPiece, legalMoves);
