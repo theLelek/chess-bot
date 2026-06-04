@@ -1,0 +1,6 @@
+/home/leon/files/programming/_projects/chess-bot/src/test/java/dev/lelek/chess/BoardBitBoardStateTest.java
+/home/leon/files/programming/_projects/chess-bot/src/test/java/dev/lelek/chess/Move/MoveTest.java
+/home/leon/files/programming/_projects/chess-bot/src/test/java/dev/lelek/chess/Move/PromotionMoveTest.java
+/home/leon/files/programming/_projects/chess-bot/src/test/java/dev/lelek/chess/api/ApiTest.java
+/home/leon/files/programming/_projects/chess-bot/src/test/java/dev/lelek/chess/board/PseudoLegalMoveFinderTest.java
+/home/leon/files/programming/_projects/chess-bot/src/test/java/dev/lelek/chess/board/model/BoardTest.java
