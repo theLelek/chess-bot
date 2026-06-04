@@ -19,3 +19,11 @@ implement zobrist hash
 implement uci protocoll
 
 maybe change Move class to bits
+
+remove boolean paramether
+
+
+MoveGenerator:
+1. order moves
+2. iterative deepening with ab pruning
+3. 

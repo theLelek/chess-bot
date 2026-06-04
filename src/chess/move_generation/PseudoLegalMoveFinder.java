@@ -19,7 +19,7 @@ public class PseudoLegalMoveFinder {
         for (int i = 0; i < BoardPiece.values().length; i++) {
             // iterating through bitboards of pieces
             BoardPiece currentPiece = BoardPiece.values()[i];
-            if (currentPiece.isWhite() != isWhiteToMove) { // skips bitboards that only exist for performance optimizations
+            if (currentPiece.isWhite() != isWhiteToMove) {
                 continue;
             }
             addPseudoLegalMovesOfBitboard(board, currentPiece, legalMoves);
@@ -159,14 +159,13 @@ public class PseudoLegalMoveFinder {
         BoardPosition enPassantPosition = board.getEnPassantPiecePosition();
         BoardPiece pawnBoardPiece = color.getPawn();
 
-        BoardPosition pieceToMoveFrom1 = new BoardPosition(enPassantPosition.x() - 1, enPassantPosition.y());
-        if (pieceToMoveFrom1.x() >= 0 && bitBoardState.getBit(pawnBoardPiece, pieceToMoveFrom1)) {
-            legalMoves.add(new EnPassantMove(pieceToMoveFrom1, new BoardPosition(board.getEnPassantTargetSquare().x(), board.getEnPassantTargetSquare().y())));
+
+        if (enPassantPosition.x() - 1 >= 0 && bitBoardState.getBit(pawnBoardPiece, new BoardPosition(enPassantPosition.x() - 1, enPassantPosition.y()))) {
+            legalMoves.add(new EnPassantMove(new BoardPosition(enPassantPosition.x() - 1, enPassantPosition.y()), new BoardPosition(board.getEnPassantTargetSquare().x(), board.getEnPassantTargetSquare().y())));
         }
 
-        BoardPosition pieceToMoveFrom2 = new BoardPosition(enPassantPosition.x() + 1, enPassantPosition.y());
-        if (pieceToMoveFrom2.x() < Board.SIZE && bitBoardState.getBit(pawnBoardPiece, pieceToMoveFrom2)) {
-            legalMoves.add(new EnPassantMove(pieceToMoveFrom2, new BoardPosition(board.getEnPassantTargetSquare().x(), board.getEnPassantTargetSquare().y())));
+        if (enPassantPosition.x() + 1 < Board.SIZE && bitBoardState.getBit(pawnBoardPiece, new BoardPosition(enPassantPosition.x() + 1, enPassantPosition.y()))) {
+            legalMoves.add(new EnPassantMove(new BoardPosition(enPassantPosition.x() + 1, enPassantPosition.y()), new BoardPosition(board.getEnPassantTargetSquare().x(), board.getEnPassantTargetSquare().y())));
         }
     }
 }

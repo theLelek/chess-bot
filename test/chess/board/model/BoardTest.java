@@ -268,6 +268,15 @@ class BoardTest {
         assertEquals(Board.initializeFromFen("8/7k/8/8/3Pp3/8/8/RK6 b - d3 0 4"), board2);
     }
 
+    @Test void move_general() {
+        Board board = Board.initializeDefaultBoard();
+        Move move = new Move("a2", "a4");
+        UnmakeMoveInfo unmakeMoveInfo = new UnmakeMoveInfo(board, move);
+        board.makeMove(move);
+        assertEquals(Board.initializeFromFen("rnbqkbnr/pppppppp/8/8/P7/8/1PPPPPPP/RNBQKBNR b KQkq a3 0 1"), board);
+        board.unmakeMove(move, unmakeMoveInfo);
+        assertEquals(Board.initializeDefaultBoard(), board);
+    }
 
     private static BoardPiece[] board2dToPieceList(BoardPiece[][] board){
         ArrayList<BoardPiece> result = new ArrayList<>();
