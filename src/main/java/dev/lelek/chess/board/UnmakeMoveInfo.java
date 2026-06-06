@@ -8,6 +8,7 @@ import dev.lelek.chess.board.model.CastlingRights;
 import java.util.Objects;
 
 public final class UnmakeMoveInfo {
+
     private final BoardPiece capturedPiece;
     private final CastlingRights castlingRightsWhite;
     private final CastlingRights castlingRightsBlack;
@@ -22,11 +23,11 @@ public final class UnmakeMoveInfo {
         this.halfMoveClock = halfMoveClock;
     }
 
-    public UnmakeMoveInfo(Board board, Move move) {
+    public UnmakeMoveInfo(Board board, Move move) { // todo fix bug
         capturedPiece = board.getPieceList()[move.to().getBitBoardSquare()];
-        castlingRightsWhite = board.getCastlingRightsWhite();
-        castlingRightsBlack = board.getCastlingRightsBlack();
-        enPassantTargetSquare = board.getEnPassantTargetSquare();
+        castlingRightsWhite = CastlingRights.copyOf(board.getCastlingRightsWhite());
+        castlingRightsBlack = CastlingRights.copyOf(board.getCastlingRightsBlack());
+        enPassantTargetSquare = board.getEnPassantTargetSquare() != null ? BoardPosition.copyOf(board.getEnPassantTargetSquare()) : null;
         halfMoveClock = board.getHalfmoveClock();
     }
 

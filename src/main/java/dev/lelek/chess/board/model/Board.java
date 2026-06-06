@@ -297,6 +297,9 @@ public class Board {
     }
 
     public static Board copyOf(Board board) {
+        if (board == null) {
+            throw new IllegalArgumentException("board cannot be null");
+        }
         boolean isWhiteToMove = board.isWhiteToMove;
         CastlingRights castlingRightsWhite = CastlingRights.copyOf(board.castlingRightsWhite);
         CastlingRights castlingRightsBlack = CastlingRights.copyOf(board.castlingRightsBlack);

@@ -32,6 +32,9 @@ public class BitBoardState {
     }
 
     public static BitBoardState copyOf(BitBoardState bitBoardState) {
+        if (bitBoardState == null) {
+            throw new IllegalArgumentException("bitBoardState cannot be null");
+        }
         BitBoardState copy = new BitBoardState();
         System.arraycopy(bitBoardState.bitboards, 0, copy.bitboards, 0, bitBoardState.bitboards.length);
         return copy;
