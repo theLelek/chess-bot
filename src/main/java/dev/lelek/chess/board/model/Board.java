@@ -18,8 +18,6 @@ import java.util.Objects;
 
 public class Board {
 
-    private static final Logger log = LoggerFactory.getLogger(Board.class);
-
     public static final int SIZE = 8;
 
     private boolean isWhiteToMove;
@@ -32,8 +30,10 @@ public class Board {
     private final BitBoardState bitBoardState;
     private final BoardPiece[] pieceList;
 
-    private final BoardPosition whiteKingPosition;
-    private final BoardPosition blackKingPosition;
+    private BoardPosition whiteKingPosition;
+    private BoardPosition blackKingPosition;
+
+    private static final Logger log = LoggerFactory.getLogger(Board.class);
 
     public Board(boolean isWhiteToMove, CastlingRights castlingRightsWhite, CastlingRights castlingRightsBlack, BoardPosition enPassantTargetSquare, int halfmoveClock, int fullmoveNumber, BitBoardState bitBoardState, BoardPiece[] pieceList, BoardPosition whiteKingPosition, BoardPosition blackKingPosition) {
         this.isWhiteToMove = isWhiteToMove;
@@ -116,6 +116,14 @@ public class Board {
         if (isBlackToMove()) fullmoveNumber++;
         updatePieces(move);
         isWhiteToMove = ! isWhiteToMove;
+
+        if (pieceToMove.isKing()) {
+            if (pieceToMove.isWhite()) {
+                whiteKingPosition = move.to();
+            } else {
+                blackKingPosition = move.to();
+            }
+        }
     }
 
     private void updateCastlingRights(Move move) {
@@ -167,6 +175,7 @@ public class Board {
     }
 
     public void unmakeMove(Move move, UnmakeMoveInfo unmakeMoveInfo) {
+        BoardPiece pieceToMove = pieceList[move.to().getBitBoardSquare()];
         castlingRightsWhite = unmakeMoveInfo.castlingRightsWhite();
         castlingRightsBlack = unmakeMoveInfo.castlingRightsBlack();
         enPassantTargetSquare = unmakeMoveInfo.enPassantTargetSquare();
@@ -174,6 +183,15 @@ public class Board {
         if (isWhiteToMove) fullmoveNumber--;
         isWhiteToMove = ! isWhiteToMove;
         outdatePieces(move, unmakeMoveInfo);
+
+        if (pieceToMove.isKing()) {
+            if (pieceToMove.isWhite()) {
+                whiteKingPosition = move.from();
+            } else {
+                blackKingPosition = move.from();
+            }
+        }
+//        whiteKingPosition = null; // todo
     }
 
     private void outdatePieces(Move move, UnmakeMoveInfo unmakeMoveInfo) {
@@ -282,12 +300,12 @@ public class Board {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Board board = (Board) o;
-        return isWhiteToMove == board.isWhiteToMove && halfmoveClock == board.halfmoveClock && fullmoveNumber == board.fullmoveNumber && Objects.equals(castlingRightsWhite, board.castlingRightsWhite) && Objects.equals(castlingRightsBlack, board.castlingRightsBlack) && Objects.equals(enPassantTargetSquare, board.enPassantTargetSquare) && Objects.equals(bitBoardState, board.bitBoardState) && Objects.deepEquals(pieceList, board.pieceList);
+        return isWhiteToMove == board.isWhiteToMove && halfmoveClock == board.halfmoveClock && fullmoveNumber == board.fullmoveNumber && Objects.equals(castlingRightsWhite, board.castlingRightsWhite) && Objects.equals(castlingRightsBlack, board.castlingRightsBlack) && Objects.equals(enPassantTargetSquare, board.enPassantTargetSquare) && Objects.equals(bitBoardState, board.bitBoardState) && Objects.deepEquals(pieceList, board.pieceList) && Objects.equals(whiteKingPosition, board.whiteKingPosition) && Objects.equals(blackKingPosition, board.blackKingPosition);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(isWhiteToMove, castlingRightsWhite, castlingRightsBlack, enPassantTargetSquare, halfmoveClock, fullmoveNumber, bitBoardState, Arrays.hashCode(pieceList));
+        return Objects.hash(isWhiteToMove, castlingRightsWhite, castlingRightsBlack, enPassantTargetSquare, halfmoveClock, fullmoveNumber, bitBoardState, Arrays.hashCode(pieceList), whiteKingPosition, blackKingPosition);
     }
 
     public boolean isWhiteToMove() {
