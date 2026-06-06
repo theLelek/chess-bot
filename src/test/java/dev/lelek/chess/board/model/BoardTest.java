@@ -58,6 +58,9 @@ class BoardTest {
         assertEquals(1, board.getFullmoveNumber());
         assertNull(board.getEnPassantTargetSquare());
         assertTrue(board.isWhiteToMove());
+
+        assertEquals(board.getWhiteKingPosition(), new BoardPosition("e1"));
+        assertEquals(board.getBlackKingPosition(), new BoardPosition("e8"));
     }
 
     @Test
@@ -181,9 +184,10 @@ class BoardTest {
         Board originalBoard1 = Board.initializeFromFen("4k3/8/8/8/8/8/8/R3K2R w KQ - 0 1");
         Board board1 = Board.initializeFromFen("4k3/8/8/8/8/8/8/R3K2R w KQ - 0 1");
         Move move1 = new CastlingMove("e1", "g1");
+        UnmakeMoveInfo unmakeMoveInfo = new UnmakeMoveInfo(board1, move1);
         board1.makeMove(move1);
         assertEquals(Board.initializeFromFen("4k3/8/8/8/8/8/8/R4RK1 b - - 1 1"), board1);
-        board1.unmakeMove(move1, new UnmakeMoveInfo(null, originalBoard1.getCastlingRightsWhite(), originalBoard1.getCastlingRightsBlack(), null, 0));
+        board1.unmakeMove(move1, unmakeMoveInfo);
         assertEquals(originalBoard1, board1);
 
         // white queenside castling
