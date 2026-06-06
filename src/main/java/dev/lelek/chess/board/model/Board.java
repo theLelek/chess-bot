@@ -53,6 +53,7 @@ public class Board {
     }
 
     public static Board initializeFromFen(String fen) {
+        log.info("initalized board: {}", fen);
         String[] fenParts = fen.split(" ");
         var isWhiteToMove = fenParts[1].equals("w");
         var castlingRightsWhite = CastlingRights.fromFen(fenParts[2], true);
