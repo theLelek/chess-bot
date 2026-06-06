@@ -1,5 +1,8 @@
 package dev.lelek.chess.board.model;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import dev.lelek.chess.BoardPosition;
 import dev.lelek.chess.Color;
 import dev.lelek.chess.Move.CastlingMove;
@@ -15,6 +18,8 @@ import java.util.Objects;
 
 public class Board {
 
+    private static final Logger log = LoggerFactory.getLogger(Board.class);
+
     public static final int SIZE = 8;
 
     private boolean isWhiteToMove;
@@ -27,7 +32,10 @@ public class Board {
     private final BitBoardState bitBoardState;
     private final BoardPiece[] pieceList;
 
-    public Board(boolean isWhiteToMove, CastlingRights castlingRightsWhite, CastlingRights castlingRightsBlack, BoardPosition enPassantTargetSquare, int halfmoveClock, int fullmoveNumber, BitBoardState bitBoardState, BoardPiece[] pieceList) {
+    private final BoardPosition whiteKingPosition;
+    private final BoardPosition blackKingPosition;
+
+    public Board(boolean isWhiteToMove, CastlingRights castlingRightsWhite, CastlingRights castlingRightsBlack, BoardPosition enPassantTargetSquare, int halfmoveClock, int fullmoveNumber, BitBoardState bitBoardState, BoardPiece[] pieceList, BoardPosition whiteKingPosition, BoardPosition blackKingPosition) {
         this.isWhiteToMove = isWhiteToMove;
         this.castlingRightsWhite = castlingRightsWhite;
         this.castlingRightsBlack = castlingRightsBlack;
@@ -36,6 +44,8 @@ public class Board {
         this.fullmoveNumber = fullmoveNumber;
         this.bitBoardState = bitBoardState;
         this.pieceList = pieceList;
+        this.whiteKingPosition = whiteKingPosition;
+        this.blackKingPosition = blackKingPosition;
     }
 
     public static Board initializeDefaultBoard() {
@@ -52,7 +62,9 @@ public class Board {
         var fullMoveNumber = Integer.parseInt(fenParts[5]);
         var pieceList = initializePieceList(fenParts[0]);
         var bitboardState = BitBoardState.initializeFromPieceList(pieceList);
-        return new Board(isWhiteToMove, castlingRightsWhite, castlingRightsBlack, enPassantTarget, halfMoveClock, fullMoveNumber, bitboardState, pieceList);
+        var whiteKingPosition = getKingBoardPosition(pieceList, Color.WHITE);
+        var blackKingPosition = getKingBoardPosition(pieceList, Color.BLACK);
+        return new Board(isWhiteToMove, castlingRightsWhite, castlingRightsBlack, enPassantTarget, halfMoveClock, fullMoveNumber, bitboardState, pieceList, whiteKingPosition, blackKingPosition);
     }
 
     private static BoardPiece[] initializePieceList(String fen) {
@@ -74,6 +86,24 @@ public class Board {
             }
         }
         return pieceList;
+    }
+
+    private static BoardPosition getKingBoardPosition(BoardPiece[] pieceList, Color color) {
+        try {
+            return initializeKingPosition(pieceList, color);
+        } catch (NoKingFoundException e) {
+            log.warn("No king found in board: " + Arrays.toString(pieceList));
+        }
+        return null;
+    }
+
+    private static BoardPosition initializeKingPosition(BoardPiece[] pieceList, Color color) {
+        for (int i = 0; i < pieceList.length; i++) {
+            if (pieceList[i] == color.getKing()) {
+                return new BoardPosition(i);
+            }
+        }
+        throw new NoKingFoundException("couldnt find king in board + " + Arrays.toString(pieceList));
     }
 
     public void makeMove(Move move) {
@@ -305,5 +335,13 @@ public class Board {
 
     public BitBoardState getBitBoardState() {
         return bitBoardState;
+    }
+
+    public BoardPosition getWhiteKingPosition() {
+        return whiteKingPosition;
+    }
+
+    public BoardPosition getBlackKingPosition() {
+        return blackKingPosition;
     }
 }
