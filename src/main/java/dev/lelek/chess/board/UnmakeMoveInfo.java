@@ -23,7 +23,7 @@ public final class UnmakeMoveInfo {
         this.halfMoveClock = halfMoveClock;
     }
 
-    public UnmakeMoveInfo(Board board, Move move) { // todo fix bug
+    public UnmakeMoveInfo(Board board, Move move) {
         capturedPiece = board.getPieceList()[move.to().getBitBoardSquare()];
         castlingRightsWhite = CastlingRights.copyOf(board.getCastlingRightsWhite());
         castlingRightsBlack = CastlingRights.copyOf(board.getCastlingRightsBlack());

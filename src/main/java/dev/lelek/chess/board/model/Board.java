@@ -191,7 +191,6 @@ public class Board {
                 blackKingPosition = move.from();
             }
         }
-//        whiteKingPosition = null; // todo
     }
 
     private void outdatePieces(Move move, UnmakeMoveInfo unmakeMoveInfo) {
@@ -290,7 +289,7 @@ public class Board {
         pieceList[to.getBitBoardSquare()] = pieceToBecome;
     }
 
-    public BoardPosition getEnPassantPiecePosition() { // todo test
+    public BoardPosition getEnPassantPiecePosition() {
         if (enPassantTargetSquare == null) throw new RuntimeException("No en passant target square set");
         Color color = (isWhiteToMove) ? Color.WHITE : Color.BLACK;
         return new BoardPosition(enPassantTargetSquare.x(), enPassantTargetSquare.y() - color.getMovingDirection());
