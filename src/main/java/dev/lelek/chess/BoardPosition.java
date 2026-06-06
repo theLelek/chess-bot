@@ -40,8 +40,15 @@ public class BoardPosition {
         }
     }
 
-    public BoardPosition copy() {
+    public BoardPosition copy() { // todo remove
         return new BoardPosition(x, y);
+    }
+
+    public static BoardPosition copyOf(BoardPosition other) {
+        if (other == null) {
+            throw new IllegalArgumentException("boardPosition cannot be null");
+        }
+        return new BoardPosition(other.x, other.y);
     }
 
     public BoardPosition move(int[] direction) throws IndexOutOfBoundsException {

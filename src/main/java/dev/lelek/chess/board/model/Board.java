@@ -1,5 +1,8 @@
 package dev.lelek.chess.board.model;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import dev.lelek.chess.BoardPosition;
 import dev.lelek.chess.Color;
 import dev.lelek.chess.Move.CastlingMove;
@@ -27,7 +30,12 @@ public class Board {
     private final BitBoardState bitBoardState;
     private final BoardPiece[] pieceList;
 
-    public Board(boolean isWhiteToMove, CastlingRights castlingRightsWhite, CastlingRights castlingRightsBlack, BoardPosition enPassantTargetSquare, int halfmoveClock, int fullmoveNumber, BitBoardState bitBoardState, BoardPiece[] pieceList) {
+    private BoardPosition whiteKingPosition;
+    private BoardPosition blackKingPosition;
+
+    private static final Logger log = LoggerFactory.getLogger(Board.class);
+
+    public Board(boolean isWhiteToMove, CastlingRights castlingRightsWhite, CastlingRights castlingRightsBlack, BoardPosition enPassantTargetSquare, int halfmoveClock, int fullmoveNumber, BitBoardState bitBoardState, BoardPiece[] pieceList, BoardPosition whiteKingPosition, BoardPosition blackKingPosition) {
         this.isWhiteToMove = isWhiteToMove;
         this.castlingRightsWhite = castlingRightsWhite;
         this.castlingRightsBlack = castlingRightsBlack;
@@ -36,6 +44,8 @@ public class Board {
         this.fullmoveNumber = fullmoveNumber;
         this.bitBoardState = bitBoardState;
         this.pieceList = pieceList;
+        this.whiteKingPosition = whiteKingPosition;
+        this.blackKingPosition = blackKingPosition;
     }
 
     public static Board initializeDefaultBoard() {
@@ -43,6 +53,7 @@ public class Board {
     }
 
     public static Board initializeFromFen(String fen) {
+        log.info("initalized board: {}", fen);
         String[] fenParts = fen.split(" ");
         var isWhiteToMove = fenParts[1].equals("w");
         var castlingRightsWhite = CastlingRights.fromFen(fenParts[2], true);
@@ -52,7 +63,9 @@ public class Board {
         var fullMoveNumber = Integer.parseInt(fenParts[5]);
         var pieceList = initializePieceList(fenParts[0]);
         var bitboardState = BitBoardState.initializeFromPieceList(pieceList);
-        return new Board(isWhiteToMove, castlingRightsWhite, castlingRightsBlack, enPassantTarget, halfMoveClock, fullMoveNumber, bitboardState, pieceList);
+        var whiteKingPosition = getKingBoardPosition(pieceList, Color.WHITE);
+        var blackKingPosition = getKingBoardPosition(pieceList, Color.BLACK);
+        return new Board(isWhiteToMove, castlingRightsWhite, castlingRightsBlack, enPassantTarget, halfMoveClock, fullMoveNumber, bitboardState, pieceList, whiteKingPosition, blackKingPosition);
     }
 
     private static BoardPiece[] initializePieceList(String fen) {
@@ -76,6 +89,24 @@ public class Board {
         return pieceList;
     }
 
+    private static BoardPosition getKingBoardPosition(BoardPiece[] pieceList, Color color) {
+        try {
+            return initializeKingPosition(pieceList, color);
+        } catch (NoKingFoundException e) {
+            log.warn("No king found in board: " + Arrays.toString(pieceList));
+        }
+        return null;
+    }
+
+    private static BoardPosition initializeKingPosition(BoardPiece[] pieceList, Color color) {
+        for (int i = 0; i < pieceList.length; i++) {
+            if (pieceList[i] == color.getKing()) {
+                return new BoardPosition(i);
+            }
+        }
+        throw new NoKingFoundException("couldnt find king in board + " + Arrays.toString(pieceList));
+    }
+
     public void makeMove(Move move) {
         BoardPiece pieceToMove = pieceList[move.from().getBitBoardSquare()];
         BoardPiece pieceToCapture = pieceList[move.to().getBitBoardSquare()];
@@ -85,6 +116,14 @@ public class Board {
         if (isBlackToMove()) fullmoveNumber++;
         updatePieces(move);
         isWhiteToMove = ! isWhiteToMove;
+
+        if (pieceToMove.isKing()) {
+            if (pieceToMove.isWhite()) {
+                whiteKingPosition = move.to();
+            } else {
+                blackKingPosition = move.to();
+            }
+        }
     }
 
     private void updateCastlingRights(Move move) {
@@ -136,6 +175,7 @@ public class Board {
     }
 
     public void unmakeMove(Move move, UnmakeMoveInfo unmakeMoveInfo) {
+        BoardPiece pieceToMove = pieceList[move.to().getBitBoardSquare()];
         castlingRightsWhite = unmakeMoveInfo.castlingRightsWhite();
         castlingRightsBlack = unmakeMoveInfo.castlingRightsBlack();
         enPassantTargetSquare = unmakeMoveInfo.enPassantTargetSquare();
@@ -143,6 +183,14 @@ public class Board {
         if (isWhiteToMove) fullmoveNumber--;
         isWhiteToMove = ! isWhiteToMove;
         outdatePieces(move, unmakeMoveInfo);
+
+        if (pieceToMove.isKing()) {
+            if (pieceToMove.isWhite()) {
+                whiteKingPosition = move.from();
+            } else {
+                blackKingPosition = move.from();
+            }
+        }
     }
 
     private void outdatePieces(Move move, UnmakeMoveInfo unmakeMoveInfo) {
@@ -241,22 +289,39 @@ public class Board {
         pieceList[to.getBitBoardSquare()] = pieceToBecome;
     }
 
-    public BoardPosition getEnPassantPiecePosition() { // todo test
+    public BoardPosition getEnPassantPiecePosition() {
         if (enPassantTargetSquare == null) throw new RuntimeException("No en passant target square set");
         Color color = (isWhiteToMove) ? Color.WHITE : Color.BLACK;
         return new BoardPosition(enPassantTargetSquare.x(), enPassantTargetSquare.y() - color.getMovingDirection());
+    }
+
+    public static Board copyOf(Board board) {
+        if (board == null) {
+            throw new IllegalArgumentException("board cannot be null");
+        }
+        boolean isWhiteToMove = board.isWhiteToMove;
+        CastlingRights castlingRightsWhite = CastlingRights.copyOf(board.castlingRightsWhite);
+        CastlingRights castlingRightsBlack = CastlingRights.copyOf(board.castlingRightsBlack);
+        BoardPosition enPassantTargetSquare = BoardPosition.copyOf(board.enPassantTargetSquare);
+        int halfmoveClock = board.getHalfmoveClock();
+        int fullMoveNumber = board.getFullmoveNumber();
+        BitBoardState bitBoardState = BitBoardState.copyOf(board.bitBoardState);
+        BoardPiece[] pieceList = board.pieceList.clone();
+        BoardPosition whiteKingPosition = BoardPosition.copyOf(board.whiteKingPosition);
+        BoardPosition blackKingPosition = BoardPosition.copyOf(board.blackKingPosition);
+        return new Board(isWhiteToMove, castlingRightsWhite, castlingRightsBlack, enPassantTargetSquare, halfmoveClock, fullMoveNumber, bitBoardState, pieceList, whiteKingPosition, blackKingPosition);
     }
 
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Board board = (Board) o;
-        return isWhiteToMove == board.isWhiteToMove && halfmoveClock == board.halfmoveClock && fullmoveNumber == board.fullmoveNumber && Objects.equals(castlingRightsWhite, board.castlingRightsWhite) && Objects.equals(castlingRightsBlack, board.castlingRightsBlack) && Objects.equals(enPassantTargetSquare, board.enPassantTargetSquare) && Objects.equals(bitBoardState, board.bitBoardState) && Objects.deepEquals(pieceList, board.pieceList);
+        return isWhiteToMove == board.isWhiteToMove && halfmoveClock == board.halfmoveClock && fullmoveNumber == board.fullmoveNumber && Objects.equals(castlingRightsWhite, board.castlingRightsWhite) && Objects.equals(castlingRightsBlack, board.castlingRightsBlack) && Objects.equals(enPassantTargetSquare, board.enPassantTargetSquare) && Objects.equals(bitBoardState, board.bitBoardState) && Objects.deepEquals(pieceList, board.pieceList) && Objects.equals(whiteKingPosition, board.whiteKingPosition) && Objects.equals(blackKingPosition, board.blackKingPosition);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(isWhiteToMove, castlingRightsWhite, castlingRightsBlack, enPassantTargetSquare, halfmoveClock, fullmoveNumber, bitBoardState, Arrays.hashCode(pieceList));
+        return Objects.hash(isWhiteToMove, castlingRightsWhite, castlingRightsBlack, enPassantTargetSquare, halfmoveClock, fullmoveNumber, bitBoardState, Arrays.hashCode(pieceList), whiteKingPosition, blackKingPosition);
     }
 
     public boolean isWhiteToMove() {
@@ -305,5 +370,13 @@ public class Board {
 
     public BitBoardState getBitBoardState() {
         return bitBoardState;
+    }
+
+    public BoardPosition getWhiteKingPosition() {
+        return whiteKingPosition;
+    }
+
+    public BoardPosition getBlackKingPosition() {
+        return blackKingPosition;
     }
 }
