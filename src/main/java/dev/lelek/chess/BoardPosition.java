@@ -40,8 +40,12 @@ public class BoardPosition {
         }
     }
 
-    public BoardPosition copy() {
+    public BoardPosition copy() { // todo remove
         return new BoardPosition(x, y);
+    }
+
+    public static BoardPosition copyOf(BoardPosition boardPosition) {
+        return new BoardPosition(boardPosition.x, boardPosition.y);
     }
 
     public BoardPosition move(int[] direction) throws IndexOutOfBoundsException {

@@ -296,6 +296,20 @@ public class Board {
         return new BoardPosition(enPassantTargetSquare.x(), enPassantTargetSquare.y() - color.getMovingDirection());
     }
 
+    public static Board copyOf(Board board) {
+        boolean isWhiteToMove = board.isWhiteToMove;
+        CastlingRights castlingRightsWhite = CastlingRights.copyOf(board.castlingRightsWhite);
+        CastlingRights castlingRightsBlack = CastlingRights.copyOf(board.castlingRightsBlack);
+        BoardPosition enPassantTargetSquare = BoardPosition.copyOf(board.enPassantTargetSquare);
+        int halfmoveClock = board.getHalfmoveClock();
+        int fullMoveNumber = board.getFullmoveNumber();
+        BitBoardState bitBoardState = BitBoardState.copyOf(board.bitBoardState);
+        BoardPiece[] pieceList = board.pieceList.clone();
+        BoardPosition whiteKingPosition = BoardPosition.copyOf(board.whiteKingPosition);
+        BoardPosition blackKingPosition = BoardPosition.copyOf(board.blackKingPosition);
+        return new Board(isWhiteToMove, castlingRightsWhite, castlingRightsBlack, enPassantTargetSquare, halfmoveClock, fullMoveNumber, bitBoardState, pieceList, whiteKingPosition, blackKingPosition);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;

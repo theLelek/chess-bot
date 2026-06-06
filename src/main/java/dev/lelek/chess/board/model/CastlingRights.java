@@ -30,6 +30,10 @@ public class CastlingRights {
         return new CastlingRights(kingSide, queenSide);
     }
 
+    public static CastlingRights copyOf(CastlingRights castlingRights) {
+        return new CastlingRights(castlingRights.canCastleKingSide, castlingRights.canCastleQueenSide);
+    }
+
     public boolean canCastleKingSide() {
         return canCastleKingSide;
     }
