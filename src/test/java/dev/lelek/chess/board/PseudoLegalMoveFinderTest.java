@@ -21,10 +21,10 @@ public class PseudoLegalMoveFinderTest {
 
     @Test
     void perftTest() {
-        // currently takes  seconds for depth 4 on default position
+        // currently takes 3.8-4.1 seconds for depth 5 on default position
         Board board = Board.initializeDefaultBoard();
         List<Move> legalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, true);
-        System.out.println(perft(4, board, true, new Stack<>()));
+        System.out.println(perft(5, board, true, new Stack<>()));
     }
 
     private static int perft(int depth, Board board, boolean isWhiteToMove, Stack<UnmakeMoveInfo> unmakeMoveInfos) {
