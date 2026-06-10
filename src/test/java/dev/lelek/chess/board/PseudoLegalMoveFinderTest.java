@@ -21,14 +21,18 @@ public class PseudoLegalMoveFinderTest {
 
     @Test
     void perftTest() {
+        // currently takes  seconds for depth 4 on default position
         Board board = Board.initializeDefaultBoard();
         List<Move> legalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, true);
-        System.out.println(perft(2, board, true, new Stack<>()));
+        System.out.println(perft(4, board, true, new Stack<>()));
     }
 
     private static int perft(int depth, Board board, boolean isWhiteToMove, Stack<UnmakeMoveInfo> unmakeMoveInfos) {
-        if (depth == 0) return 1;
         List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, isWhiteToMove);
+        if (isKingInCheck(board, pseudoLegalMoves, isWhiteToMove ? Color.BLACK : Color.WHITE)) {
+            return 0;
+        }
+        if (depth == 0) return 1;
 
         int count = 0;
         for (Move move : pseudoLegalMoves) {
@@ -38,6 +42,16 @@ public class PseudoLegalMoveFinderTest {
             board.unmakeMove(move, unmakeMoveInfos.pop());
         }
         return count;
+    }
+
+    private static boolean isKingInCheck(Board board, List<Move> moves, Color color) {
+        BoardPosition kingPosition = color == Color.WHITE ? board.getWhiteKingPosition() : board.getBlackKingPosition();
+        for (Move move : moves) {
+            if (move.to().equals(kingPosition)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Test
