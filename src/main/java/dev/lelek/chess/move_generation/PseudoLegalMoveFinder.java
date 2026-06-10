@@ -57,13 +57,13 @@ public class PseudoLegalMoveFinder {
         for (int[] direction : currentPieceMoveRules.getDirections()) {
             BoardPosition currentPosition = position.copy();
             boolean interrupted = false;
+
             do {
-                try {
-                    currentPosition = currentPosition.move(direction);
-                } catch (IndexOutOfBoundsException e) {
+                if (currentPosition.x() + direction[0] < 0 || currentPosition.x() + direction[0] >= Board.SIZE || currentPosition.y() + direction[1] < 0 || currentPosition.y() + direction[1] >= Board.SIZE) {
                     interrupted = true;
                     continue;
                 }
+                currentPosition = currentPosition.move(direction);
                 if (board.getPieceList()[currentPosition.getBitBoardSquare()] != null) {
                     interrupted = true;
                     if (board.getPieceList()[currentPosition.getBitBoardSquare()].hasSameColor(boardPiece)) {
@@ -71,7 +71,7 @@ public class PseudoLegalMoveFinder {
                     }
                 }
                 legalMoves.add(new Move(position, currentPosition));
-            } while (currentPieceMoveRules.canMoveInfinitely() && !interrupted);
+            } while (currentPieceMoveRules.canMoveInfinitely() && ! interrupted);
         }
     }
 
