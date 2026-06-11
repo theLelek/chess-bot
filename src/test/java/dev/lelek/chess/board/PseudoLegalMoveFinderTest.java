@@ -6,7 +6,6 @@ import dev.lelek.chess.Move.CastlingMove;
 import dev.lelek.chess.Move.EnPassantMove;
 import dev.lelek.chess.Move.Move;
 import dev.lelek.chess.Move.PromotionMove;
-import dev.lelek.chess.board.UnmakeMoveInfo;
 import dev.lelek.chess.move_generation.PseudoLegalMoveFinder;
 import dev.lelek.chess.board.model.Board;
 import org.junit.jupiter.api.*;
@@ -17,38 +16,60 @@ import java.util.List;
 import java.util.Stack;
 
 
+
 public class PseudoLegalMoveFinderTest {
 
+    // all perft results can be seen on https://www.chessprogramming.org/Perft_Results
     @Test
-    void perftTest() {
-        // currently takes 3.8-4.1 seconds for depth 5 on default position
+    void perftPosition1() {
+        // currently takes 3.8-4.1 seconds for depth 5 on the default position
         Board board = Board.initializeDefaultBoard();
-        List<Move> legalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, true);
-        System.out.println(perft(5, board, true, new Stack<>()));
+        Assertions.assertEquals(4_865_609,  perft(5, board, new Stack<>(), null));
     }
 
-    private static int perft(int depth, Board board, boolean isWhiteToMove, Stack<UnmakeMoveInfo> unmakeMoveInfos) {
+    @Test
+    void perftPosition2() {
+        /*
+        the fen of position 2 uses a short version which is currently not supported,
+        thus the - at the end had to be manually changed to 0 1
+         */
+        Board board = Board.initializeFromFen("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1");
+        Assertions.assertEquals(97_862, perft(3, board, new Stack<>(), null));
+    }
+
+
+    private static int perft(int depth, Board board, Stack<UnmakeMoveInfo> unmakeMoveInfos, Move previousMove) {
+        boolean isWhiteToMove = board.isWhiteToMove();
         List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, isWhiteToMove);
-        if (isKingInCheck(board, pseudoLegalMoves, isWhiteToMove ? Color.BLACK : Color.WHITE)) {
+        BoardPosition kingPosition = isWhiteToMove ? board.getBlackKingPosition() : board.getWhiteKingPosition();
+
+        if (previousMove instanceof CastlingMove castlingMove) {
+            BoardPosition positionToCheck = new BoardPosition(castlingMove.isKingSideCastling() ? 5 : 3, castlingMove.from().y());
+            if (isPositionTargeted(pseudoLegalMoves, positionToCheck, kingPosition)) {
+                return 0;
+            }
+        } else if (isPositionTargeted(pseudoLegalMoves, kingPosition)) {
             return 0;
         }
+
         if (depth == 0) return 1;
 
         int count = 0;
         for (Move move : pseudoLegalMoves) {
             unmakeMoveInfos.push(new UnmakeMoveInfo(board, move));
             board.makeMove(move);
-            count += perft(depth - 1, board, ! isWhiteToMove, unmakeMoveInfos);
+            count += perft(depth - 1, board, unmakeMoveInfos, move);
             board.unmakeMove(move, unmakeMoveInfos.pop());
         }
         return count;
     }
 
-    private static boolean isKingInCheck(Board board, List<Move> moves, Color color) {
-        BoardPosition kingPosition = color == Color.WHITE ? board.getWhiteKingPosition() : board.getBlackKingPosition();
+    private static boolean isPositionTargeted(List<Move> moves, BoardPosition... positions) {
         for (Move move : moves) {
-            if (move.to().equals(kingPosition)) {
-                return true;
+            for (BoardPosition position : positions) {
+                if (move.to().equals(position)) {
+                    return true;
+                }
             }
         }
         return false;
