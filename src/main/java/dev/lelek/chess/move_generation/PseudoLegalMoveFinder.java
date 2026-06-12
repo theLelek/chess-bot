@@ -125,7 +125,11 @@ public class PseudoLegalMoveFinder {
                 continue;
             }
             if (legalMoves.get(i).to().y() == promotionRow) {
-                legalMoves.add(new PromotionMove(legalMoves.get(i).from(), legalMoves.get(i).to(), null));
+                legalMoves.add(new PromotionMove(legalMoves.get(i).from(), legalMoves.get(i).to(), color.getQueen()));
+                legalMoves.add(new PromotionMove(legalMoves.get(i).from(), legalMoves.get(i).to(), color.getRook()));
+                legalMoves.add(new PromotionMove(legalMoves.get(i).from(), legalMoves.get(i).to(), color.getBishop()));
+                legalMoves.add(new PromotionMove(legalMoves.get(i).from(), legalMoves.get(i).to(), color.getKnight()));
+                legalMoves.add(new PromotionMove(legalMoves.get(i).from(), legalMoves.get(i).to(), color.getKnight()));
                 legalMoves.remove(i);
             }
         }
