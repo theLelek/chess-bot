@@ -52,8 +52,8 @@ public class PseudoLegalMoveFinderTest {
 
     @Test
     void perftPosition5() {
-        Board board = Board.initializeFromFen("rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8  ");
-        Assertions.assertEquals( 62379 , perft(3, board, new Stack<>(), null));
+        Board board = Board.initializeFromFen("rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8");
+        Assertions.assertEquals(2103487, perft(4, board, new Stack<>(), null));
     }
 
     @Test
@@ -62,7 +62,6 @@ public class PseudoLegalMoveFinderTest {
         Assertions.assertEquals(3894594, perft(4, board, new Stack<>(), null));
     }
 
-
     private static int perft(int depth, Board board, Stack<UnmakeMoveInfo> unmakeMoveInfos, Move previousMove) {
         boolean isWhiteToMove = board.isWhiteToMove();
         List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, isWhiteToMove);
@@ -70,7 +69,7 @@ public class PseudoLegalMoveFinderTest {
 
         if (previousMove instanceof CastlingMove castlingMove) {
             BoardPosition positionToCheck = new BoardPosition(castlingMove.isKingSideCastling() ? 5 : 3, castlingMove.from().y());
-            if (isPositionTargeted(pseudoLegalMoves, positionToCheck, kingPosition)) {
+            if (isPositionTargeted(pseudoLegalMoves, positionToCheck, kingPosition, previousMove.from())) {
                 return 0;
             }
         } else if (isPositionTargeted(pseudoLegalMoves, kingPosition)) {
@@ -83,7 +82,8 @@ public class PseudoLegalMoveFinderTest {
         for (Move move : pseudoLegalMoves) {
             unmakeMoveInfos.push(new UnmakeMoveInfo(board, move));
             board.makeMove(move);
-            count += perft(depth - 1, board, unmakeMoveInfos, move);
+            int foo = perft(depth - 1, board, unmakeMoveInfos, move);
+            count += foo;
             board.unmakeMove(move, unmakeMoveInfos.pop());
         }
         return count;
