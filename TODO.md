@@ -22,6 +22,8 @@ maybe change Move class to bits
 
 remove boolean paramether
 
+maybe add shortend fen support (shorter version of fen string)
+
 
 MoveGenerator:
 1. order moves

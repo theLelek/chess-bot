@@ -6,7 +6,6 @@ import dev.lelek.chess.Move.CastlingMove;
 import dev.lelek.chess.Move.EnPassantMove;
 import dev.lelek.chess.Move.Move;
 import dev.lelek.chess.Move.PromotionMove;
-import dev.lelek.chess.board.UnmakeMoveInfo;
 import dev.lelek.chess.move_generation.PseudoLegalMoveFinder;
 import dev.lelek.chess.board.model.Board;
 import org.junit.jupiter.api.*;
@@ -17,38 +16,85 @@ import java.util.List;
 import java.util.Stack;
 
 
+
 public class PseudoLegalMoveFinderTest {
 
+    // all perft results can be seen on https://www.chessprogramming.org/Perft_Results
+    // todo add 2 kinds of tests (long tests with higher depth and short tests with lower depth)
     @Test
-    void perftTest() {
-        // currently takes 3.8-4.1 seconds for depth 5 on default position
+    void perftPosition1() {
+        // currently takes 3.8-4.1 seconds for depth 5 on the default position
         Board board = Board.initializeDefaultBoard();
-        List<Move> legalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, true);
-        System.out.println(perft(5, board, true, new Stack<>()));
+        Assertions.assertEquals(4_865_609,  perft(5, board, new Stack<>(), null));
     }
 
-    private static int perft(int depth, Board board, boolean isWhiteToMove, Stack<UnmakeMoveInfo> unmakeMoveInfos) {
+    @Test
+    void perftPosition2() {
+        /*
+        the fen of position 2 uses a short version which is currently not supported,
+        thus the - at the end had to be manually changed to 0 1
+         */
+        Board board = Board.initializeFromFen("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1");
+        Assertions.assertEquals(97_862, perft(3, board, new Stack<>(), null));
+    }
+
+    @Test
+    void perftPosition3() {
+        Board board = Board.initializeFromFen("8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 1 ");
+        Assertions.assertEquals(43238, perft(4, board, new Stack<>(), null));
+    }
+
+    @Test
+    void perftPosition4() {
+        Board board = Board.initializeFromFen("r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1");
+        Assertions.assertEquals(9467, perft(3, board, new Stack<>(), null));
+    }
+
+    @Test
+    void perftPosition5() {
+        Board board = Board.initializeFromFen("rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8");
+        Assertions.assertEquals(2103487, perft(4, board, new Stack<>(), null));
+    }
+
+    @Test
+    void perftPosition6() {
+        Board board = Board.initializeFromFen("r4rk1/1pp1qppp/p1np1n2/2b1p1B1/2B1P1b1/P1NP1N2/1PP1QPPP/R4RK1 w - - 0 10 ");
+        Assertions.assertEquals(3894594, perft(4, board, new Stack<>(), null));
+    }
+
+    private static int perft(int depth, Board board, Stack<UnmakeMoveInfo> unmakeMoveInfos, Move previousMove) {
+        boolean isWhiteToMove = board.isWhiteToMove();
         List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, isWhiteToMove);
-        if (isKingInCheck(board, pseudoLegalMoves, isWhiteToMove ? Color.BLACK : Color.WHITE)) {
+        BoardPosition kingPosition = isWhiteToMove ? board.getBlackKingPosition() : board.getWhiteKingPosition();
+
+        if (previousMove instanceof CastlingMove castlingMove) {
+            BoardPosition positionToCheck = new BoardPosition(castlingMove.isKingSideCastling() ? 5 : 3, castlingMove.from().y());
+            if (isPositionTargeted(pseudoLegalMoves, positionToCheck, kingPosition, previousMove.from())) {
+                return 0;
+            }
+        } else if (isPositionTargeted(pseudoLegalMoves, kingPosition)) {
             return 0;
         }
+
         if (depth == 0) return 1;
 
         int count = 0;
         for (Move move : pseudoLegalMoves) {
             unmakeMoveInfos.push(new UnmakeMoveInfo(board, move));
             board.makeMove(move);
-            count += perft(depth - 1, board, ! isWhiteToMove, unmakeMoveInfos);
+            int foo = perft(depth - 1, board, unmakeMoveInfos, move);
+            count += foo;
             board.unmakeMove(move, unmakeMoveInfos.pop());
         }
         return count;
     }
 
-    private static boolean isKingInCheck(Board board, List<Move> moves, Color color) {
-        BoardPosition kingPosition = color == Color.WHITE ? board.getWhiteKingPosition() : board.getBlackKingPosition();
+    private static boolean isPositionTargeted(List<Move> moves, BoardPosition... positions) {
         for (Move move : moves) {
-            if (move.to().equals(kingPosition)) {
-                return true;
+            for (BoardPosition position : positions) {
+                if (move.to().equals(position)) {
+                    return true;
+                }
             }
         }
         return false;
@@ -171,7 +217,7 @@ public class PseudoLegalMoveFinderTest {
         Board board = Board.initializeFromFen("8/4P3/8/8/8/8/8/4K2k w - - 0 1");
         List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, true);
         List<PromotionMove> promotionMoves = filterByPromotionMove(pseudoLegalMoves);
-        List<PromotionMove> expected = Arrays.asList(new PromotionMove("e7", "e8", null));
+        List<PromotionMove> expected = Arrays.asList(new PromotionMove("e7", "e8", BoardPiece.WHITE_KNIGHT), new PromotionMove("e7", "e8", BoardPiece.WHITE_ROOK), new PromotionMove("e7", "e8", BoardPiece.WHITE_QUEEN), new PromotionMove("e7", "e8", BoardPiece.WHITE_BISHOP));
         Assertions.assertTrue(areLegalMovesEqual(promotionMoves, expected));
     }
 
@@ -180,7 +226,7 @@ public class PseudoLegalMoveFinderTest {
         Board board = Board.initializeFromFen("4K2k/8/8/8/8/8/4p3/8 b - - 0 1");
         List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, false);
         List<PromotionMove> promotionMoves = filterByPromotionMove(pseudoLegalMoves);
-        List<PromotionMove> expected = Arrays.asList(new PromotionMove("e2", "e1", null));
+        List<PromotionMove> expected = Arrays.asList(new PromotionMove("e2", "e1", BoardPiece.BLACK_KNIGHT), new PromotionMove("e2", "e1", BoardPiece.BLACK_BISHOP), new PromotionMove("e2", "e1", BoardPiece.BLACK_ROOK), new PromotionMove("e2", "e1", BoardPiece.BLACK_QUEEN));
         Assertions.assertTrue(areLegalMovesEqual(promotionMoves, expected));
     }
 
@@ -189,8 +235,18 @@ public class PseudoLegalMoveFinderTest {
         Board board = Board.initializeFromFen("8/2P1P3/8/8/8/8/8/4K2k w - - 0 1");
         List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, true);
         List<PromotionMove> promotionMoves = filterByPromotionMove(pseudoLegalMoves);
-        List<PromotionMove> expected = Arrays.asList(new PromotionMove("e7", "e8", null), new PromotionMove("c7", "c8", null));
-        Assertions.assertTrue(areLegalMovesEqual(promotionMoves, expected));
+        List<PromotionMove> expected = Arrays.asList(
+                new PromotionMove("e7", "e8", BoardPiece.WHITE_QUEEN),
+                new PromotionMove("e7", "e8", BoardPiece.WHITE_ROOK),
+                new PromotionMove("e7", "e8", BoardPiece.WHITE_BISHOP),
+                new PromotionMove("e7", "e8", BoardPiece.WHITE_KNIGHT),
+
+                new PromotionMove("c7", "c8", BoardPiece.WHITE_QUEEN),
+                new PromotionMove("c7", "c8", BoardPiece.WHITE_ROOK),
+                new PromotionMove("c7", "c8", BoardPiece.WHITE_BISHOP),
+                new PromotionMove("c7", "c8", BoardPiece.WHITE_KNIGHT)
+        );
+       Assertions.assertTrue(areLegalMovesEqual(promotionMoves, expected));
     }
 
     // en pessant
