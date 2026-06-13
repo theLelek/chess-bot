@@ -85,18 +85,18 @@ public class PseudoLegalMoveFinderTest {
     }
 
     private static boolean isInCheck(Board board, Move previousMove, List<Move> pseudoLegalMoves, BoardPosition kingPosition) {
+        List<BoardPosition> positionsToCheck = new ArrayList<>();
+        positionsToCheck.add(kingPosition);
+
         if (previousMove instanceof CastlingMove castlingMove) {
             BoardPosition positionToCheck = new BoardPosition(castlingMove.isKingSideCastling() ? 5 : 3, castlingMove.from().y());
-            if (isPositionTargeted(pseudoLegalMoves, positionToCheck, kingPosition, previousMove.from())) {
-                return true;
-            }
-        } else if (isPositionTargeted(pseudoLegalMoves, kingPosition)) {
-            return true;
+            positionsToCheck.add(positionToCheck);
+            positionsToCheck.add(previousMove.from());
         }
-        return false;
+        return isPositionTargeted(pseudoLegalMoves, positionsToCheck);
     }
 
-    private static boolean isPositionTargeted(List<Move> moves, BoardPosition... positions) {
+    private static boolean isPositionTargeted(List<Move> moves, List<BoardPosition> positions) {
         for (Move move : moves) {
             for (BoardPosition position : positions) {
                 if (move.to().equals(position)) {
