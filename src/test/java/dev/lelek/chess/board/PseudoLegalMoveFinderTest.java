@@ -67,12 +67,7 @@ public class PseudoLegalMoveFinderTest {
         List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, isWhiteToMove);
         BoardPosition kingPosition = isWhiteToMove ? board.getBlackKingPosition() : board.getWhiteKingPosition();
 
-        if (previousMove instanceof CastlingMove castlingMove) {
-            BoardPosition positionToCheck = new BoardPosition(castlingMove.isKingSideCastling() ? 5 : 3, castlingMove.from().y());
-            if (isPositionTargeted(pseudoLegalMoves, positionToCheck, kingPosition, previousMove.from())) {
-                return 0;
-            }
-        } else if (isPositionTargeted(pseudoLegalMoves, kingPosition)) {
+        if (isInCheck(board, previousMove, pseudoLegalMoves, kingPosition)) {
             return 0;
         }
 
@@ -87,6 +82,18 @@ public class PseudoLegalMoveFinderTest {
             board.unmakeMove(move, unmakeMoveInfos.pop());
         }
         return count;
+    }
+
+    private static boolean isInCheck(Board board, Move previousMove, List<Move> pseudoLegalMoves, BoardPosition kingPosition) {
+        if (previousMove instanceof CastlingMove castlingMove) {
+            BoardPosition positionToCheck = new BoardPosition(castlingMove.isKingSideCastling() ? 5 : 3, castlingMove.from().y());
+            if (isPositionTargeted(pseudoLegalMoves, positionToCheck, kingPosition, previousMove.from())) {
+                return true;
+            }
+        } else if (isPositionTargeted(pseudoLegalMoves, kingPosition)) {
+            return true;
+        }
+        return false;
     }
 
     private static boolean isPositionTargeted(List<Move> moves, BoardPosition... positions) {
