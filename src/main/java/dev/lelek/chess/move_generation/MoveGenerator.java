@@ -42,23 +42,24 @@ public class MoveGenerator {
             return Integer.MIN_VALUE / 2;
         }
 
-        if (depth == 0) return BoardEvaluation.evaluate(board, color);
+        if (depth == 0) return -BoardEvaluation.evaluate(board, color);
 
-        int best = 0;
+        int best = Integer.MIN_VALUE / 2;
         for (Move move : pseudoLegalMoves) {
             unmakeMoveInfos.push(new UnmakeMoveInfo(board, move));
             board.makeMove(move);
+
             int foo = findBestMove(board, unmakeMoveInfos, move, depth - 1, startingDepth);
-            foo += random.nextInt(21) - 10;
-            if (foo >= best) {
-                best = foo;
+            if (foo >= best && foo != Integer.MIN_VALUE / 2) {
+                best = foo + random.nextInt(21) - 10;;
                 if (depth == startingDepth) {
                     bestMove = move;
                 }
             }
+
             board.unmakeMove(move, unmakeMoveInfos.pop());
         }
-        return -best;
+        return -best; // todo will currently return INT_MIN / 2 if no position is valid
     }
 
     private static boolean isPositionTargeted(List<Move> moves, BoardPosition... positions) {
