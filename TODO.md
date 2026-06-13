@@ -24,6 +24,10 @@ remove boolean paramether
 
 maybe add shortend fen support (shorter version of fen string)
 
+add more logging
+seperate perfts from other tests
+
+
 
 MoveGenerator:
 1. order moves
