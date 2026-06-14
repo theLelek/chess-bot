@@ -22,13 +22,16 @@ class MoveGeneratorTest {
     }
 
     @Test
-    void generateMove_() {
+    void generateMove_checkmate() {
         Board board = Board.initializeFromFen("1k6/1Q5R/8/8/8/8/8/K7 b - - 3 2");
+        Move bestMove = MoveGenerator.generateMove(board, 2);
+        Assertions.assertNull(bestMove);
+    }
+
+    @Test
+    void generateMove_findCheckmate() {
+        Board board = Board.initializeFromFen("1k6/7R/8/8/4Q3/8/8/K7 w - - 3 2");
         Move bestMove = MoveGenerator.generateMove(board, 2);
         Assertions.assertEquals(new Move("e4", "b7"), bestMove);
     }
-
-
-
-
 }
