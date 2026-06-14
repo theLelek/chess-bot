@@ -29,9 +29,23 @@ class MoveGeneratorTest {
     }
 
     @Test
-    void generateMove_findCheckmate() {
-        Board board = Board.initializeFromFen("1k6/7R/8/8/4Q3/8/8/K7 w - - 3 2");
+    void generateMove_mateIn1ByQueen() {
+        Board board = Board.initializeFromFen("1k6/8/8/8/4Q3/8/8/K6B w - - 3 2");
         Move bestMove = MoveGenerator.generateMove(board, 2);
         Assertions.assertEquals(new Move("e4", "b7"), bestMove);
+    }
+
+    @Test
+    void generateMove_mateIn1ByRook() {
+        Board board = Board.initializeFromFen("1k6/7R/8/8/8/8/8/K4R2 w - - 3 2");
+        Move bestMove = MoveGenerator.generateMove(board, 2);
+        Assertions.assertEquals(new Move("f1", "f8"), bestMove);
+    }
+
+    @Test
+    void generateMove_mateIn2() {
+        Board board = Board.initializeFromFen("3qr2k/pbpp2pp/1p5N/3Q2b1/2P1P3/P7/1PP2PPP/R4RK1 w - - 1 2");
+        Move bestMove = MoveGenerator.generateMove(board, 4);
+        Assertions.assertEquals(new Move("d5", "g8"), bestMove);
     }
 }

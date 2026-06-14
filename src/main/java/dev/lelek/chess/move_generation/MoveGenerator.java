@@ -32,6 +32,8 @@ public class MoveGenerator {
         for (int i = 1; i <= maxDepth; i++) {
             bestMove = negmax(board, null, i, new Stack<>()).move();
         }
+        // if result.move() = null and result.score = WORST -> checkmate
+        // if result.move() = null and result.score = 0 -> stalemate
         return bestMove;
     }
 
@@ -44,11 +46,6 @@ public class MoveGenerator {
         if (wasPreviousMoveILlegal(previousMove, pseudoLegalMoves, kingPosition)) {
             return null;
         }
-
-//        if (isPositionAttacked(pseudoLegalMoves, kingPosition)) {
-////            return new Result(BEST, null); // would lead to king capture
-//            return null;
-//        }
 
         if (depth == 0) {
             return new Result(BoardEvaluation.evaluate(board, color), null);
@@ -78,7 +75,7 @@ public class MoveGenerator {
             List<Move> pseudoLegalMoves2 = PseudoLegalMoveFinder.getPseudoLegalMoves(board, ! board.isWhiteToMove());
             BoardPosition kingPosition2 = ! board.isWhiteToMove() ? board.getBlackKingPosition() : board.getWhiteKingPosition();
 
-            if (isPositionAttacked(pseudoLegalMoves2, List.of(kingPosition2))) {
+            if (isPositionAttacked(pseudoLegalMoves2, kingPosition2)) {
                 return new Result(WORST, null); // checkmate
             }
             return new Result(0, null); // stalemate
@@ -108,7 +105,6 @@ public class MoveGenerator {
         }
         return false;
     }
-
 
     private static boolean isPositionAttacked(List<Move> moves, BoardPosition position) {
         for (Move move : moves) {
