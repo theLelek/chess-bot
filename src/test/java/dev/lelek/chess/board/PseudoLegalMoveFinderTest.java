@@ -67,7 +67,7 @@ public class PseudoLegalMoveFinderTest {
         List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, isWhiteToMove);
         BoardPosition kingPosition = isWhiteToMove ? board.getBlackKingPosition() : board.getWhiteKingPosition();
 
-        if (isInCheck(board, previousMove, pseudoLegalMoves, kingPosition)) {
+        if (isInCheck(previousMove, pseudoLegalMoves, kingPosition)) {
             return 0;
         }
 
@@ -84,7 +84,7 @@ public class PseudoLegalMoveFinderTest {
         return count;
     }
 
-    private static boolean isInCheck(Board board, Move previousMove, List<Move> pseudoLegalMoves, BoardPosition kingPosition) {
+    private static boolean isInCheck(Move previousMove, List<Move> pseudoLegalMoves, BoardPosition kingPosition) {
         List<BoardPosition> positionsToCheck = new ArrayList<>();
         positionsToCheck.add(kingPosition);
 

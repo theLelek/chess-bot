@@ -7,62 +7,90 @@ import dev.lelek.chess.Move.Move;
 import dev.lelek.chess.board.UnmakeMoveInfo;
 import dev.lelek.chess.board.model.Board;
 
-import java.time.LocalTime;
-import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.Random;
-import java.util.Stack;
+import java.util.*;
 
 public class MoveGenerator {
 
     private static final Random random = new Random();
-    static Move bestMove = null;
 
-    public static Move generateMove(Board board, int seconds) {
-        LocalTime time = LocalTime.now();
-        for (int i = 1; ChronoUnit.MILLIS.between(time, LocalTime.now()) < seconds; i++) { // iterative deepening
-            findBestMove(board, new Stack<>(), null, i, i);
+    public static Move generateMove(Board board, long timeMillis) {
+        long endTime = System.nanoTime() + timeMillis * 1_000_000L;
+        Move bestMove = null;
+
+        for (int i = 1; System.nanoTime() < endTime; i++) {
+            bestMove = negmax(board, null, i, new Stack<>()).move();
         }
         return bestMove;
     }
 
+    public static Move generateMove(Board board, int maxDepth) {
+        Move bestMove = null;
 
-    private static int findBestMove(Board board, Stack<UnmakeMoveInfo> unmakeMoveInfos, Move previousMove, int depth, final int startingDepth) {
-        boolean isWhiteToMove = board.isWhiteToMove();
-        Color color = (isWhiteToMove) ? Color.WHITE : Color.BLACK;
-        List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, isWhiteToMove);
-        BoardPosition kingPosition = isWhiteToMove ? board.getBlackKingPosition() : board.getWhiteKingPosition();
+        for (int i = 1; i <= maxDepth; i++) {
+            bestMove = negmax(board, null, i, new Stack<>()).move();
+        }
+        return bestMove;
+    }
 
-        if (previousMove instanceof CastlingMove castlingMove) {
-            BoardPosition positionToCheck = new BoardPosition(castlingMove.isKingSideCastling() ? 5 : 3, castlingMove.from().y());
-            if (isPositionTargeted(pseudoLegalMoves, positionToCheck, kingPosition, previousMove.from())) {
-                return Integer.MIN_VALUE / 2;
-            }
-        } else if (isPositionTargeted(pseudoLegalMoves, kingPosition)) {
-            return Integer.MIN_VALUE / 2;
+    private static Result negmax(Board board, Move previousMove, int depth, Stack<UnmakeMoveInfo> unmakeMoveInfos) {
+        Color color = board.isWhiteToMove() ? Color.WHITE : Color.BLACK;
+
+        List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove());
+
+        BoardPosition kingPosition = board.isWhiteToMove()
+                ? board.getBlackKingPosition()
+                : board.getWhiteKingPosition();
+
+        if (isInCheck(previousMove, pseudoLegalMoves, kingPosition)) {
+            return null;
         }
 
-        if (depth == 0) return -BoardEvaluation.evaluate(board, color);
+        if (depth == 0) {
+            return new Result(BoardEvaluation.evaluate(board, color), null);
+        }
 
-        int best = Integer.MIN_VALUE / 2;
+        Move bestMove = null;
+        int bestScore = Integer.MIN_VALUE;
+        boolean foundLegalMove = false;
+
         for (Move move : pseudoLegalMoves) {
             unmakeMoveInfos.push(new UnmakeMoveInfo(board, move));
             board.makeMove(move);
 
-            int foo = findBestMove(board, unmakeMoveInfos, move, depth - 1, startingDepth);
-            if (foo >= best && foo != Integer.MIN_VALUE / 2) {
-                best = foo + random.nextInt(21) - 10;;
-                if (depth == startingDepth) {
-                    bestMove = move;
-                }
+            Result result = negmax(board, move, depth - 1, unmakeMoveInfos);
+
+            if (result != null && -result.score() >= bestScore) {
+                bestScore = -result.score();
+                bestMove = move;
+                foundLegalMove = true;
             }
 
             board.unmakeMove(move, unmakeMoveInfos.pop());
         }
-        return -best; // todo will currently return INT_MIN / 2 if no position is valid
+
+        if (!foundLegalMove) {
+            if (isPositionAttacked(pseudoLegalMoves, List.of(kingPosition))) {
+                return new Result(Integer.MIN_VALUE, null);
+            }
+            return new Result(0, null);
+        }
+
+        return new Result(bestScore, bestMove);
     }
 
-    private static boolean isPositionTargeted(List<Move> moves, BoardPosition... positions) {
+    private static boolean isInCheck(Move previousMove, List<Move> pseudoLegalMoves, BoardPosition kingPosition) {
+        List<BoardPosition> positionsToCheck = new ArrayList<>();
+        positionsToCheck.add(kingPosition);
+
+        if (previousMove instanceof CastlingMove castlingMove) {
+            BoardPosition positionToCheck = new BoardPosition(castlingMove.isKingSideCastling() ? 5 : 3, castlingMove.from().y());
+            positionsToCheck.add(positionToCheck);
+            positionsToCheck.add(previousMove.from());
+        }
+        return isPositionAttacked(pseudoLegalMoves, positionsToCheck);
+    }
+
+    private static boolean isPositionAttacked(List<Move> moves, List<BoardPosition> positions) {
         for (Move move : moves) {
             for (BoardPosition position : positions) {
                 if (move.to().equals(position)) {
@@ -73,3 +101,5 @@ public class MoveGenerator {
         return false;
     }
 }
+
+record Result(int score, Move move) {}
