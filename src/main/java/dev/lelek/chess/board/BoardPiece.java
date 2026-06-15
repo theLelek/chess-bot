@@ -27,15 +27,6 @@ public enum BoardPiece implements BitboardIndexProvider {
         this.bitboardIndex = bitboardIndex;
     }
 
-    public static BoardPiece fromBitboardIndex(int index) {
-        for (BoardPiece boardPiece : BoardPiece.values()) {
-            if (boardPiece.getBitboardIndex() == index) {
-                return boardPiece;
-            }
-        }
-        throw new IllegalArgumentException("Invalid bitboard index: " + index);
-    }
-
     public static BoardPiece fromFen(char fen) {
         for (BoardPiece piece : BoardPiece.values()) {
             if (piece.fen == fen) {
@@ -66,7 +57,7 @@ public enum BoardPiece implements BitboardIndexProvider {
     }
 
     public boolean isBlack() {
-        return !isWhite();
+        return ! isWhite();
     }
 
     public char getFen() {

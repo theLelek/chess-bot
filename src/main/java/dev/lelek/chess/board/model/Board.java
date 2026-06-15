@@ -295,7 +295,7 @@ public class Board {
         return new BoardPosition(enPassantTargetSquare.x(), enPassantTargetSquare.y() - color.getMovingDirection());
     }
 
-    public static Board copyOf(Board board) {
+    public static Board copyOf(Board board) { // todo maybe remove
         if (board == null) {
             throw new IllegalArgumentException("board cannot be null");
         }
