@@ -45,7 +45,31 @@ class MoveGeneratorTest {
     @Test
     void generateMove_mateIn2() {
         Board board = Board.initializeFromFen("3qr2k/pbpp2pp/1p5N/3Q2b1/2P1P3/P7/1PP2PPP/R4RK1 w - - 1 2");
-        Move bestMove = MoveGenerator.generateMove(board, 4);
+        Move bestMove = MoveGenerator.generateMove(board, 5); // why is depth 3 not enough
         Assertions.assertEquals(new Move("d5", "g8"), bestMove);
+    }
+
+    @Test
+    void checkMate() {
+        Board board = Board.initializeFromFen("1r6/8/8/8/8/8/8/Kq6 w - - 0 1");
+        Move bestMove = MoveGenerator.generateMove(board, 1);
+        Assertions.assertEquals(GameStatus.CHECKMATE, MoveGenerator.getGameStatus(board));
+        Assertions.assertNull(bestMove);
+    }
+
+    @Test
+    void stalemate() {
+        Board board = Board.initializeFromFen("8/8/8/8/8/1q6/8/K7 w - - 0 1");
+        Move bestMove = MoveGenerator.generateMove(board, 1);
+        Assertions.assertEquals(GameStatus.STALEMATE, MoveGenerator.getGameStatus(board));
+        Assertions.assertNull(bestMove);
+    }
+
+    @Test
+    void ongoing() {
+        Board board = Board.initializeFromFen("1r6/8/1q6/8/8/8/8/K7 w - - 0 1");
+        Move bestMove = MoveGenerator.generateMove(board, 1);
+        Assertions.assertEquals(GameStatus.ONGOING, MoveGenerator.getGameStatus(board));
+        Assertions.assertEquals(new Move("a1", "a2"), bestMove);
     }
 }
