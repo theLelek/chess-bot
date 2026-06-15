@@ -217,6 +217,15 @@ public class PseudoLegalMoveFinderTest {
     }
 
     // TODO replace with 1 method for every subclass
+//
+//    private static <T extends Move> List<T> filter(List<Move> legalMoves, T type) {
+//        List<T> moves = new ArrayList<>();
+//        for (Move move : legalMoves) {
+//            moves.add((T) move);
+//        }
+//        return moves;
+//    }
+
     private static List<CastlingMove> filterByCastlingMove(List<Move> legalMoves) {
         List<CastlingMove> castlingMoves = new ArrayList<>();
         for (Move move : legalMoves) {
