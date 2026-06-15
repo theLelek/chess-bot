@@ -13,9 +13,7 @@ import java.util.List;
 import java.util.Stack;
 
 public class PerftTest {
-
     // all perft results can be seen on https://www.chessprogramming.org/Perft_Results
-    // todo add 2 kinds of tests (long tests with higher depth and short tests with lower depth)
     @Test
     void perftPosition1() {
         // currently takes 3.8-4.1 seconds for depth 5 on the default position
