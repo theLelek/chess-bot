@@ -38,6 +38,10 @@ public class MoveGenerator {
     }
 
     private static Result negmax(Board board, Move previousMove, int depth, Stack<UnmakeMoveInfo> unmakeMoveInfos) {
+        if (board.getHalfmoveClock() == 50) { // 50 move rule
+            return new Result(0, null);
+        }
+
         Color color = board.isWhiteToMove() ? Color.WHITE : Color.BLACK;
 
         List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove());
