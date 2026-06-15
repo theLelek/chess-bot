@@ -34,7 +34,7 @@ public class PseudoLegalMoveFinder {
     }
 
     private static void addPseudoLegalMovesOfBitboard(Board board, BoardPiece boardPiece, List<Move> legalMoves) {
-        long bitboard = board.getPosition().getBitboard(boardPiece.getBitboardIndex());
+        long bitboard = board.getPosition().getBitboard(boardPiece);
         while (bitboard != 0) {
             long leastSignificantBit = bitboard & -bitboard; // todo why / how does this work
             int bitBoardSquare = Long.numberOfTrailingZeros(leastSignificantBit);

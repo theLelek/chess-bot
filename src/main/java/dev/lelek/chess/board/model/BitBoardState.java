@@ -92,18 +92,5 @@ public class BitBoardState {
     public long getBitboard(BitboardIndexProvider bitboardIndexProvider) {
         return bitboards[bitboardIndexProvider.getBitboardIndex()];
     }
-
-    public long getBitboard(int index) {
-        return bitboards[index];
-    }
-
-    public void setBitboard(BitboardIndexProvider bitboardIndexProvider, long value) {
-        bitboards[bitboardIndexProvider.getBitboardIndex()] = value;
-    }
-
     // todo maybe add toggleBit helper
-
-    public long[] getBitboards() {
-        return bitboards;
-    }
 }
