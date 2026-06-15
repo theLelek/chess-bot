@@ -45,7 +45,7 @@ class MoveGeneratorTest {
     @Test
     void generateMove_mateIn2() {
         Board board = Board.initializeFromFen("3qr2k/pbpp2pp/1p5N/3Q2b1/2P1P3/P7/1PP2PPP/R4RK1 w - - 1 2");
-        Move bestMove = MoveGenerator.generateMove(board, 4); // TODO why is depth 3 not enough
+        Move bestMove = MoveGenerator.generateMove(board, 4);
         Assertions.assertEquals(new Move("d5", "g8"), bestMove);
     }
 
