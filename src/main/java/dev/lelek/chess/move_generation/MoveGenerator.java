@@ -37,7 +37,7 @@ public class MoveGenerator {
         return bestMove;
     }
 
-    private static Result negmax(Board board, Move previousMove, int depth, Stack<UnmakeMoveInfo> unmakeMoveInfos) {
+    private static GameResult negmax(Board board, Move previousMove, int depth, Stack<UnmakeMoveInfo> unmakeMoveInfos) {
         Color color = board.isWhiteToMove() ? Color.WHITE : Color.BLACK;
 
         List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove());
@@ -48,11 +48,11 @@ public class MoveGenerator {
         }
 
         if (board.getHalfmoveClock() == 50) { // 50 move rule
-            return new Result(0, null);
+            return new GameResult(0, null);
         }
 
         if (depth == 0) {
-            return new Result(BoardEvaluation.evaluate(board, color), null);
+            return new GameResult(BoardEvaluation.evaluate(board, color), null);
         }
 
         Move bestMove = null;
@@ -63,28 +63,31 @@ public class MoveGenerator {
             unmakeMoveInfos.push(new UnmakeMoveInfo(board, move));
             board.makeMove(move);
 
-            // result will be null if move was illegal
-            Result result = negmax(board, move, depth - 1, unmakeMoveInfos);
+            // gameResult will be null if move was illegal
+            GameResult gameResult = negmax(board, move, depth - 1, unmakeMoveInfos);
 
-            if (result != null && -result.score() > bestScore) {
-                bestScore = -result.score();
+            if (gameResult != null && -gameResult.score() > bestScore) {
+                bestScore = -gameResult.score();
                 bestMove = move;
                 foundLegalMove = true;
             }
 
             board.unmakeMove(move, unmakeMoveInfos.pop());
         }
+        return getGameResult(board, foundLegalMove, bestScore, bestMove);
+    }
 
-        if (!foundLegalMove) {
-            List<Move> pseudoLegalMoves2 = PseudoLegalMoveFinder.getPseudoLegalMoves(board, !board.isWhiteToMove());
-            BoardPosition kingPosition2 = !board.isWhiteToMove() ? board.getBlackKingPosition() : board.getWhiteKingPosition();
+    private static GameResult getGameResult(Board board, boolean foundLegalMove, int bestScore, Move bestMove) {
+        if (! foundLegalMove) {
+            List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, !board.isWhiteToMove());
+            BoardPosition kingPosition = !board.isWhiteToMove() ? board.getBlackKingPosition() : board.getWhiteKingPosition();
 
-            if (isPositionAttacked(pseudoLegalMoves2, kingPosition2)) {
-                return new Result(WORST, null); // checkmate
+            if (isPositionAttacked(pseudoLegalMoves, kingPosition)) {
+                return new GameResult(WORST, null); // checkmate
             }
-            return new Result(0, null); // stalemate
+            return new GameResult(0, null); // stalemate
         }
-        return new Result(bestScore, bestMove);
+        return new GameResult(bestScore, bestMove);
     }
 
     private static boolean wasPreviousMoveIllegal(Move previousMove, List<Move> pseudoLegalMoves, BoardPosition positionToCheck1) {
@@ -109,4 +112,4 @@ public class MoveGenerator {
     }
 }
 
-record Result(int score, Move move) {}
+record GameResult(int score, Move move) {}
