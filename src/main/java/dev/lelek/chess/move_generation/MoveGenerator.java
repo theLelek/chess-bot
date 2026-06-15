@@ -43,7 +43,7 @@ public class MoveGenerator {
         List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove());
         BoardPosition kingPosition = board.isWhiteToMove() ? board.getBlackKingPosition() : board.getWhiteKingPosition();
 
-        if (wasPreviousMoveILlegal(previousMove, pseudoLegalMoves, kingPosition)) {
+        if (wasPreviousMoveIllegal(previousMove, pseudoLegalMoves, kingPosition)) {
             return null;
         }
 
@@ -75,9 +75,9 @@ public class MoveGenerator {
             board.unmakeMove(move, unmakeMoveInfos.pop());
         }
 
-        if (! foundLegalMove) {
-            List<Move> pseudoLegalMoves2 = PseudoLegalMoveFinder.getPseudoLegalMoves(board, ! board.isWhiteToMove());
-            BoardPosition kingPosition2 = ! board.isWhiteToMove() ? board.getBlackKingPosition() : board.getWhiteKingPosition();
+        if (!foundLegalMove) {
+            List<Move> pseudoLegalMoves2 = PseudoLegalMoveFinder.getPseudoLegalMoves(board, !board.isWhiteToMove());
+            BoardPosition kingPosition2 = !board.isWhiteToMove() ? board.getBlackKingPosition() : board.getWhiteKingPosition();
 
             if (isPositionAttacked(pseudoLegalMoves2, kingPosition2)) {
                 return new Result(WORST, null); // checkmate
@@ -87,33 +87,22 @@ public class MoveGenerator {
         return new Result(bestScore, bestMove);
     }
 
-    private static boolean wasPreviousMoveILlegal(Move previousMove, List<Move> pseudoLegalMoves, BoardPosition kingPosition) {
-        List<BoardPosition> positionsToCheck = new ArrayList<>();
-        positionsToCheck.add(kingPosition);
-
+    private static boolean wasPreviousMoveIllegal(Move previousMove, List<Move> pseudoLegalMoves, BoardPosition positionToCheck1) {
         if (previousMove instanceof CastlingMove castlingMove) {
-            BoardPosition positionToCheck = new BoardPosition(castlingMove.isKingSideCastling() ? 5 : 3, castlingMove.from().y());
-            positionsToCheck.add(positionToCheck);
-            positionsToCheck.add(previousMove.from());
+            BoardPosition positionToCheck2 = new BoardPosition(castlingMove.isKingSideCastling() ? 5 : 3, castlingMove.from().y());
+            BoardPosition positionToCheck3 = previousMove.from();
+            return isPositionAttacked(pseudoLegalMoves, positionToCheck1, positionToCheck2, positionToCheck3);
+        } else {
+            return isPositionAttacked(pseudoLegalMoves, positionToCheck1);
         }
-        return isPositionAttacked(pseudoLegalMoves, positionsToCheck);
     }
 
-    private static boolean isPositionAttacked(List<Move> moves, List<BoardPosition> positions) {
+    private static boolean isPositionAttacked(List<Move> moves, BoardPosition... positions) {
         for (Move move : moves) {
             for (BoardPosition position : positions) {
                 if (move.to().equals(position)) {
                     return true;
                 }
-            }
-        }
-        return false;
-    }
-
-    private static boolean isPositionAttacked(List<Move> moves, BoardPosition position) {
-        for (Move move : moves) {
-            if (move.to().equals(position)) {
-                return true;
             }
         }
         return false;
