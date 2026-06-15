@@ -1,17 +1,11 @@
 package dev.lelek;
 
+import dev.lelek.chess.board.model.Board;
+import dev.lelek.chess.move_generation.MoveGenerator;
+
 public class Main {
     public static void main(String[] args) {
-        /*
-        Bot bot = new Bot(board)
-        Board board = new Board();
-
-        while() {
-            board.update(api.getUserMove)
-            Move move = Bot.getMove()
-            print(move)
-        }
-
-         */
+        Board board = Board.initializeDefaultBoard();
+        System.out.println(MoveGenerator.generateMove(board, 5));
     }
 }

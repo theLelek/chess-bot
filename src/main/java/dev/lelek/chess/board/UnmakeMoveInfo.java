@@ -23,7 +23,7 @@ public final class UnmakeMoveInfo {
         this.halfMoveClock = halfMoveClock;
     }
 
-    public UnmakeMoveInfo(Board board, Move move) {
+    public UnmakeMoveInfo(Board board, Move move) { // todo maybe change to static factory method so class can be replaced with record
         capturedPiece = board.getPieceList()[move.to().getBitBoardSquare()];
         castlingRightsWhite = CastlingRights.copyOf(board.getCastlingRightsWhite());
         castlingRightsBlack = CastlingRights.copyOf(board.getCastlingRightsBlack());
