@@ -331,16 +331,8 @@ public class Board {
         return halfmoveClock;
     }
 
-    public void setHalfmoveClock(int halfmoveClock) {
-        this.halfmoveClock = halfmoveClock;
-    }
-
     public int getFullmoveNumber() {
         return fullmoveNumber;
-    }
-
-    public void setFullmoveNumber(int fullmoveNumber) {
-        this.fullmoveNumber = fullmoveNumber;
     }
 
     public BoardPosition getEnPassantTargetSquare() {
