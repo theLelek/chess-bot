@@ -8,7 +8,13 @@ public class Uci {
 
     private static final Logger log = LoggerFactory.getLogger(Uci.class);
 
+    private static final String engineName = "chess-bot";
+    private static final String author = "lelek";
+
     public static void start() {
+        System.out.println("id name " + engineName);
+        System.out.println("id author " + author);
+        System.out.println("uciok");
 
         Board board;
 
