@@ -16,7 +16,7 @@ public class Cli {
                     Uci.start();
                    break;
                 case "play":
-                    UserCli.start();
+                    PlayCli.start();
                     break;
                 default:
                     System.out.println("Invalid command");

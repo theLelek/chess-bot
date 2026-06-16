@@ -10,7 +10,7 @@ import dev.lelek.chess.board.model.Board;
 import dev.lelek.chess.move_generation.GameStatus;
 import dev.lelek.chess.move_generation.MoveGenerator;
 
-public class UserCli {
+public class PlayCli {
 
     public static void start() {
         Board board = Board.initializeDefaultBoard();
