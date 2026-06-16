@@ -295,21 +295,8 @@ public class Board {
         return new BoardPosition(enPassantTargetSquare.x(), enPassantTargetSquare.y() - color.getMovingDirection());
     }
 
-    public static Board copyOf(Board board) { // todo maybe remove
-        if (board == null) {
-            throw new IllegalArgumentException("board cannot be null");
-        }
-        boolean isWhiteToMove = board.isWhiteToMove;
-        CastlingRights castlingRightsWhite = CastlingRights.copyOf(board.castlingRightsWhite);
-        CastlingRights castlingRightsBlack = CastlingRights.copyOf(board.castlingRightsBlack);
-        BoardPosition enPassantTargetSquare = BoardPosition.copyOf(board.enPassantTargetSquare);
-        int halfmoveClock = board.getHalfmoveClock();
-        int fullMoveNumber = board.getFullmoveNumber();
-        BitBoardState bitBoardState = BitBoardState.copyOf(board.bitBoardState);
-        BoardPiece[] pieceList = board.pieceList.clone();
-        BoardPosition whiteKingPosition = BoardPosition.copyOf(board.whiteKingPosition);
-        BoardPosition blackKingPosition = BoardPosition.copyOf(board.blackKingPosition);
-        return new Board(isWhiteToMove, castlingRightsWhite, castlingRightsBlack, enPassantTargetSquare, halfmoveClock, fullMoveNumber, bitBoardState, pieceList, whiteKingPosition, blackKingPosition);
+    public BoardPiece getPieceAt(BoardPosition position) {
+        return pieceList[position.getBitBoardSquare()];
     }
 
     @Override

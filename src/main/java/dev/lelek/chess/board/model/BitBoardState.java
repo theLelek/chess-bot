@@ -31,15 +31,6 @@ public class BitBoardState {
         return bitBoardState;
     }
 
-    public static BitBoardState copyOf(BitBoardState bitBoardState) {
-        if (bitBoardState == null) {
-            throw new IllegalArgumentException("bitBoardState cannot be null");
-        }
-        BitBoardState copy = new BitBoardState();
-        System.arraycopy(bitBoardState.bitboards, 0, copy.bitboards, 0, bitBoardState.bitboards.length);
-        return copy;
-    }
-
     public static void printBitBoard(long bitboard) {
         for (int rank = 7; rank >= 0; rank--) {
             for (int file = 0; file < Board.SIZE; file++) {
