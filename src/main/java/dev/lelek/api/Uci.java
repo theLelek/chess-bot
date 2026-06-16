@@ -15,8 +15,7 @@ public class Uci {
         while (true) {
             String guiInput = Cli.scanner.nextLine().trim();
             if (guiInput.equals("quit"))
-                throw new RuntimeException("quit"); // todo not sure if thats the best way to stop the engine
-
+                System.exit(0); // todo not sure if thats the best way to stop the engine
             String[] parts = guiInput.split(" ");
             switch (parts[0]) {
                 case "position":

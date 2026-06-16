@@ -6,7 +6,7 @@ public class Cli {
 
     static final Scanner scanner = new Scanner(System.in);
 
-    private static final String engineName = "chess-engine";
+    private static final String engineName = "chess-bot";
     private static final String author = "lelek";
 
     public static void start() {
