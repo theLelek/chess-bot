@@ -13,8 +13,8 @@ public class MoveGenerator {
 
     private static final Random random = new Random();
 
-    private static final int BEST = Integer.MAX_VALUE / 2;
-    private static final int WORST = Integer.MIN_VALUE / 2;
+    static final int BEST = Integer.MAX_VALUE / 2;
+    static final int WORST = Integer.MIN_VALUE / 2;
 
     public static Move generateMove(Board board, long timeMillis) {
         long endTime = System.nanoTime() + timeMillis * 1_000_000L;
@@ -37,18 +37,9 @@ public class MoveGenerator {
         return bestMove;
     }
 
-    public static GameStatus getGameStatus(Board board) {
-        BoardResults result = negmax(board, null, 1, new Stack<>());
-        if (result.move() == null && result.score() == WORST) {
-            return GameStatus.CHECKMATE;
-        } else if (result.move() == null && result.score() == 0) {
-            return GameStatus.STALEMATE;
-        } else {
-            return GameStatus.ONGOING;
-        }
-    }
 
-    private static BoardResults negmax(Board board, Move previousMove, int depth, Stack<UnmakeMoveInfo> unmakeMoveInfos) {
+
+    static BoardResults negmax(Board board, Move previousMove, int depth, Stack<UnmakeMoveInfo> unmakeMoveInfos) {
         Color color = board.isWhiteToMove() ? Color.WHITE : Color.BLACK;
 
         List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove());

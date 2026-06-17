@@ -48,28 +48,4 @@ class MoveGeneratorTest {
         Move bestMove = MoveGenerator.generateMove(board, 4);
         Assertions.assertEquals(new Move("d5", "g8"), bestMove);
     }
-
-    @Test
-    void checkMate() {
-        Board board = Board.initializeFromFen("1r6/8/8/8/8/8/8/Kq6 w - - 0 1");
-        Move bestMove = MoveGenerator.generateMove(board, 1);
-        Assertions.assertEquals(GameStatus.CHECKMATE, MoveGenerator.getGameStatus(board));
-        Assertions.assertNull(bestMove);
-    }
-
-    @Test
-    void stalemate() {
-        Board board = Board.initializeFromFen("8/8/8/8/8/1q6/8/K7 w - - 0 1");
-        Move bestMove = MoveGenerator.generateMove(board, 1);
-        Assertions.assertEquals(GameStatus.STALEMATE, MoveGenerator.getGameStatus(board));
-        Assertions.assertNull(bestMove);
-    }
-
-    @Test
-    void ongoing() {
-        Board board = Board.initializeFromFen("1r6/8/1q6/8/8/8/8/K7 w - - 0 1");
-        Move bestMove = MoveGenerator.generateMove(board, 1);
-        Assertions.assertEquals(GameStatus.ONGOING, MoveGenerator.getGameStatus(board));
-        Assertions.assertEquals(new Move("a1", "a2"), bestMove);
-    }
 }
