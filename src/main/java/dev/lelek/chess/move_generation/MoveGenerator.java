@@ -39,9 +39,12 @@ public class MoveGenerator {
         List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove());
         if (! pseudoLegalMoves.contains(move)) return false;
 
+        UnmakeMoveInfo unmakeMoveInfo = new UnmakeMoveInfo(board, move);
         board.makeMove(move);
         List<Move> pseudoLegalMoves2 = PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove());
-        return ! wasPreviousMoveIllegal(board, move, pseudoLegalMoves2);
+        boolean result = ! wasPreviousMoveIllegal(board, move, pseudoLegalMoves2);
+        board.unmakeMove(move, unmakeMoveInfo);
+        return result;
     }
 
     static BoardResults negmax(Board board, Move previousMove, int depth, Stack<UnmakeMoveInfo> unmakeMoveInfos) {

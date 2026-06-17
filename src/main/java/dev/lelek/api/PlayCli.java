@@ -16,14 +16,7 @@ public class PlayCli {
         Board board = Board.initializeDefaultBoard();
         printBoard(board);
         while (GameStatus.getGameStatus(board) == GameStatus.ONGOING) {
-            Move playerMove = null;
-            while (playerMove == null) {
-                try {
-                    playerMove = initializeMove();
-                } catch (Exception e) {
-                    System.out.println("invalid move");
-                }
-            }
+            Move playerMove = getPlayerMove(board);
             board.makeMove(playerMove);
 
             Move engineMove = MoveGenerator.generateMove(board, (long) 1000); // 1 second for engine move
@@ -33,6 +26,20 @@ public class PlayCli {
             System.out.println("----------------------------");
         }
         System.out.println(GameStatus.getGameStatus(board));
+    }
+
+    private static Move getPlayerMove(Board board) {
+        Move playerMove = null;
+        while (playerMove == null) {
+            try {
+                playerMove = initializeMove();
+                if (! MoveGenerator.isMoveLegal(board, playerMove)) throw new Exception();
+            } catch (Exception e) {
+                System.out.println("invalid move");
+                playerMove = null;
+            }
+        }
+        return playerMove;
     }
 
     private static Move initializeMove() {
