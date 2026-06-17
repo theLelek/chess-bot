@@ -1,5 +1,6 @@
 package dev.lelek.chess.move_generation;
 
+import dev.lelek.chess.Move.CastlingMove;
 import dev.lelek.chess.Move.Move;
 import dev.lelek.chess.board.model.Board;
 import org.junit.jupiter.api.Assertions;
@@ -47,5 +48,27 @@ class MoveGeneratorTest {
         Board board = Board.initializeFromFen("3qr2k/pbpp2pp/1p5N/3Q2b1/2P1P3/P7/1PP2PPP/R4RK1 w - - 1 2");
         Move bestMove = MoveGenerator.generateMove(board, 4);
         Assertions.assertEquals(new Move("d5", "g8"), bestMove);
+    }
+
+    @Test
+    void isMoveLegal_defaultBoard() {
+        Board board = Board.initializeDefaultBoard();
+
+        Move move1 = new Move("e2", "e4");
+        Assertions.assertTrue(MoveGenerator.isMoveLegal(board, move1));
+
+        Move move2 = new Move("a1", "b1");
+        Assertions.assertFalse(MoveGenerator.isMoveLegal(board, move2));
+    }
+
+    @Test
+    void isMoveLegal_customBoard() {
+        Board board = Board.initializeFromFen("rn1qkbnr/pppppppp/8/1b6/8/8/PPPP1PPP/rN2K2R w Kkq - 0 1");
+
+        Move move1 = new Move("b1", "c3");
+        Assertions.assertFalse(MoveGenerator.isMoveLegal(board, move1));
+
+        Move move2 = new CastlingMove("e1", "g1");
+        Assertions.assertFalse(MoveGenerator.isMoveLegal(board, move2));
     }
 }
