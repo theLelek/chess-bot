@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PseudoLegalMoveFinder {
-    public static List<Move> getPseudoLegalMoves(Board board, boolean isWhiteToMove) {
+    public static List<Move> getPseudoLegalMoves(Board board, boolean isWhiteToMove) { // todo remove boolena paramether
         List<Move> legalMoves = new ArrayList<>();
         BitBoardState bitBoardState = board.getPosition();
         for (int i = 0; i < BoardPiece.values().length; i++) {
