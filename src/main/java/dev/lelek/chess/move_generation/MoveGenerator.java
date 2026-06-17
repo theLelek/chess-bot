@@ -47,7 +47,7 @@ public class MoveGenerator {
         return result;
     }
 
-    static BoardResults negmax(Board board, Move previousMove, int depth, Stack<UnmakeMoveInfo> unmakeMoveInfos) {
+    static BoardResults negmax(Board board, Move previousMove, int depth, Stack<UnmakeMoveInfo> unmakeMoveInfos) { // todo write more tests
         Color color = board.isWhiteToMove() ? Color.WHITE : Color.BLACK;
 
         List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove());
