@@ -7,8 +7,8 @@ It is written from scratch without any libraries.
 - Bitboard-based board representation
 - FEN support
 - Legal move generation
+- negmax search
 - ~~UCI protocol~~
-- ~~Alpha-beta search~~
 - ~~Iterative deepening~~
 - ~~Move ordering~~
 - ~~Transposition table~~
