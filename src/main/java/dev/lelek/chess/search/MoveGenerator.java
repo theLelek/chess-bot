@@ -57,7 +57,7 @@ public class MoveGenerator {
         boolean foundLegalMove = false;
 
         for (Move move : pseudoLegalMoves) {
-            unmakeMoveInfos.push(new UnmakeMoveInfo(board, move));
+            unmakeMoveInfos.push(UnmakeMoveInfo.from(board, move));
             board.makeMove(move);
 
             // boardResults will be null if move was illegal

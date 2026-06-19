@@ -68,7 +68,7 @@ public class PerftTest {
 
         int count = 0;
         for (Move move : pseudoLegalMoves) {
-            unmakeMoveInfos.push(new UnmakeMoveInfo(board, move));
+            unmakeMoveInfos.push(UnmakeMoveInfo.from(board, move));
             board.makeMove(move);
             int foo = perft(depth - 1, board, unmakeMoveInfos, move);
             count += foo;

@@ -182,7 +182,7 @@ class BoardTest {
         Board originalBoard1 = Board.initializeFromFen("4k3/8/8/8/8/8/8/R3K2R w KQ - 0 1");
         Board board1 = Board.initializeFromFen("4k3/8/8/8/8/8/8/R3K2R w KQ - 0 1");
         Move move1 = new CastlingMove("e1", "g1");
-        UnmakeMoveInfo unmakeMoveInfo = new UnmakeMoveInfo(board1, move1);
+        UnmakeMoveInfo unmakeMoveInfo = UnmakeMoveInfo.from(board1, move1);
         board1.makeMove(move1);
         assertEquals(Board.initializeFromFen("4k3/8/8/8/8/8/8/R4RK1 b - - 1 1"), board1);
         board1.unmakeMove(move1, unmakeMoveInfo);
@@ -275,7 +275,7 @@ class BoardTest {
     @Test void move_general() {
         Board board = Board.initializeDefaultBoard();
         Move move = new Move("a2", "a4");
-        UnmakeMoveInfo unmakeMoveInfo = new UnmakeMoveInfo(board, move);
+        UnmakeMoveInfo unmakeMoveInfo = UnmakeMoveInfo.from(board, move);
         board.makeMove(move);
         assertEquals(Board.initializeFromFen("rnbqkbnr/pppppppp/8/8/P7/8/1PPPPPPP/RNBQKBNR b KQkq a3 0 1"), board);
         board.unmakeMove(move, unmakeMoveInfo);

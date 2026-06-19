@@ -271,7 +271,7 @@ public class Board {
         if (pieceToReplaceWith != null) {
             bitBoardState.setBit(pieceToReplaceWith, from);
             bitBoardState.setBit(OccupancyBitboard.ALL_PIECES, from);
-            bitBoardState.setBit(color.getOpponentOccupancyBitboard(), from); // todo color.getOpponent... should be changed
+            bitBoardState.setBit(color.getOpponentOccupancyBitboard(), from);
             pieceList[from.getBitBoardSquare()] = pieceToReplaceWith;
         }
 
