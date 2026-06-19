@@ -197,7 +197,6 @@ public class PseudoLegalMoveFinderTest {
     void no_enPassant_whenPawnsAreNotAdjacent() {
         Board board = Board.initializeFromFen("8/8/8/8/2p1P3/8/8/4K2k w - c6 0 1");
         List<Move> legalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, true);
-//        List<EnPassantMove> enPassantMoves = filterByEnPassantMove(legalMoves);
         List<EnPassantMove> enPassantMoves = filterByType(legalMoves, EnPassantMove.class);
         Assertions.assertTrue(enPassantMoves.isEmpty());
     }
