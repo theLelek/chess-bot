@@ -3,7 +3,6 @@ package dev.lelek.chess;
 import dev.lelek.chess.Move.CastlingMove;
 import dev.lelek.chess.board.OccupancyBitboard;
 
-
 public enum Color {
 
     WHITE(
@@ -72,7 +71,6 @@ public enum Color {
     private final BoardPiece opponentRook;
     private final BoardPiece opponentQueen;
     private final BoardPiece opponentKing;
-
 
     Color(int homeRank, int backRank, int pawnStartingRow, int movingDirection, CastlingMove castlingMoveKingSide, CastlingMove castlingMoveQueenSide, OccupancyBitboard ownOccupancyBitboard, OccupancyBitboard opponentOccupancyBitboard, BoardPiece pawn, BoardPiece knight, BoardPiece bishop, BoardPiece rook, BoardPiece queen, BoardPiece king, BoardPiece opponentPawn, BoardPiece opponentKnight, BoardPiece opponentBishop, BoardPiece opponentRook, BoardPiece opponentQueen, BoardPiece opponentKing) {
         this.homeRank = homeRank;
