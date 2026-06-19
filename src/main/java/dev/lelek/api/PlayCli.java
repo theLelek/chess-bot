@@ -31,8 +31,11 @@ public class PlayCli {
 
     private static Move getPlayerMove(Board board) {
         Move playerMove = null;
+
+
         while (playerMove == null) {
             try {
+
                 playerMove = initializeMove();
                 if (! MoveValidator.isMoveLegal(board, playerMove)) throw new Exception();
             } catch (Exception e) {

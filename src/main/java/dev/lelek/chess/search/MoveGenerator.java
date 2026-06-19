@@ -40,7 +40,7 @@ public class MoveGenerator {
 
         List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove());
 
-        if (wasPreviousMoveIllegal(board, previousMove, pseudoLegalMoves)) {
+        if (MoveValidator.wasPreviousMoveIllegal(board, previousMove, pseudoLegalMoves)) {
             return null;
         }
 
@@ -74,39 +74,17 @@ public class MoveGenerator {
         return getBoardResult(board, foundLegalMove, bestScore, bestMove);
     }
 
-    static boolean wasPreviousMoveIllegal(Board board, Move previousMove, List<Move> pseudoLegalMoves) {
-        BoardPosition kingPosition = board.isWhiteToMove() ? board.getBlackKingPosition() : board.getWhiteKingPosition();
-        if (previousMove instanceof CastlingMove castlingMove) {
-            BoardPosition positionToCheck2 = new BoardPosition(castlingMove.isKingSideCastling() ? 5 : 3, castlingMove.from().y());
-            BoardPosition positionToCheck3 = previousMove.from();
-            return isPositionAttacked(pseudoLegalMoves, kingPosition, positionToCheck2, positionToCheck3);
-        } else {
-            return isPositionAttacked(pseudoLegalMoves, kingPosition);
-        }
-    }
-
     private static BoardResults getBoardResult(Board board, boolean foundLegalMove, int bestScore, Move bestMove) {
         if (! foundLegalMove) {
             List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, !board.isWhiteToMove());
             BoardPosition kingPosition = !board.isWhiteToMove() ? board.getBlackKingPosition() : board.getWhiteKingPosition();
 
-            if (isPositionAttacked(pseudoLegalMoves, kingPosition)) {
+            if (Utils.isPositionAttacked(pseudoLegalMoves, kingPosition)) {
                 return new BoardResults(WORST, null); // checkmate
             }
             return new BoardResults(0, null); // stalemate
         }
         return new BoardResults(bestScore, bestMove);
-    }
-
-    private static boolean isPositionAttacked(List<Move> moves, BoardPosition... positions) {
-        for (Move move : moves) {
-            for (BoardPosition position : positions) {
-                if (move.to().equals(position)) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 }
 
