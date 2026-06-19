@@ -7,8 +7,9 @@ import dev.lelek.chess.Move.Move;
 import dev.lelek.chess.Move.PromotionMove;
 import dev.lelek.chess.board.BoardPiece;
 import dev.lelek.chess.board.model.Board;
-import dev.lelek.chess.move_generation.GameStatus;
-import dev.lelek.chess.move_generation.MoveGenerator;
+import dev.lelek.chess.search.GameStatus;
+import dev.lelek.chess.search.MoveGenerator;
+import dev.lelek.chess.search.MoveValidator;
 
 public class PlayCli {
 
@@ -33,7 +34,7 @@ public class PlayCli {
         while (playerMove == null) {
             try {
                 playerMove = initializeMove();
-                if (! MoveGenerator.isMoveLegal(board, playerMove)) throw new Exception();
+                if (! MoveValidator.isMoveLegal(board, playerMove)) throw new Exception();
             } catch (Exception e) {
                 System.out.println("invalid move");
                 playerMove = null;

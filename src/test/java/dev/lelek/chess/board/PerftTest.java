@@ -4,7 +4,7 @@ import dev.lelek.chess.BoardPosition;
 import dev.lelek.chess.Move.CastlingMove;
 import dev.lelek.chess.Move.Move;
 import dev.lelek.chess.board.model.Board;
-import dev.lelek.chess.move_generation.PseudoLegalMoveFinder;
+import dev.lelek.chess.search.PseudoLegalMoveFinder;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

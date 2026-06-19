@@ -7,7 +7,7 @@ import dev.lelek.chess.Move.Move;
 import dev.lelek.chess.Move.PromotionMove;
 import dev.lelek.chess.board.BoardPiece;
 import dev.lelek.chess.board.model.Board;
-import dev.lelek.chess.move_generation.MoveGenerator;
+import dev.lelek.chess.search.MoveGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,12 +42,12 @@ public class Uci {
                     System.out.println("bestmove " + toUciMoveFormat(bestMove));
                     break;
                 default:
-                    log.warn("invalid or non supported uci command was entered: " + guiInput);
+                    log.warn("invalid or non supported uci command was entered: {}", guiInput);
             }
         }
     }
 
-    private static Board getPosition(String guiInput) { // todo fix bugs
+    private static Board getPosition(String guiInput) {
         String[] parts = guiInput.split(" ");
         Board board = parts[1].equals("startpos") ? Board.initializeDefaultBoard() : Board.initializeFromFen(parts[1]);
         if (parts.length == 2) {

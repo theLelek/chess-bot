@@ -1,6 +1,6 @@
 package dev.lelek.chess.board;
 
-import dev.lelek.chess.move_generation.PieceMoveRules;
+import dev.lelek.chess.search.PieceMoveRules;
 
 public enum BoardPiece implements BitboardIndexProvider {
     WHITE_PAWN('P', PieceMoveRules.WHITE_PAWN, 0),

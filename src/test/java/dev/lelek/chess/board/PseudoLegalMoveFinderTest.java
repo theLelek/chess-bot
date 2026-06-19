@@ -6,7 +6,7 @@ import dev.lelek.chess.Move.CastlingMove;
 import dev.lelek.chess.Move.EnPassantMove;
 import dev.lelek.chess.Move.Move;
 import dev.lelek.chess.Move.PromotionMove;
-import dev.lelek.chess.move_generation.PseudoLegalMoveFinder;
+import dev.lelek.chess.search.PseudoLegalMoveFinder;
 import dev.lelek.chess.board.model.Board;
 import org.junit.jupiter.api.*;
 

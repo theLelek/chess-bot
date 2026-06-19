@@ -1,4 +1,4 @@
-package dev.lelek.chess.move_generation;
+package dev.lelek.chess.search;
 
 import dev.lelek.chess.BoardPosition;
 import dev.lelek.chess.Color;
@@ -33,18 +33,6 @@ public class MoveGenerator {
             bestMove = negmax(board, null, i, new Stack<>()).move();
         }
         return bestMove;
-    }
-
-    public static boolean isMoveLegal(Board board, Move move) {
-        List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove());
-        if (! pseudoLegalMoves.contains(move)) return false;
-
-        UnmakeMoveInfo unmakeMoveInfo = new UnmakeMoveInfo(board, move);
-        board.makeMove(move);
-        List<Move> pseudoLegalMoves2 = PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove());
-        boolean result = ! wasPreviousMoveIllegal(board, move, pseudoLegalMoves2);
-        board.unmakeMove(move, unmakeMoveInfo);
-        return result;
     }
 
     static BoardResults negmax(Board board, Move previousMove, int depth, Stack<UnmakeMoveInfo> unmakeMoveInfos) { // todo write more tests
@@ -86,6 +74,17 @@ public class MoveGenerator {
         return getBoardResult(board, foundLegalMove, bestScore, bestMove);
     }
 
+    static boolean wasPreviousMoveIllegal(Board board, Move previousMove, List<Move> pseudoLegalMoves) {
+        BoardPosition kingPosition = board.isWhiteToMove() ? board.getBlackKingPosition() : board.getWhiteKingPosition();
+        if (previousMove instanceof CastlingMove castlingMove) {
+            BoardPosition positionToCheck2 = new BoardPosition(castlingMove.isKingSideCastling() ? 5 : 3, castlingMove.from().y());
+            BoardPosition positionToCheck3 = previousMove.from();
+            return isPositionAttacked(pseudoLegalMoves, kingPosition, positionToCheck2, positionToCheck3);
+        } else {
+            return isPositionAttacked(pseudoLegalMoves, kingPosition);
+        }
+    }
+
     private static BoardResults getBoardResult(Board board, boolean foundLegalMove, int bestScore, Move bestMove) {
         if (! foundLegalMove) {
             List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, !board.isWhiteToMove());
@@ -97,17 +96,6 @@ public class MoveGenerator {
             return new BoardResults(0, null); // stalemate
         }
         return new BoardResults(bestScore, bestMove);
-    }
-
-    private static boolean wasPreviousMoveIllegal(Board board, Move previousMove, List<Move> pseudoLegalMoves) {
-        BoardPosition kingPosition = board.isWhiteToMove() ? board.getBlackKingPosition() : board.getWhiteKingPosition();
-        if (previousMove instanceof CastlingMove castlingMove) {
-            BoardPosition positionToCheck2 = new BoardPosition(castlingMove.isKingSideCastling() ? 5 : 3, castlingMove.from().y());
-            BoardPosition positionToCheck3 = previousMove.from();
-            return isPositionAttacked(pseudoLegalMoves, kingPosition, positionToCheck2, positionToCheck3);
-        } else {
-            return isPositionAttacked(pseudoLegalMoves, kingPosition);
-        }
     }
 
     private static boolean isPositionAttacked(List<Move> moves, BoardPosition... positions) {
