@@ -1,6 +1,11 @@
 package dev.lelek.api;
 
+import dev.lelek.chess.BoardPosition;
+import dev.lelek.chess.Move.Move;
+import dev.lelek.chess.Move.PromotionMove;
+import dev.lelek.chess.board.BoardPiece;
 import dev.lelek.chess.board.model.Board;
+import dev.lelek.chess.move_generation.MoveGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +21,7 @@ public class Uci {
         System.out.println("id author " + author);
         System.out.println("uciok");
 
-        Board board;
+        Board board = null;
 
         while (true) {
             String guiInput = Cli.scanner.nextLine().trim();
@@ -31,6 +36,8 @@ public class Uci {
                     System.out.println("readyok");
                     break;
                 case "go":
+                    Move bestMove = MoveGenerator.generateMove(board, (long) 1000);
+                    System.out.println(toUciMoveFormat(bestMove));
                     break;
                 default:
                     log.warn("invalid or non supported uci command was entered: " + guiInput);
@@ -40,8 +47,32 @@ public class Uci {
 
     private static Board getPosition(String guiInput) {
         String[] parts = guiInput.split(" ");
-        String fen = parts[1];
-        return fen.equals("startpos") ? Board.initializeDefaultBoard() : Board.initializeFromFen(fen);
-        // todo implement making moves which can be additionaly sent by the gui
+        Board board = parts[1].equals("startpos") ? Board.initializeDefaultBoard() : Board.initializeFromFen(parts[1]);
+        if (parts.length == 2) {
+            return board;
+        }
+        for (int i = 3; i < parts.length; i++) {
+            Move move = fromUciMoveFormat(parts[i]);
+            board.makeMove(move);
+        }
+        return board;
+    }
+
+    private static String toUciMoveFormat(Move move) {
+        String out = move.from().toString() + move.to().toString();
+        if (move instanceof PromotionMove) {
+            out += ((PromotionMove) move).getPromotionPiece().getFen();
+        }
+        return out;
+    }
+
+    private static Move fromUciMoveFormat(String uciMove) {
+        BoardPosition from = new BoardPosition(uciMove.substring(0, 2));
+        BoardPosition to = new BoardPosition(uciMove.substring(2, 4));
+        if (uciMove.length() > 4) {
+            BoardPiece pieceToPromote = BoardPiece.fromFen(uciMove.charAt(4));
+            return new PromotionMove(from, to, pieceToPromote);
+        }
+        return new Move(from, to);
     }
 }
