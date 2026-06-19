@@ -334,12 +334,12 @@ function loadGame() {
 
 
 async function getBotMove(moveString = "a message from js") {
-    const response = await fetch("http://127.0.0.1:5050/calc",{
-        method: "Post", 
-        headers: {"Content-Type": "application/json"},
+    const response = await fetch("http://127.0.0.1:8081/chess",{
+        method: "Post",
+        headers: {"Content-Type": "text/plain"},
         body: JSON.stringify({a: 5, b: 6})
-    });
-    console.log(response.json());
+    }).then(response => response.text())
+        .then(console.log)
 }
 
 
