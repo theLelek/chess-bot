@@ -12,11 +12,6 @@ public class CastlingRights {
         this.canCastleQueenSide = canCastleQueenSide;
     }
 
-    public CastlingRights(CastlingRights castlingRights) {
-        this.canCastleKingSide = castlingRights.canCastleKingSide;
-        this.canCastleQueenSide = castlingRights.canCastleQueenSide;
-    }
-
     public static CastlingRights fromFen(String fen, boolean isWhite) {
         boolean kingSide;
         boolean queenSide;

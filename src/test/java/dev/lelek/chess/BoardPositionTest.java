@@ -1,11 +1,10 @@
 package dev.lelek.chess;
 
-import dev.lelek.chess.BoardPosition;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class BoardBitBoardStateTest {
+class BoardPositionTest {
 
     @Test
     void getFromString() {

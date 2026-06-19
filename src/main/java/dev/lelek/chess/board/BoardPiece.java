@@ -1,6 +1,6 @@
 package dev.lelek.chess.board;
 
-import dev.lelek.chess.move_generation.PieceMoveRules;
+import dev.lelek.chess.search.PieceMoveRules;
 
 public enum BoardPiece implements BitboardIndexProvider {
     WHITE_PAWN('P', PieceMoveRules.WHITE_PAWN, 0),
@@ -25,15 +25,6 @@ public enum BoardPiece implements BitboardIndexProvider {
         this.fen = fen;
         this.moveRules = moveRules;
         this.bitboardIndex = bitboardIndex;
-    }
-
-    public static BoardPiece fromBitboardIndex(int index) {
-        for (BoardPiece boardPiece : BoardPiece.values()) {
-            if (boardPiece.getBitboardIndex() == index) {
-                return boardPiece;
-            }
-        }
-        throw new IllegalArgumentException("Invalid bitboard index: " + index);
     }
 
     public static BoardPiece fromFen(char fen) {
@@ -66,7 +57,7 @@ public enum BoardPiece implements BitboardIndexProvider {
     }
 
     public boolean isBlack() {
-        return !isWhite();
+        return ! isWhite();
     }
 
     public char getFen() {

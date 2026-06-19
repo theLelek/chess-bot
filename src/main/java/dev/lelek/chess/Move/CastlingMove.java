@@ -14,4 +14,12 @@ public class CastlingMove extends Move {
     public CastlingMove(String from, String to) {
         super(new BoardPosition(from), new BoardPosition(to));
     }
+
+    public boolean isKingSideCastling() {
+        return to().x() == 6;
+    }
+
+    public boolean isQueenSideCastling() {
+        return to().x() == 2;
+    }
 }

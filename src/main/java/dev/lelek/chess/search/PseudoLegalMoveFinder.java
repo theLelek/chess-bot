@@ -1,4 +1,4 @@
-package dev.lelek.chess.move_generation;
+package dev.lelek.chess.search;
 
 import dev.lelek.chess.BoardPosition;
 import dev.lelek.chess.Color;
@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PseudoLegalMoveFinder {
-    public static List<Move> getPseudoLegalMoves(Board board, boolean isWhiteToMove) {
+    public static List<Move> getPseudoLegalMoves(Board board, boolean isWhiteToMove) { // todo remove boolena paramether
         List<Move> legalMoves = new ArrayList<>();
         BitBoardState bitBoardState = board.getPosition();
         for (int i = 0; i < BoardPiece.values().length; i++) {
@@ -34,7 +34,7 @@ public class PseudoLegalMoveFinder {
     }
 
     private static void addPseudoLegalMovesOfBitboard(Board board, BoardPiece boardPiece, List<Move> legalMoves) {
-        long bitboard = board.getPosition().getBitboard(boardPiece.getBitboardIndex());
+        long bitboard = board.getPosition().getBitboard(boardPiece);
         while (bitboard != 0) {
             long leastSignificantBit = bitboard & -bitboard; // todo why / how does this work
             int bitBoardSquare = Long.numberOfTrailingZeros(leastSignificantBit);
@@ -57,13 +57,13 @@ public class PseudoLegalMoveFinder {
         for (int[] direction : currentPieceMoveRules.getDirections()) {
             BoardPosition currentPosition = position.copy();
             boolean interrupted = false;
+
             do {
-                try {
-                    currentPosition = currentPosition.move(direction);
-                } catch (IndexOutOfBoundsException e) {
+                if (currentPosition.x() + direction[0] < 0 || currentPosition.x() + direction[0] >= Board.SIZE || currentPosition.y() + direction[1] < 0 || currentPosition.y() + direction[1] >= Board.SIZE) {
                     interrupted = true;
                     continue;
                 }
+                currentPosition = currentPosition.move(direction);
                 if (board.getPieceList()[currentPosition.getBitBoardSquare()] != null) {
                     interrupted = true;
                     if (board.getPieceList()[currentPosition.getBitBoardSquare()].hasSameColor(boardPiece)) {
@@ -71,7 +71,7 @@ public class PseudoLegalMoveFinder {
                     }
                 }
                 legalMoves.add(new Move(position, currentPosition));
-            } while (currentPieceMoveRules.canMoveInfinitely() && !interrupted);
+            } while (currentPieceMoveRules.canMoveInfinitely() && ! interrupted);
         }
     }
 
@@ -125,7 +125,10 @@ public class PseudoLegalMoveFinder {
                 continue;
             }
             if (legalMoves.get(i).to().y() == promotionRow) {
-                legalMoves.add(new PromotionMove(legalMoves.get(i).from(), legalMoves.get(i).to(), null));
+                legalMoves.add(new PromotionMove(legalMoves.get(i).from(), legalMoves.get(i).to(), color.getQueen()));
+                legalMoves.add(new PromotionMove(legalMoves.get(i).from(), legalMoves.get(i).to(), color.getRook()));
+                legalMoves.add(new PromotionMove(legalMoves.get(i).from(), legalMoves.get(i).to(), color.getBishop()));
+                legalMoves.add(new PromotionMove(legalMoves.get(i).from(), legalMoves.get(i).to(), color.getKnight()));
                 legalMoves.remove(i);
             }
         }
