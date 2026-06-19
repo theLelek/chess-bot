@@ -86,24 +86,4 @@ public class BoardPosition {
     public String toString() {
         return (char) (x + 97) + String.valueOf(Math.abs(y - Board.SIZE));
     }
-
-    public static class Builder {
-
-        private int y;
-        private int x;
-
-        public Builder y(int y) {
-            this.y = y;
-            return this;
-        }
-
-        public Builder x(int x) {
-            this.x = x;
-            return this;
-        }
-
-        public BoardPosition build() {
-            return new BoardPosition(x, y);
-        }
-    }
 }
