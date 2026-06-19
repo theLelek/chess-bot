@@ -1,6 +1,8 @@
 package dev.lelek.api;
 
 import dev.lelek.chess.BoardPosition;
+import dev.lelek.chess.Move.CastlingMove;
+import dev.lelek.chess.Move.EnPassantMove;
 import dev.lelek.chess.Move.Move;
 import dev.lelek.chess.Move.PromotionMove;
 import dev.lelek.chess.board.BoardPiece;
@@ -31,13 +33,13 @@ public class Uci {
             switch (parts[0]) {
                 case "position":
                     board = getPosition(guiInput);
-                   break;
+                    break;
                 case "isready":
                     System.out.println("readyok");
                     break;
                 case "go":
                     Move bestMove = MoveGenerator.generateMove(board, (long) 1000);
-                    System.out.println(toUciMoveFormat(bestMove));
+                    System.out.println("bestmove " + toUciMoveFormat(bestMove));
                     break;
                 default:
                     log.warn("invalid or non supported uci command was entered: " + guiInput);
@@ -45,17 +47,37 @@ public class Uci {
         }
     }
 
-    private static Board getPosition(String guiInput) {
+    private static Board getPosition(String guiInput) { // todo fix bugs
         String[] parts = guiInput.split(" ");
         Board board = parts[1].equals("startpos") ? Board.initializeDefaultBoard() : Board.initializeFromFen(parts[1]);
         if (parts.length == 2) {
             return board;
         }
         for (int i = 3; i < parts.length; i++) {
-            Move move = fromUciMoveFormat(parts[i]);
+            Move move = fromUciMoveFormat(board, parts[i]);
             board.makeMove(move);
         }
         return board;
+    }
+
+    private static Move fromUciMoveFormat(Board board, String uciMove) {
+        BoardPosition from = new BoardPosition(uciMove.substring(0, 2));
+        BoardPosition to = new BoardPosition(uciMove.substring(2, 4));
+
+        if (uciMove.length() > 4) {
+            BoardPiece pieceToPromote = BoardPiece.fromFen(uciMove.charAt(4));
+            return new PromotionMove(from, to, pieceToPromote);
+        }
+
+        if (board.getPieceAt(from).isKing() && Math.abs(from.x() - to.x()) == 2) {
+            return new CastlingMove(from, to);
+        }
+
+        if (board.getPieceAt(from).isPawn() && board.getPieceAt(to) == null && from.x() != to.x()) {
+            return new EnPassantMove(from, to);
+        }
+
+        return new Move(from, to);
     }
 
     private static String toUciMoveFormat(Move move) {
@@ -64,15 +86,5 @@ public class Uci {
             out += ((PromotionMove) move).getPromotionPiece().getFen();
         }
         return out;
-    }
-
-    private static Move fromUciMoveFormat(String uciMove) {
-        BoardPosition from = new BoardPosition(uciMove.substring(0, 2));
-        BoardPosition to = new BoardPosition(uciMove.substring(2, 4));
-        if (uciMove.length() > 4) {
-            BoardPiece pieceToPromote = BoardPiece.fromFen(uciMove.charAt(4));
-            return new PromotionMove(from, to, pieceToPromote);
-        }
-        return new Move(from, to);
     }
 }
