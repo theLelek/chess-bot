@@ -1,7 +1,6 @@
 package dev.lelek.chess;
 
 import dev.lelek.chess.Move.CastlingMove;
-import dev.lelek.chess.board.BoardPiece;
 import dev.lelek.chess.board.OccupancyBitboard;
 
 

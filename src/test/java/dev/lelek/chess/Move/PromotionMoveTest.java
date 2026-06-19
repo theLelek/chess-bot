@@ -1,8 +1,7 @@
 package dev.lelek.chess.Move;
 
 import dev.lelek.chess.BoardPosition;
-import dev.lelek.chess.Move.PromotionMove;
-import dev.lelek.chess.board.BoardPiece;
+import dev.lelek.chess.BoardPiece;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

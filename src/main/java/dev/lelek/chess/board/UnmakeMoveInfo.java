@@ -1,5 +1,6 @@
 package dev.lelek.chess.board;
 
+import dev.lelek.chess.BoardPiece;
 import dev.lelek.chess.BoardPosition;
 import dev.lelek.chess.Move.Move;
 import dev.lelek.chess.board.model.Board;

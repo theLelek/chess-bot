@@ -9,7 +9,7 @@ import dev.lelek.chess.Move.CastlingMove;
 import dev.lelek.chess.Move.EnPassantMove;
 import dev.lelek.chess.Move.Move;
 import dev.lelek.chess.Move.PromotionMove;
-import dev.lelek.chess.board.BoardPiece;
+import dev.lelek.chess.BoardPiece;
 import dev.lelek.chess.board.OccupancyBitboard;
 import dev.lelek.chess.board.UnmakeMoveInfo;
 

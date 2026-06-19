@@ -5,7 +5,7 @@ import dev.lelek.chess.Color;
 import dev.lelek.chess.Move.EnPassantMove;
 import dev.lelek.chess.Move.Move;
 import dev.lelek.chess.Move.PromotionMove;
-import dev.lelek.chess.board.BoardPiece;
+import dev.lelek.chess.BoardPiece;
 import dev.lelek.chess.board.OccupancyBitboard;
 import dev.lelek.chess.board.model.BitBoardState;
 import dev.lelek.chess.board.model.Board;
@@ -15,6 +15,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PseudoLegalMoveFinder {
+
+    private static final int[][] queenMoves = {{-1, -1}, {0, -1}, {1, -1}, {-1,  0}, {1,  0}, {-1,  1}, {0,  1}, {1,  1}};
+    private static final int[][] rookMoves = {{-1, 0}, {0, -1}, {0,  1}, {1,  0}};
+    private static final int[][] bishopMoves = {{1,  1}, {-1, 1}, {1, -1}, {-1, -1}};
+    private static final int[][] knightMoves = {{1, -2}, {-1, -2}, {2, -1}, {-2, -1}, {2,  1}, {-2,  1}, {1,  2}, {-1,  2}};
+    private static final int[][] kingMoves = {{-1, -1}, {0, -1}, {1, -1}, {-1,  0}, {1,  0}, {-1,  1}, {0,  1}, { 1,  1}};
+
     public static List<Move> getPseudoLegalMoves(Board board, boolean isWhiteToMove) { // todo remove boolena paramether
         List<Move> legalMoves = new ArrayList<>();
         BitBoardState bitBoardState = board.getPosition();
@@ -52,9 +59,9 @@ public class PseudoLegalMoveFinder {
     }
 
     private static void addPseudoLegalMovesOfGeneralPiece(Board board, BoardPiece boardPiece, BoardPosition position, List<Move> legalMoves) { // TODO refactor
-        PieceMoveRules currentPieceMoveRules = boardPiece.getMoveRules();
+        int[][] currentPieceMovesRules = getPieceMoves(boardPiece);
 
-        for (int[] direction : currentPieceMoveRules.getDirections()) {
+        for (int[] direction : currentPieceMovesRules) {
             BoardPosition currentPosition = position.copy();
             boolean interrupted = false;
 
@@ -64,14 +71,14 @@ public class PseudoLegalMoveFinder {
                     continue;
                 }
                 currentPosition = currentPosition.move(direction);
-                if (board.getPieceList()[currentPosition.getBitBoardSquare()] != null) {
+                if (board.getPieceAt(currentPosition) != null) {
                     interrupted = true;
-                    if (board.getPieceList()[currentPosition.getBitBoardSquare()].hasSameColor(boardPiece)) {
+                    if (board.getPieceAt(currentPosition).hasSameColor(boardPiece)) {
                         continue;
                     }
                 }
                 legalMoves.add(new Move(position, currentPosition));
-            } while (currentPieceMoveRules.canMoveInfinitely() && ! interrupted);
+            } while ((boardPiece.isBishop() || boardPiece.isRook() || boardPiece.isQueen()) && ! interrupted);
         }
     }
 
@@ -172,5 +179,20 @@ public class PseudoLegalMoveFinder {
         if (enPassantPosition.x() + 1 < Board.SIZE && bitBoardState.getBit(pawnBoardPiece, new BoardPosition(enPassantPosition.x() + 1, enPassantPosition.y()))) {
             legalMoves.add(new EnPassantMove(new BoardPosition(enPassantPosition.x() + 1, enPassantPosition.y()), new BoardPosition(board.getEnPassantTargetSquare().x(), board.getEnPassantTargetSquare().y())));
         }
+    }
+
+    private static int[][] getPieceMoves(BoardPiece boardPiece) {
+        if (boardPiece.isKing()) {
+            return kingMoves;
+        } else if (boardPiece.isQueen()) {
+            return queenMoves;
+        } else if (boardPiece.isRook()) {
+            return rookMoves;
+        } else if (boardPiece.isBishop()) {
+            return bishopMoves;
+        } else if (boardPiece.isKnight()) {
+            return knightMoves;
+        }
+        throw new IllegalArgumentException("Unknown piece type: " + boardPiece);
     }
 }

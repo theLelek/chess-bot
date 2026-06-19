@@ -1,7 +1,7 @@
 package dev.lelek.chess.search;
 
 import dev.lelek.chess.Color;
-import dev.lelek.chess.board.BoardPiece;
+import dev.lelek.chess.BoardPiece;
 import dev.lelek.chess.board.OccupancyBitboard;
 import dev.lelek.chess.board.model.Board;
 

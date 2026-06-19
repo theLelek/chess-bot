@@ -1,29 +1,28 @@
-package dev.lelek.chess.board;
+package dev.lelek.chess;
 
-import dev.lelek.chess.search.PieceMoveRules;
+import dev.lelek.chess.board.BitboardIndexProvider;
 
 public enum BoardPiece implements BitboardIndexProvider {
-    WHITE_PAWN('P', PieceMoveRules.WHITE_PAWN, 0),
-    WHITE_KNIGHT('N', PieceMoveRules.KNIGHT, 1),
-    WHITE_BISHOP('B', PieceMoveRules.BISHOP, 2),
-    WHITE_ROOK('R', PieceMoveRules.ROOK, 3),
-    WHITE_QUEEN('Q', PieceMoveRules.QUEEN, 4),
-    WHITE_KING('K', PieceMoveRules.KING, 5),
 
-    BLACK_PAWN('p', PieceMoveRules.BLACK_PAWN, 6),
-    BLACK_KNIGHT('n', PieceMoveRules.KNIGHT, 7),
-    BLACK_BISHOP('b', PieceMoveRules.BISHOP, 8),
-    BLACK_ROOK('r', PieceMoveRules.ROOK, 9),
-    BLACK_QUEEN('q', PieceMoveRules.QUEEN, 10),
-    BLACK_KING('k', PieceMoveRules.KING, 11);
+    WHITE_PAWN('P', 0),
+    WHITE_KNIGHT('N', 1),
+    WHITE_BISHOP('B', 2),
+    WHITE_ROOK('R', 3),
+    WHITE_QUEEN('Q', 4),
+    WHITE_KING('K', 5),
+
+    BLACK_PAWN('p', 6),
+    BLACK_KNIGHT('n', 7),
+    BLACK_BISHOP('b', 8),
+    BLACK_ROOK('r', 9),
+    BLACK_QUEEN('q', 10),
+    BLACK_KING('k', 11);
 
     private final char fen;
-    private final PieceMoveRules moveRules;
     private final int bitboardIndex;
 
-    BoardPiece(char fen, PieceMoveRules moveRules, int bitboardIndex) {
+    BoardPiece(char fen, int bitboardIndex) {
         this.fen = fen;
-        this.moveRules = moveRules;
         this.bitboardIndex = bitboardIndex;
     }
 
@@ -62,10 +61,6 @@ public enum BoardPiece implements BitboardIndexProvider {
 
     public char getFen() {
         return fen;
-    }
-
-    public PieceMoveRules getMoveRules() {
-        return moveRules;
     }
 
     public boolean isRook() {

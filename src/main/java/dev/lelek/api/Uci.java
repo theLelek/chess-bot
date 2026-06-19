@@ -5,7 +5,7 @@ import dev.lelek.chess.Move.CastlingMove;
 import dev.lelek.chess.Move.EnPassantMove;
 import dev.lelek.chess.Move.Move;
 import dev.lelek.chess.Move.PromotionMove;
-import dev.lelek.chess.board.BoardPiece;
+import dev.lelek.chess.BoardPiece;
 import dev.lelek.chess.board.model.Board;
 import dev.lelek.chess.search.MoveGenerator;
 import org.slf4j.Logger;
