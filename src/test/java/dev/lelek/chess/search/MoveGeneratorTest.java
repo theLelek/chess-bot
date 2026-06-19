@@ -1,5 +1,6 @@
-package dev.lelek.chess.move_generation;
+package dev.lelek.chess.search;
 
+import dev.lelek.chess.Move.CastlingMove;
 import dev.lelek.chess.Move.Move;
 import dev.lelek.chess.board.model.Board;
 import org.junit.jupiter.api.Assertions;
@@ -45,31 +46,29 @@ class MoveGeneratorTest {
     @Test
     void generateMove_mateIn2() {
         Board board = Board.initializeFromFen("3qr2k/pbpp2pp/1p5N/3Q2b1/2P1P3/P7/1PP2PPP/R4RK1 w - - 1 2");
-        Move bestMove = MoveGenerator.generateMove(board, 4); // TODO why is depth 3 not enough
+        Move bestMove = MoveGenerator.generateMove(board, 4);
         Assertions.assertEquals(new Move("d5", "g8"), bestMove);
     }
 
     @Test
-    void checkMate() {
-        Board board = Board.initializeFromFen("1r6/8/8/8/8/8/8/Kq6 w - - 0 1");
-        Move bestMove = MoveGenerator.generateMove(board, 1);
-        Assertions.assertEquals(GameStatus.CHECKMATE, MoveGenerator.getGameStatus(board));
-        Assertions.assertNull(bestMove);
+    void isMoveLegal_defaultBoard() {
+        Board board = Board.initializeDefaultBoard();
+
+        Move move1 = new Move("e2", "e4");
+        Assertions.assertTrue(MoveValidator.isMoveLegal(board, move1));
+
+        Move move2 = new Move("a1", "b1");
+        Assertions.assertFalse(MoveValidator.isMoveLegal(board, move2));
     }
 
     @Test
-    void stalemate() {
-        Board board = Board.initializeFromFen("8/8/8/8/8/1q6/8/K7 w - - 0 1");
-        Move bestMove = MoveGenerator.generateMove(board, 1);
-        Assertions.assertEquals(GameStatus.STALEMATE, MoveGenerator.getGameStatus(board));
-        Assertions.assertNull(bestMove);
-    }
+    void isMoveLegal_customBoard() {
+        Board board = Board.initializeFromFen("rn1qkbnr/pppppppp/8/1b6/8/8/PPPP1PPP/rN2K2R w Kkq - 0 1");
 
-    @Test
-    void ongoing() {
-        Board board = Board.initializeFromFen("1r6/8/1q6/8/8/8/8/K7 w - - 0 1");
-        Move bestMove = MoveGenerator.generateMove(board, 1);
-        Assertions.assertEquals(GameStatus.ONGOING, MoveGenerator.getGameStatus(board));
-        Assertions.assertEquals(new Move("a1", "a2"), bestMove);
+        Move move1 = new Move("b1", "c3");
+        Assertions.assertFalse(MoveValidator.isMoveLegal(board, move1));
+
+        Move move2 = new CastlingMove("e1", "g1");
+        Assertions.assertFalse(MoveValidator.isMoveLegal(board, move2));
     }
 }

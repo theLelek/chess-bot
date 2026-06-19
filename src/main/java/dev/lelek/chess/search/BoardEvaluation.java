@@ -1,4 +1,4 @@
-package dev.lelek.chess.move_generation;
+package dev.lelek.chess.search;
 
 import dev.lelek.chess.Color;
 import dev.lelek.chess.board.BoardPiece;

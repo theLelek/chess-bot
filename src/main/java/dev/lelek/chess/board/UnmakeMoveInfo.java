@@ -27,7 +27,7 @@ public final class UnmakeMoveInfo {
         capturedPiece = board.getPieceList()[move.to().getBitBoardSquare()];
         castlingRightsWhite = CastlingRights.copyOf(board.getCastlingRightsWhite());
         castlingRightsBlack = CastlingRights.copyOf(board.getCastlingRightsBlack());
-        enPassantTargetSquare = board.getEnPassantTargetSquare() != null ? BoardPosition.copyOf(board.getEnPassantTargetSquare()) : null;
+        enPassantTargetSquare = board.getEnPassantTargetSquare() != null ? BoardPosition.copyOf(board.getEnPassantTargetSquare()) : null; // todo copying can probably be avoided
         halfMoveClock = board.getHalfmoveClock();
     }
 

@@ -1,4 +1,4 @@
-package dev.lelek.chess.move_generation;
+package dev.lelek.chess.search;
 
 import dev.lelek.chess.BoardPosition;
 import dev.lelek.chess.Color;
@@ -13,8 +13,8 @@ public class MoveGenerator {
 
     private static final Random random = new Random();
 
-    private static final int BEST = Integer.MAX_VALUE / 2;
-    private static final int WORST = Integer.MIN_VALUE / 2;
+    static final int BEST = Integer.MAX_VALUE / 2;
+    static final int WORST = Integer.MIN_VALUE / 2;
 
     public static Move generateMove(Board board, long timeMillis) {
         long endTime = System.nanoTime() + timeMillis * 1_000_000L;
@@ -32,29 +32,15 @@ public class MoveGenerator {
         for (int i = 1; i <= maxDepth; i++) {
             bestMove = negmax(board, null, i, new Stack<>()).move();
         }
-        // if result.move() = null and result.score = WORST -> checkmate
-        // if result.move() = null and result.score = 0 -> stalemate
         return bestMove;
     }
 
-    public static GameStatus getGameStatus(Board board) {
-        BoardResults result = negmax(board, null, 1, new Stack<>());
-        if (result.move() == null && result.score() == WORST) {
-            return GameStatus.CHECKMATE;
-        } else if (result.move() == null && result.score() == 0) {
-            return GameStatus.STALEMATE;
-        } else {
-            return GameStatus.ONGOING;
-        }
-    }
-
-    private static BoardResults negmax(Board board, Move previousMove, int depth, Stack<UnmakeMoveInfo> unmakeMoveInfos) {
+    static BoardResults negmax(Board board, Move previousMove, int depth, Stack<UnmakeMoveInfo> unmakeMoveInfos) { // todo write more tests
         Color color = board.isWhiteToMove() ? Color.WHITE : Color.BLACK;
 
         List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove());
-        BoardPosition kingPosition = board.isWhiteToMove() ? board.getBlackKingPosition() : board.getWhiteKingPosition();
 
-        if (wasPreviousMoveIllegal(previousMove, pseudoLegalMoves, kingPosition)) {
+        if (MoveValidator.wasPreviousMoveIllegal(board, previousMove, pseudoLegalMoves)) {
             return null;
         }
 
@@ -85,41 +71,20 @@ public class MoveGenerator {
 
             board.unmakeMove(move, unmakeMoveInfos.pop());
         }
-        return getGameResult(board, foundLegalMove, bestScore, bestMove);
+        return getBoardResult(board, foundLegalMove, bestScore, bestMove);
     }
 
-    private static BoardResults getGameResult(Board board, boolean foundLegalMove, int bestScore, Move bestMove) {
+    private static BoardResults getBoardResult(Board board, boolean foundLegalMove, int bestScore, Move bestMove) {
         if (! foundLegalMove) {
             List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, !board.isWhiteToMove());
             BoardPosition kingPosition = !board.isWhiteToMove() ? board.getBlackKingPosition() : board.getWhiteKingPosition();
 
-            if (isPositionAttacked(pseudoLegalMoves, kingPosition)) {
+            if (Utils.isPositionAttacked(pseudoLegalMoves, kingPosition)) {
                 return new BoardResults(WORST, null); // checkmate
             }
             return new BoardResults(0, null); // stalemate
         }
         return new BoardResults(bestScore, bestMove);
-    }
-
-    private static boolean wasPreviousMoveIllegal(Move previousMove, List<Move> pseudoLegalMoves, BoardPosition positionToCheck1) {
-        if (previousMove instanceof CastlingMove castlingMove) {
-            BoardPosition positionToCheck2 = new BoardPosition(castlingMove.isKingSideCastling() ? 5 : 3, castlingMove.from().y());
-            BoardPosition positionToCheck3 = previousMove.from();
-            return isPositionAttacked(pseudoLegalMoves, positionToCheck1, positionToCheck2, positionToCheck3);
-        } else {
-            return isPositionAttacked(pseudoLegalMoves, positionToCheck1);
-        }
-    }
-
-    private static boolean isPositionAttacked(List<Move> moves, BoardPosition... positions) {
-        for (Move move : moves) {
-            for (BoardPosition position : positions) {
-                if (move.to().equals(position)) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 }
 

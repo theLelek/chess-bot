@@ -1,4 +1,4 @@
-package dev.lelek.chess.move_generation;
+package dev.lelek.chess.search;
 
 
 public enum PieceMoveRules {
@@ -18,7 +18,6 @@ public enum PieceMoveRules {
         this.directions = directions;
         this.canMoveInfinitely = canMoveInfinitely;
     }
-
 
     public int[][] getDirections() {
         return directions;
