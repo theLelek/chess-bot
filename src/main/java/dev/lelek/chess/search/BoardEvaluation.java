@@ -8,15 +8,15 @@ import dev.lelek.chess.board.model.Board;
 class BoardEvaluation {
 
     private static final int PAWN_VALUE = 100;
-    private static final int KNIGHT_VALUE = 300;
-    private static final int BISHOP_VALUE = 300;
-    private static final int ROOK_VALUE = 500;
-    private static final int QUEEN_VALUE = 900;
+    private static final int KNIGHT_VALUE = 350;
+    private static final int BISHOP_VALUE = 350;
+    private static final int ROOK_VALUE = 525;
+    private static final int QUEEN_VALUE = 1000;
     private static final int KING_VALUE = 100_000;
 
     public static int evaluate(Board board, Color color) {
         int value = 0;
-        long bb = board.getBitBoardState().getBitboard(OccupancyBitboard.ALL_PIECES); // copy
+        long bb = board.getBitBoardState().getBitboard(OccupancyBitboard.ALL_PIECES);
         while (bb != 0) {
             long lsb = bb & -bb;
             bb &= bb - 1;
@@ -73,5 +73,21 @@ class BoardEvaluation {
                 break;
         }
         return value;
+    }
+}
+
+enum GamePhase {
+
+    OPENING, MIDDLEGAME, ENDGAME;
+
+    public static GamePhase fromBoard(Board board) {
+        long bb = board.getBitBoardState().getBitboard(OccupancyBitboard.ALL_PIECES);
+        while (bb != 0) {
+            long lsb = bb & -bb;
+            bb &= bb - 1;
+
+            BoardPiece piece = board.getPieceList()[Long.numberOfTrailingZeros(lsb)];
+
+        }
     }
 }
