@@ -15,12 +15,24 @@ public class MoveGenerator {
     static final int BEST = Integer.MAX_VALUE / 2;
     static final int WORST = Integer.MIN_VALUE / 2;
 
+    private static volatile boolean timedOut = false;
+
     public static Move generateMove(Board board, long timeMillis) {
-        long endTime = System.nanoTime() + timeMillis * 1_000_000L;
         Move bestMove = null;
 
-        for (int i = 1; System.nanoTime() < endTime; i++) {
-            bestMove = negmax(board, null, i, new Stack<>()).move();
+        new Thread(() -> {
+            try {
+                Thread.sleep(timeMillis);
+                timedOut = true;
+            } catch (InterruptedException ignored) {}
+        }).start();
+
+        for (int i = 1; ; i++) {
+            BoardResults foo = negmax(board, null, i, new Stack<>());
+            if (foo == null) {
+                break;
+            }
+            bestMove = foo.move();
         }
         return bestMove;
     }
@@ -35,6 +47,9 @@ public class MoveGenerator {
     }
 
     static BoardResults negmax(Board board, Move previousMove, int depth, Stack<UnmakeMoveInfo> unmakeMoveInfos) { // todo write more tests
+        if (timedOut) {
+            return null;
+        }
         Color color = board.isWhiteToMove() ? Color.WHITE : Color.BLACK;
 
         List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove());
