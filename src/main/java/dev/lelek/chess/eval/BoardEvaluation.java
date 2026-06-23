@@ -20,6 +20,7 @@ public class BoardEvaluation {
 
     public static int evaluate(Board board, Color color) {
 
+        int value = 0;
         long bb = board.getBitBoardState().getBitboard(OccupancyBitboard.ALL_PIECES);
         while (bb != 0) {
             long lsb = bb & -bb;
@@ -28,13 +29,10 @@ public class BoardEvaluation {
 
             BoardPosition boardPosition = new BoardPosition(bitBoardSquare);
             BoardPiece piece = board.getPieceList()[bitBoardSquare];
-
-
-
+            int pieceValue = piece.getColor() == color ? getValue(piece) : -getValue(piece);
+            value += pieceValue;
         }
-
-
-        return -1;
+        return value;
     }
 
     static int computeBoardValue(Board board) {
