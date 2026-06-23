@@ -6,12 +6,10 @@ import dev.lelek.chess.BoardPiece;
 import dev.lelek.chess.board.OccupancyBitboard;
 import dev.lelek.chess.board.model.Board;
 
-import java.util.Arrays;
-
 public class BoardEvaluation {
 
     // right now 4250 is base eval for each color
-    public static final int DEFAULT_BOARD_VALUE = computeDefaultBoardValue(Board.initializeDefaultBoard());
+    public static final int DEFAULT_BOARD_VALUE = computeBoardValue(Board.initializeDefaultBoard());
 
     private static final int PAWN_VALUE = 100;
     private static final int KNIGHT_VALUE = 350;
@@ -39,7 +37,7 @@ public class BoardEvaluation {
         return -1;
     }
 
-    private static int computeDefaultBoardValue(Board board) {
+    static int computeBoardValue(Board board) {
         int value = 0;
         long bb = board.getBitBoardState().getBitboard(OccupancyBitboard.ALL_PIECES);
         while (bb != 0) {
