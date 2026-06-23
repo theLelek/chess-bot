@@ -9,7 +9,7 @@ import dev.lelek.chess.board.model.Board;
 public class BoardEvaluation {
 
     // right now 4250 is base eval for each color
-    public static final int DEFAULT_BOARD_VALUE = computeBoardValue(Board.initializeDefaultBoard());
+    static final int DEFAULT_BOARD_VALUE = computeBoardValue(Board.initializeDefaultBoard());
 
     private static final int PAWN_VALUE = 100;
     private static final int KNIGHT_VALUE = 350;
