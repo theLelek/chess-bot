@@ -5,6 +5,7 @@ import dev.lelek.chess.Color;
 import dev.lelek.chess.Move.Move;
 import dev.lelek.chess.board.UnmakeMoveInfo;
 import dev.lelek.chess.board.model.Board;
+import dev.lelek.chess.eval.BoardEvaluation;
 
 import java.util.*;
 
