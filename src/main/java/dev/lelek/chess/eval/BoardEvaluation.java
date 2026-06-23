@@ -29,7 +29,7 @@ public class BoardEvaluation {
 
             BoardPosition boardPosition = new BoardPosition(bitBoardSquare);
             BoardPiece piece = board.getPieceList()[bitBoardSquare];
-            int pieceValue = piece.getColor() == color ? getValue(piece) : -getValue(piece);
+            int pieceValue = piece.hasColor(color) ? getValue(piece) : -getValue(piece);
             value += pieceValue;
         }
         return value;
