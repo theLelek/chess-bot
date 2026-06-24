@@ -68,7 +68,7 @@ public class MoveGenerator {
         }
 
         if (depth == 0) {
-            return new BoardResults(random.nextInt(5) - 3 + BoardEvaluation.evaluate(board, color), null);
+            return new BoardResults(random.nextInt(3) - 1 + BoardEvaluation.evaluate(board, color), null);
         }
 
         Move bestMove = null;
