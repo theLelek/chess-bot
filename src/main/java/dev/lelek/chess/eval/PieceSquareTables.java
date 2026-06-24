@@ -3,7 +3,7 @@ package dev.lelek.chess.eval;
 import dev.lelek.chess.BoardPiece;
 import dev.lelek.chess.board.model.Board;
 
-public class PieceSquareTables { // todo maybe convert to enum
+class PieceSquareTables { // todo maybe convert to enum
 
     public static int[][][] fromPiece(BoardPiece piece) {
         switch (piece) {

@@ -19,6 +19,7 @@ public class MoveGenerator {
     private static volatile boolean timedOut = false;
 
     public static Move generateMove(Board board, long timeMillis) {
+        timedOut = false;
         Move bestMove = null;
 
         new Thread(() -> {
@@ -35,15 +36,18 @@ public class MoveGenerator {
             }
             bestMove = foo.move();
         }
+        timedOut = false;
         return bestMove;
     }
 
     public static Move generateMove(Board board, int maxDepth) {
+        timedOut = false;
         Move bestMove = null;
 
         for (int i = 1; i <= maxDepth; i++) {
             bestMove = negmax(board, null, i, new Stack<>()).move();
         }
+        timedOut = false;
         return bestMove;
     }
 
@@ -64,7 +68,7 @@ public class MoveGenerator {
         }
 
         if (depth == 0) {
-            return new BoardResults(random.nextInt(21) - 10 + BoardEvaluation.evaluate(board, color), null);
+            return new BoardResults(random.nextInt(5) - 3 + BoardEvaluation.evaluate(board, color), null);
         }
 
         Move bestMove = null;

@@ -2,10 +2,9 @@ package dev.lelek.chess.eval;
 
 import dev.lelek.chess.BoardPiece;
 import dev.lelek.chess.BoardPosition;
-import dev.lelek.chess.Color;
 import dev.lelek.chess.board.model.Board;
 
-public class PieceSquareTableHandler {
+class PieceSquareTableHandler {
 
     private final double gamePhase;
     private final double openingPercent;

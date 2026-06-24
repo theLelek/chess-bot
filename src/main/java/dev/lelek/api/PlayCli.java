@@ -19,7 +19,7 @@ public class PlayCli {
         while (GameStatus.getGameStatus(board) == GameStatus.ONGOING) {
             Move playerMove = getPlayerMove(board);
             board.makeMove(playerMove);
-
+         // todo fix bug need break
             Move engineMove = MoveGenerator.generateMove(board, (long) 1000); // 1 second for engine move
             board.makeMove(engineMove);
             printBoard(board);
