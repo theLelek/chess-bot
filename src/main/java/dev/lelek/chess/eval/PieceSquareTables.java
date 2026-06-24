@@ -1,16 +1,41 @@
 package dev.lelek.chess.eval;
 
-public class PieceSquareTables {
+import dev.lelek.chess.BoardPiece;
+import dev.lelek.chess.board.model.Board;
 
-    private static int[][] mirror(int[][] table) {
-        int[][] mirrored = new int[8][8];
-        for (int row = 0; row < 8; row++) {
-            mirrored[row] = table[7 - row].clone();
+public class PieceSquareTables { // todo maybe convert to enum
+
+    public static int[][][] fromPiece(BoardPiece piece) {
+        switch (piece) {
+            case WHITE_PAWN -> {return pawnsWhite;}
+            case BLACK_PAWN -> {return pawnsBlack;}
+            case WHITE_ROOK -> {return rooksWhite;}
+            case BLACK_ROOK -> {return rooksBlack;}
+            case WHITE_BISHOP -> {return bishopsWhite;}
+            case BLACK_BISHOP -> {return bishopsBlack;}
+            case WHITE_KNIGHT -> {return knightsWhite;}
+            case BLACK_KNIGHT -> {return knightsBlack;}
+            case WHITE_QUEEN -> {return queensWhite;}
+            case BLACK_QUEEN -> {return queensBlack;}
+            case WHITE_KING -> {return kingsWhite;}
+            case BLACK_KING -> {return kingsBlack;}
+            default -> throw new IllegalArgumentException("Unexpected value: " + piece);
+        }
+    }
+
+    private static int[][][] mirror(int[][][] table) {
+        int[][][] mirrored = new int[table.length][][];
+        for (int i = 0; i < table.length; i++) {
+            int[][] currentMirrored = new int[Board.SIZE][Board.SIZE];
+            for (int j = 0; j < Board.SIZE; j++) {
+                currentMirrored[j] = table[i][Board.SIZE - 1 - j].clone();
+            }
+            mirrored[i] = currentMirrored;
         }
         return mirrored;
     }
 
-    static final int[][] pawnWhite = {
+    private static final int[][] pawnWhite = {
             { 0,  0,   0,   0,   0,   0,  0,  0},
             {50, 50,  50,  50,  50,  50, 50, 50},
             {10, 10,  20,  30,  30,  20, 10, 10},
@@ -21,7 +46,7 @@ public class PieceSquareTables {
             { 0,  0,   0,   0,   0,   0,  0,  0}
     };
 
-    static final int[][] knightWhite = {
+    private static final int[][] knightWhite = {
             {-50, -40, -30, -30, -30, -30, -40, -50},
             {-40, -20,   0,   0,   0,   0, -20, -40},
             {-30,   0,  10,  15,  15,  10,   0, -30},
@@ -32,7 +57,7 @@ public class PieceSquareTables {
             {-50, -40, -20, -30, -30, -20, -40, -50}
     };
 
-    static final int[][] bishopWhite = {
+    private static final int[][] bishopWhite = {
             {-20, -10, -10, -10, -10, -10, -10, -20},
             {-10,   0,   0,   0,   0,   0,   0, -10},
             {-10,   0,   5,  10,  10,   5,   0, -10},
@@ -43,7 +68,7 @@ public class PieceSquareTables {
             {-20, -10, -40, -10, -10, -40, -10, -20}
     };
 
-    static final int[][] rookWhite = {
+    private static final int[][] rookWhite = {
             {  0,   0,   5,  10,  10,   5,   0,   0},
             { -5,   0,   0,   0,   0,   0,   0,  -5},
             { -5,   0,   0,   0,   0,   0,   0,  -5},
@@ -54,7 +79,7 @@ public class PieceSquareTables {
             {  0,   0,   5,  10,  10,   5,   0,   0}
     };
 
-    static final int[][] queenOpeningWhite = {
+    private static final int[][] queenOpeningWhite = {
             {-20, -10, -10,  -5,  -5, -10, -10, -20},
             {-10, -10, -10, -10, -10, -10, -10, -10},
             {-10, -10,   0,   0,   0,   0, -10, -10},
@@ -65,7 +90,7 @@ public class PieceSquareTables {
             {-20, -10, -10,  -5,  -5, -10, -10, -20}
     };
 
-    static final int[][] queenMiddleWhite = {
+    private static final int[][] queenMiddleWhite = {
             {-20, -10, -10,  -5,  -5, -10, -10, -20},
             {-10,   0,   0,   0,   0,   0,   0, -10},
             {-10,   0,   5,   5,   5,   5,   0, -10},
@@ -76,7 +101,7 @@ public class PieceSquareTables {
             {-20, -10, -10,  -5,  -5, -10, -10, -20}
     };
 
-    static final int[][] queenEndWhite = {
+    private static final int[][] queenEndWhite = {
             {-10,  -5,  -5,   0,   0,  -5,  -5, -10},
             { -5,   0,   5,   5,   5,   5,   0,  -5},
             { -5,   5,  10,  10,  10,  10,   5,  -5},
@@ -87,7 +112,7 @@ public class PieceSquareTables {
             {-10,  -5,  -5,   0,   0,  -5,  -5, -10}
     };
 
-    static final int[][] kingOpeningWhite = {
+    private static final int[][] kingOpeningWhite = {
             {-30, -40, -40, -50, -50, -40, -40, -30},
             {-30, -40, -40, -50, -50, -40, -40, -30},
             {-30, -40, -40, -50, -50, -40, -40, -30},
@@ -98,7 +123,7 @@ public class PieceSquareTables {
             { 20,  30,  10,   0,   0,  10,  30,  20}
     };
 
-    static final int[][] kingMiddleWhite = {
+    private static final int[][] kingMiddleWhite = {
             {-30, -40, -40, -50, -50, -40, -40, -30},
             {-30, -40, -40, -50, -50, -40, -40, -30},
             {-30, -40, -40, -50, -50, -40, -40, -30},
@@ -109,7 +134,7 @@ public class PieceSquareTables {
             { 20,  20,  10,   0,   0,  10,  20,  20}
     };
 
-    static final int[][] kingEndWhite = {
+    private static final int[][] kingEndWhite = {
             {-50, -40, -30, -20, -20, -30, -40, -50},
             {-30, -20, -10,   0,   0, -10, -20, -30},
             {-30, -10,  20,  30,  30,  20, -10, -30},
@@ -120,16 +145,23 @@ public class PieceSquareTables {
             {-50, -30, -30, -30, -30, -30, -30, -50}
     };
 
-    static final int[][] pawnBlack = mirror(pawnWhite);
-    static final int[][] knightBlack = mirror(knightWhite);
-    static final int[][] bishopBlack = mirror(bishopWhite);
-    static final int[][] rookBlack = mirror(rookWhite);
 
-    static final int[][] queenOpeningBlack = mirror(queenOpeningWhite);
-    static final int[][] queenMiddleBlack = mirror(queenMiddleWhite);
-    static final int[][] queenEndBlack = mirror(queenEndWhite);
+    static final int[][][] pawnsWhite = {pawnWhite, pawnWhite, pawnWhite};
+    static final int[][][] pawnsBlack = mirror(pawnsWhite);
 
-    static final int[][] kingOpeningBlack = mirror(kingOpeningWhite);
-    static final int[][] kingMiddleBlack = mirror(kingMiddleWhite);
-    static final int[][] kingEndBlack = mirror(kingEndWhite);
+    static final int[][][] rooksWhite = {rookWhite, rookWhite, rookWhite};
+    static final int[][][] rooksBlack = mirror(rooksWhite);
+
+    static final int[][][] knightsWhite = {knightWhite, knightWhite, knightWhite};
+    static final int[][][] knightsBlack = mirror(knightsWhite);
+
+    static final int[][][] bishopsWhite = {bishopWhite, bishopWhite, bishopWhite};
+    static final int[][][] bishopsBlack = mirror(bishopsWhite);
+
+
+    static final int[][][] kingsWhite = {kingOpeningWhite, kingMiddleWhite, kingEndWhite};
+    static final int[][][] kingsBlack = mirror(kingsWhite);
+
+    static final int[][][] queensWhite = {queenOpeningWhite, queenMiddleWhite, queenEndWhite};
+    static final int[][][] queensBlack = mirror(queensWhite);
 }

@@ -34,3 +34,5 @@ MoveGenerator:
 2. iterative deepening with ab pruning
 3. zobrist hash (tranposition tables)
 
+
+maybe rename BoardPiece enum fields to format: PAWN_WHITE

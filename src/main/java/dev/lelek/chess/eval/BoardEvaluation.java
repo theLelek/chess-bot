@@ -19,18 +19,20 @@ public class BoardEvaluation {
     private static final int KING_VALUE = 0;
 
     public static int evaluate(Board board, Color color) {
-
         int value = 0;
+        PieceSquareTableHandler pieceSquareTableHandler = PieceSquareTableHandler.fromBoard(board);
         long bb = board.getBitBoardState().getBitboard(OccupancyBitboard.ALL_PIECES);
         while (bb != 0) {
             long lsb = bb & -bb;
             bb &= bb - 1;
             int bitBoardSquare = Long.numberOfTrailingZeros(lsb);
 
-            BoardPosition boardPosition = new BoardPosition(bitBoardSquare);
+            BoardPosition position = new BoardPosition(bitBoardSquare);
             BoardPiece piece = board.getPieceList()[bitBoardSquare];
+
             int pieceValue = piece.hasColor(color) ? getValue(piece) : -getValue(piece);
             value += pieceValue;
+            value += pieceSquareTableHandler.getEvaluation(piece, position);
         }
         return value;
     }
