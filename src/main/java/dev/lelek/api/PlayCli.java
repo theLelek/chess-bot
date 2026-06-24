@@ -58,10 +58,10 @@ public class PlayCli {
                 move = normalMove;
                 break;
             case 1:
-                move = (CastlingMove) normalMove;
+                move = new CastlingMove(normalMove.from(), normalMove.to());
                 break;
             case 2:
-                move = (EnPassantMove) normalMove;
+                move = new EnPassantMove(normalMove.from(), normalMove.to());
                 break;
             case 3:
                 System.out.println("enter the piece to promote to (e.g. WHITE_KING");
