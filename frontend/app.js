@@ -24,6 +24,7 @@ let endCoordinates = null;
 
 
 const boardSize = 8;
+const maxThinkTimeForEngineInMilliseconds = 4000;
 let isBotWhite = false;
 let isWhiteToMove = true;
 
@@ -183,13 +184,13 @@ function move(posibleMoves){
         console.log("invalidMove!");
     }
 
-    if (startCoordinates == "e1" && endCoordinates == "g1") {
+    if (startCoordinates === "e1" && endCoordinates === "g1") {
         makeSmallRochade("w");
-    } else if (startCoordinates == "e1" && endCoordinates == "c1") {
+    } else if (startCoordinates === "e1" && endCoordinates === "c1") {
         makeBigRochade("w");
-    } else if (startCoordinates == "e8" && endCoordinates == "g8") {
+    } else if (startCoordinates === "e8" && endCoordinates === "g8") {
         makeSmallRochade("b");
-    } else if (startCoordinates == "e8" && endCoordinates == "c8") {
+    } else if (startCoordinates === "e8" && endCoordinates === "c8") {
         makeBigRochade("b");
     } else{
         makeMove();
@@ -207,8 +208,7 @@ function makeMove(){
 }
 
 function makeSmallRochade(color){
-    console.log("Rochade function called");
-    if (color == "w") {
+    if (color === "w") {
         setFieldValueByNotation("e1", null);
         setFieldValueByNotation("h1", null);
         setFieldValueByNotation("g1", "K");
@@ -224,7 +224,7 @@ function makeSmallRochade(color){
 }
 
 function makeBigRochade(color){
-    if (color == "w") {
+    if (color === "w") {
         setFieldValueByNotation("e1", null);
         setFieldValueByNotation("a1", null);
         setFieldValueByNotation("c1", "K");
@@ -246,7 +246,7 @@ function renderMove(startCoordinates, endCoordinates, additionalCoordinates = []
     let buttons = board.querySelectorAll(".field");
 
     buttons.forEach(button => {
-        if(button.dataset.coordinates == startCoordinates || button.dataset.coordinates == endCoordinates || additionalCoordinates.includes(button.dataset.coordinates)){
+        if(button.dataset.coordinates === startCoordinates || button.dataset.coordinates === endCoordinates || additionalCoordinates.includes(button.dataset.coordinates)){
             let row = button.dataset.row;
             let col = button.dataset.col;
 
@@ -332,26 +332,33 @@ function loadGame() {
     renderBoard();
 }
 
+function sendMove(from, to, ...promotion){
+    let stringMove = from + to;
+    if(promotion === undefined) stringMove += promotion;
 
-async function getBotMove(moveString = "a message from js") {
-    const response = await fetch("http://127.0.0.1:8081/chess",{
+    let responseGotten = sendMessage(stringMove)
+
+    console.log(responseGotten);
+}
+
+async function sendMessage(message = "a message from js") {
+    fetch("http://127.0.0.1:8081/chess",{
         method: "Post",
-        headers: {"Content-Type": "text/plain"},
-        body: JSON.stringify({a: 5, b: 6})
-    }).then(response => response.text())
-        .then(console.log)
+        headers: {"Content-Type": "application/json"},
+        body: "isready"
+    }).then(function (response) {return response.text()});
 }
 
 
-function updateFieldFromFen() {
-    const boardString = game.fen().split(" ")[0];
+function updateFieldFromFen(fen) {
+    const boardString = fen().split(" ")[0];
 
-    const splitedBoardString = boardString.split("/");
+    const splitBoardString = boardString.split("/");
 
     field = [];
 
     for(let i = 0; i< boardSize; i++){
-        const string = splitedBoardString[i];
+        const string = splitBoardString[i];
 
         let arr = [];
 
