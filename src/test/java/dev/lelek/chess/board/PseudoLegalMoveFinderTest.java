@@ -28,7 +28,7 @@ public class PseudoLegalMoveFinderTest {
     }
 
     @Test
-    @DisplayName("dev.lelek.Test find legal pawn move with black pawn on h7, can capture and move two fields foreward")
+    @DisplayName("com.example.Test find legal pawn move with black pawn on h7, can capture and move two fields foreward")
     public void testFindLegalPawnMoves2() {
         Board board = Board.initializeFromFen("rnbqkbnr/p1pppppp/6P1/8/1p6/8/PPPPPP1P/RNBQKBNR w KQkq - 0 1");
         List<Move> legalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, false);
@@ -38,7 +38,7 @@ public class PseudoLegalMoveFinderTest {
     }
 
     @Test
-    @DisplayName("dev.lelek.Test white knight on b1 in starting position can only move to a3 and c3")
+    @DisplayName("com.example.Test white knight on b1 in starting position can only move to a3 and c3")
     public void testFindLegalKnightMoves1() {
         Board board = Board.initializeFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
         List<Move> legalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, true);
@@ -48,7 +48,7 @@ public class PseudoLegalMoveFinderTest {
     }
 
     @Test
-    @DisplayName("dev.lelek.Test white pawn on e3 blocked by black pawn on e4 has no legal moves")
+    @DisplayName("com.example.Test white pawn on e3 blocked by black pawn on e4 has no legal moves")
     public void testFindLegalPawnMovesBlocked() {
         Board board = Board.initializeFromFen("4k3/8/8/8/4p3/4P3/8/4K3 w - - 0 1");
         List<Move> legalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, true);
@@ -57,7 +57,7 @@ public class PseudoLegalMoveFinderTest {
     }
 
     @Test
-    @DisplayName("dev.lelek.Test black bishop on f8 has no moves when blocked by own pawns")
+    @DisplayName("com.example.Test black bishop on f8 has no moves when blocked by own pawns")
     public void testFindLegalBishopMovesBlocked() {
         Board board = Board.initializeFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
         List<Move> legalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, false);
@@ -66,7 +66,7 @@ public class PseudoLegalMoveFinderTest {
     }
 
     @Test
-    @DisplayName("dev.lelek.Test white pawn on e2 in starting position can move to e3 or e4")
+    @DisplayName("com.example.Test white pawn on e2 in starting position can move to e3 or e4")
     public void testFindLegalPawnMovesDoubleStep() {
         Board board = Board.initializeFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
         List<Move> legalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, true);

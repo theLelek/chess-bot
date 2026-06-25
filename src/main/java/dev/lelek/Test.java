@@ -1,31 +1,15 @@
 package dev.lelek;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
-
-@SpringBootApplication
-@RestController
-@CrossOrigin(origins="*")
 public class Test {
-
     public static void main(String[] args) {
-        SpringApplication.run(Test.class, args);
+        long bitBoard = 0;
+        bitBoard |= (1L << 5); // place piece on 0
+        bitBoard &= ~(1L << 5); // removes piece on 5
+        boolean occupied = (bitBoard & (1L << 5)) != 0; // check if bit in 5 is occupied
+        bitBoard ^= (1L << 5); // reversed bit
+
+        
+
+
     }
-
-    @PostMapping("/chess")
-    public String chess(@RequestBody String message) throws ClassNotFoundException {
-        return "Hello from Server, received message: " + message;
-    }
-
-
-
-
-
-
-
-
 }

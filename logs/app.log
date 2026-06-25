@@ -1,0 +1,8 @@
+2026-06-19 08:25:53 [main] INFO  dev.lelek.chess.board.model.Board - initalized board: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+2026-06-19 08:26:51 [main] INFO  dev.lelek.chess.board.model.Board - initalized board: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+2026-06-19 08:28:48 [main] WARN  dev.lelek.api.Uci - invalid or non supported uci command was entered: readyok
+2026-06-19 08:28:59 [main] INFO  dev.lelek.chess.board.model.Board - initalized board: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+2026-06-19 09:08:56 [main] INFO  dev.lelek.chess.board.model.Board - initalized board: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+2026-06-19 09:10:31 [main] INFO  dev.lelek.chess.board.model.Board - initalized board: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+2026-06-19 10:25:40 [main] INFO  dev.lelek.chess.board.model.Board - initalized board: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+2026-06-19 10:44:51 [main] INFO  dev.lelek.chess.board.model.Board - initalized board: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
