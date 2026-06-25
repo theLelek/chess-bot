@@ -11,8 +11,6 @@ import dev.lelek.chess.search.MoveGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.plaf.TableHeaderUI;
-
 public class Uci {
 
     private static final Logger log = LoggerFactory.getLogger(Uci.class);
@@ -40,11 +38,8 @@ public class Uci {
                     System.out.println("readyok");
                     break;
                 case "go":
-                    Board finalBoard = board;
-                    new Thread(() -> {
-                        Move bestMove = MoveGenerator.generateMove(finalBoard, (long) 1000);
-                        System.out.println("bestmove " + toUciMoveFormat(bestMove));
-                }).start();
+                    Move bestMove = MoveGenerator.generateMove(board, (long) 1000);
+                    System.out.println("bestmove " + toUciMoveFormat(bestMove));
                     break;
                 default:
                     log.warn("invalid or non supported uci command was entered: {}", guiInput);
