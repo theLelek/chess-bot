@@ -1,7 +1,7 @@
 package dev.lelek.chess.Move;
 
 import dev.lelek.chess.BoardPosition;
-import dev.lelek.chess.board.BoardPiece;
+import dev.lelek.chess.BoardPiece;
 
 import java.util.Objects;
 

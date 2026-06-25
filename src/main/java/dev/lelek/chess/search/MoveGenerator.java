@@ -2,10 +2,10 @@ package dev.lelek.chess.search;
 
 import dev.lelek.chess.BoardPosition;
 import dev.lelek.chess.Color;
-import dev.lelek.chess.Move.CastlingMove;
 import dev.lelek.chess.Move.Move;
 import dev.lelek.chess.board.UnmakeMoveInfo;
 import dev.lelek.chess.board.model.Board;
+import dev.lelek.chess.eval.BoardEvaluation;
 
 import java.util.*;
 
@@ -16,26 +16,45 @@ public class MoveGenerator {
     static final int BEST = Integer.MAX_VALUE / 2;
     static final int WORST = Integer.MIN_VALUE / 2;
 
+    private static volatile boolean timedOut = false;
+
     public static Move generateMove(Board board, long timeMillis) {
-        long endTime = System.nanoTime() + timeMillis * 1_000_000L;
+        timedOut = false;
         Move bestMove = null;
 
-        for (int i = 1; System.nanoTime() < endTime; i++) {
-            bestMove = negmax(board, null, i, new Stack<>()).move();
+        new Thread(() -> {
+            try {
+                Thread.sleep(timeMillis);
+                timedOut = true;
+            } catch (InterruptedException ignored) {}
+        }).start();
+
+        for (int i = 1; ; i++) {
+            BoardResults foo = negmax(board, null, i, new Stack<>());
+            if (foo == null) {
+                break;
+            }
+            bestMove = foo.move();
         }
+        timedOut = false;
         return bestMove;
     }
 
     public static Move generateMove(Board board, int maxDepth) {
+        timedOut = false;
         Move bestMove = null;
 
         for (int i = 1; i <= maxDepth; i++) {
             bestMove = negmax(board, null, i, new Stack<>()).move();
         }
+        timedOut = false;
         return bestMove;
     }
 
     static BoardResults negmax(Board board, Move previousMove, int depth, Stack<UnmakeMoveInfo> unmakeMoveInfos) { // todo write more tests
+        if (timedOut) {
+            return null;
+        }
         Color color = board.isWhiteToMove() ? Color.WHITE : Color.BLACK;
 
         List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove());
@@ -49,7 +68,7 @@ public class MoveGenerator {
         }
 
         if (depth == 0) {
-            return new BoardResults(random.nextInt(21) - 10 + BoardEvaluation.evaluate(board, color), null);
+            return new BoardResults(random.nextInt(3) - 1 + BoardEvaluation.evaluate(board, color), null);
         }
 
         Move bestMove = null;
@@ -57,7 +76,7 @@ public class MoveGenerator {
         boolean foundLegalMove = false;
 
         for (Move move : pseudoLegalMoves) {
-            unmakeMoveInfos.push(new UnmakeMoveInfo(board, move));
+            unmakeMoveInfos.push(UnmakeMoveInfo.from(board, move));
             board.makeMove(move);
 
             // boardResults will be null if move was illegal

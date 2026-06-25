@@ -5,7 +5,7 @@ import dev.lelek.chess.Move.CastlingMove;
 import dev.lelek.chess.Move.EnPassantMove;
 import dev.lelek.chess.Move.Move;
 import dev.lelek.chess.Move.PromotionMove;
-import dev.lelek.chess.board.BoardPiece;
+import dev.lelek.chess.BoardPiece;
 import dev.lelek.chess.board.model.Board;
 import dev.lelek.chess.search.GameStatus;
 import dev.lelek.chess.search.MoveGenerator;
@@ -19,7 +19,7 @@ public class PlayCli {
         while (GameStatus.getGameStatus(board) == GameStatus.ONGOING) {
             Move playerMove = getPlayerMove(board);
             board.makeMove(playerMove);
-
+         // todo fix bug need break
             Move engineMove = MoveGenerator.generateMove(board, (long) 1000); // 1 second for engine move
             board.makeMove(engineMove);
             printBoard(board);
@@ -58,10 +58,10 @@ public class PlayCli {
                 move = normalMove;
                 break;
             case 1:
-                move = (CastlingMove) normalMove;
+                move = new CastlingMove(normalMove.from(), normalMove.to());
                 break;
             case 2:
-                move = (EnPassantMove) normalMove;
+                move = new EnPassantMove(normalMove.from(), normalMove.to());
                 break;
             case 3:
                 System.out.println("enter the piece to promote to (e.g. WHITE_KING");

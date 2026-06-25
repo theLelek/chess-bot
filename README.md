@@ -8,8 +8,8 @@ It is written from scratch without any libraries.
 - FEN support
 - Legal move generation
 - negmax search
-- ~~UCI protocol~~
-- ~~Iterative deepening~~
+- UCI protocol
+- Iterative deepening
+- ~~alpha-beta pruning~~
 - ~~Move ordering~~
 - ~~Transposition table~~
-- ~~Zobrist hashing~~

@@ -13,7 +13,7 @@ public class MoveValidator {
         List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove());
         if (! pseudoLegalMoves.contains(move)) return false;
 
-        UnmakeMoveInfo unmakeMoveInfo = new UnmakeMoveInfo(board, move);
+        UnmakeMoveInfo unmakeMoveInfo = UnmakeMoveInfo.from(board, move);
         board.makeMove(move);
         List<Move> pseudoLegalMoves2 = PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove());
         boolean result = ! wasPreviousMoveIllegal(board, move, pseudoLegalMoves2);

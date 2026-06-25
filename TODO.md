@@ -23,6 +23,9 @@ remove boolean paramether and replace them with Color enum
 
 maybe add shortend fen support (shorter version of fen string)
 
+
+add helper function for converting arrays to bitboard indexed arrays
+
 add more logging
 
 
@@ -30,3 +33,6 @@ MoveGenerator:
 1. order moves
 2. iterative deepening with ab pruning
 3. zobrist hash (tranposition tables)
+
+
+maybe rename BoardPiece enum fields to format: PAWN_WHITE
