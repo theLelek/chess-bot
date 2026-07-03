@@ -59,7 +59,7 @@ public class MoveGenerator {
 
         List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove());
 
-        if (MoveValidator.wasPreviousMoveIllegal(board, previousMove, pseudoLegalMoves)) {
+        if (LegalMoveFinder.wasPreviousMoveIllegal(board, previousMove, pseudoLegalMoves)) {
             return null;
         }
 

@@ -6,9 +6,22 @@ import dev.lelek.chess.Move.Move;
 import dev.lelek.chess.board.UnmakeMoveInfo;
 import dev.lelek.chess.board.model.Board;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class MoveValidator {
+public class LegalMoveFinder {
+
+    public static List<Move> getLegalMoves(Board board) {
+        List<Move> legalMoves = new ArrayList<>();
+        List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove());
+        for (Move move : pseudoLegalMoves) {
+            if (isMoveLegal(board, move)) {
+                legalMoves.add(move);
+            }
+        }
+        return legalMoves;
+    }
+
     public static boolean isMoveLegal(Board board, Move move) {
         List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove());
         if (! pseudoLegalMoves.contains(move)) return false;
