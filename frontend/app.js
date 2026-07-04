@@ -72,12 +72,10 @@ function createBoard(){
         board.style.height = windowHeight*0.8 + "px";
         board.style.width = windowHeight*0.8 + "px";
         board.style.margin = "5vh";
-        console.log("height");
     } else {
         board.style.height = windowWidth + "px";
         board.style.width = windowWidth + "px";
         board.style.margin = "0px";
-        console.log("width");
     }
 
     for(let i = 0; i < boardSize; i++){
@@ -196,6 +194,7 @@ function move(posibleMoves){
         makeMove();
         renderMove(startCoordinates, endCoordinates);
     }
+    sendMove(startCoordinates, endCoordinates);
 
     startCoordinates = null;
     endCoordinates = null;
@@ -322,7 +321,7 @@ function saveGame() {
 function loadGame() {
     const saved = localStorage.getItem("chessBoard");
     if (!saved) return;
-    if(saved == "undefined") return;
+    if(saved === "") return;
 
     field = JSON.parse(saved);
     isBotWhite = localStorage.getItem("isBotWhite");
@@ -332,21 +331,37 @@ function loadGame() {
     renderBoard();
 }
 
-function sendMove(from, to, ...promotion){
-    let stringMove = from + to;
-    if(promotion === undefined) stringMove += promotion;
+async function sendMove(from, to, ...promotion) {
+    let stringMove = "0\n" + from + " " + to;
+    if (promotion !== undefined) stringMove += promotion;
 
-    let responseGotten = sendMessage(stringMove)
+    let responseGotten = sendMessage(stringMove);
+    let responseString = await responseGotten;
 
-    console.log(responseGotten);
+    if(typeof responseString !== "string") {
+        responseString = String(responseString);
+    }
+
+    console.log(responseString);
+
+    return responseString;
 }
 
-async function sendMessage(message = "a message from js") {
-    fetch("http://127.0.0.1:8081/chess",{
-        method: "Post",
-        headers: {"Content-Type": "application/json"},
-        body: "isready"
-    }).then(function (response) {return response.text()});
+async function sendMessage(message = "isready") {
+    return fetch("http://127.0.0.1:8081/chess", {
+        method: "POST",
+        headers: { "Content-Type": "text/plain" },
+        body: message
+    })
+        .then(async function (response) {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return await response.text();
+        })
+        .catch(function (error) {
+            return error.message;
+        });
 }
 
 
