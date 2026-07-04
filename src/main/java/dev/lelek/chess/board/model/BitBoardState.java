@@ -2,7 +2,7 @@ package dev.lelek.chess.board.model;
 
 import dev.lelek.chess.BoardPosition;
 import dev.lelek.chess.board.BitboardIndexProvider;
-import dev.lelek.chess.board.BoardPiece;
+import dev.lelek.chess.BoardPiece;
 import dev.lelek.chess.board.OccupancyBitboard;
 
 import java.util.Arrays;

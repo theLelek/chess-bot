@@ -5,46 +5,58 @@ import dev.lelek.chess.Move.CastlingMove;
 import dev.lelek.chess.Move.EnPassantMove;
 import dev.lelek.chess.Move.Move;
 import dev.lelek.chess.Move.PromotionMove;
-import dev.lelek.chess.board.BoardPiece;
+import dev.lelek.chess.BoardPiece;
 import dev.lelek.chess.board.model.Board;
 import dev.lelek.chess.search.MoveGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Uci {
+class Uci {
 
     private static final Logger log = LoggerFactory.getLogger(Uci.class);
 
     private static final String engineName = "chess-bot";
     private static final String author = "lelek";
 
-    public static void start() {
-        System.out.println("id name " + engineName);
-        System.out.println("id author " + author);
-        System.out.println("uciok");
+    private Board board;
 
-        Board board = null;
-
+    static void start() {
+        Uci uci = new Uci();
         while (true) {
-            String guiInput = Cli.scanner.nextLine().trim();
-            if (guiInput.equals("quit"))
-                System.exit(0); // todo not sure if thats the best way to stop the engine
-            String[] parts = guiInput.split(" ");
-            switch (parts[0]) {
-                case "position":
-                    board = getPosition(guiInput);
-                    break;
-                case "isready":
-                    System.out.println("readyok");
-                    break;
-                case "go":
-                    Move bestMove = MoveGenerator.generateMove(board, (long) 1000);
-                    System.out.println("bestmove " + toUciMoveFormat(bestMove));
-                    break;
-                default:
-                    log.warn("invalid or non supported uci command was entered: {}", guiInput);
-            }
+            String command = Api.scanner.nextLine();
+            String response = uci.handleCommand(command);
+            System.out.println(response);
         }
+    }
+    
+    String handleCommand(String command) {
+        log.error("test");
+        String out = "";
+        String[] parts = command.split(" ");
+        switch (parts[0]) {
+            case "quit":
+                System.exit(0);
+                break;
+            case "uci":
+                out = String.format("""
+                        id name %s
+                        id author %s
+                        uciok""", engineName, author);
+                break;
+            case "position":
+                board = getPosition(command);
+                break;
+            case "isready":
+                out = "readyok";
+                break;
+            case "go":
+                Move bestMove = MoveGenerator.generateMove(board, (long) 1000);
+                out = "bestmove " + toUciMoveFormat(bestMove);
+                break;
+            default:
+                log.warn("invalid or non supported uci command was entered: {}", command);
+        }
+        return out;
     }
 
     private static Board getPosition(String guiInput) {
@@ -60,7 +72,7 @@ public class Uci {
         return board;
     }
 
-    private static Move fromUciMoveFormat(Board board, String uciMove) {
+    static Move fromUciMoveFormat(Board board, String uciMove) {
         BoardPosition from = new BoardPosition(uciMove.substring(0, 2));
         BoardPosition to = new BoardPosition(uciMove.substring(2, 4));
 
@@ -86,5 +98,9 @@ public class Uci {
             out += ((PromotionMove) move).getPromotionPiece().getFen();
         }
         return out;
+    }
+
+    public Board getBoard() {
+        return board;
     }
 }
