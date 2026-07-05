@@ -11,6 +11,9 @@ import dev.lelek.chess.search.MoveGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
+
 class Uci {
 
     private static final Logger log = LoggerFactory.getLogger(Uci.class);
@@ -22,21 +25,24 @@ class Uci {
 
     static void start() {
         Uci uci = new Uci();
+        System.out.println(uci.handleCommand("uci"));
         while (true) {
             String command = Api.scanner.nextLine();
-            String response = uci.handleCommand(command);
-            System.out.println(response);
+            if (command.equals("quit")) return;
+
+            Runnable runnable = () -> {
+                String response = uci.handleCommand(command);
+                if (response != null) System.out.println(response);
+            };
+            new Thread(runnable).start();
         }
     }
     
     String handleCommand(String command) {
         log.error("test");
-        String out = "";
+        String out = null;
         String[] parts = command.split(" ");
         switch (parts[0]) {
-            case "quit":
-                System.exit(0);
-                break;
             case "uci":
                 out = String.format("""
                         id name %s
@@ -59,17 +65,40 @@ class Uci {
         return out;
     }
 
-    private static Board getPosition(String guiInput) {
-        String[] parts = guiInput.split(" ");
-        Board board = parts[1].equals("startpos") ? Board.initializeDefaultBoard() : Board.initializeFromFen(parts[1]);
-        if (parts.length == 2) {
-            return board;
-        }
-        for (int i = 3; i < parts.length; i++) {
-            Move move = fromUciMoveFormat(board, parts[i]);
+    private static Board getPosition(String command) {
+        Board board = extractStartPosition(command);
+        List<Move> moves = extractMoves(board, command);
+        for (Move move : moves) {
             board.makeMove(move);
         }
         return board;
+    }
+
+    private static Board extractStartPosition(String command) {
+        if (command.startsWith("position startpos")) {
+            return Board.initializeDefaultBoard();
+        } else {
+            return Board.initializeFromFen(extractFen(command));
+        }
+    }
+
+    private static String extractFen(String command) {
+        int start = "position fen ".length();
+        int end = command.indexOf(" moves");
+        return (end == -1) ? command.substring(start) : command.substring(start, end);
+    }
+
+    private static List<Move> extractMoves(Board board, String command) {
+        List<Move> moves = new ArrayList<>();
+        if (! command.contains("moves")) {
+            return moves;
+        }
+        int start = command.indexOf("moves") + "moves".length() + 1;
+        String[] movesPart = command.substring(start).split(" ");
+        for (String move : movesPart) {
+            moves.add(fromUciMoveFormat(board, move));
+        }
+        return moves;
     }
 
     static Move fromUciMoveFormat(Board board, String uciMove) {
