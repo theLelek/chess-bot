@@ -21,7 +21,6 @@ public class Api {
         if (userInput.equals("play")) {
             PlayCli.start();
         } else {
-
             Uci.start();
         }
     }

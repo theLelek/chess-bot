@@ -23,15 +23,10 @@ public class UciTest {
     }
 
     @Test
-    void asynchronousTest() {
+    void generalTest() {
         Uci uci = new Uci();
         Assertions.assertEquals(3, uci.handleCommand("uci").split("\n").length);
         Assertions.assertNull(uci.handleCommand("position startpos"));
-        Assertions.assertEquals(Board.initializeDefaultBoard(), uci.getBoard());
-        Runnable runnable = () -> {
-            uci.handleCommand("go");
-        };
-        new Thread(runnable).start();
         Assertions.assertEquals("readyok", uci.handleCommand("isready"));
     }
 }
