@@ -16,9 +16,11 @@ class PlayCli { // todo convert to instantiatable class like Uci
         while (GameStatus.getGameStatus(board) == GameStatus.ONGOING) {
             Move playerMove = getPlayerMove(board);
             board.makeMove(playerMove);
-         // todo fix bug need break
+            if (GameStatus.getGameStatus(board) != GameStatus.ONGOING) break;
+
             Move engineMove = MoveGenerator.generateMove(board, (long) 1000); // 1 second for engine move
             board.makeMove(engineMove);
+
             printBoard(board);
             System.out.println("engine move: " + engineMove);
             System.out.println("----------------------------");
