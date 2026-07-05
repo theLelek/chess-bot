@@ -391,3 +391,41 @@ function updateFieldFromFen(fen) {
         field.push(arr);
     }
 }
+
+
+function fieldToFen(field) {
+    const rows = [];
+
+    for (let i = 0; i < field.length; i++) {
+        const row = field[i];
+        let rowString = "";
+        let emptyCount = 0;
+
+        for (let j = 0; j < row.length; j++) {
+            const cell = row[j];
+
+            if (cell === null) {
+                emptyCount++;
+            } else {
+                if (emptyCount > 0) {
+                    rowString += emptyCount;
+                    emptyCount = 0;
+                }
+                rowString += cell;
+            }
+        }
+
+        if (emptyCount > 0) {
+            rowString += emptyCount;
+        }
+
+        rows.push(rowString);
+    }
+
+    return rows.join("/");
+}
+
+function fieldToFullFen(field, activeColor = "w", castling = "KQkq", enPassant = "-", halfmove = 0, fullmove = 1) {
+    const boardString = fieldToFen(field);
+    return `${boardString} ${activeColor} ${castling} ${enPassant} ${halfmove} ${fullmove}`;
+}
