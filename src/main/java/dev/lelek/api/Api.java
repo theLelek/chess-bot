@@ -16,7 +16,7 @@ public class Api {
         }
     }
 
-    static void startCli() {
+    private static void startCli() {
         String userInput = scanner.nextLine().trim();
         if (userInput.equals("play")) {
             PlayCli.start();

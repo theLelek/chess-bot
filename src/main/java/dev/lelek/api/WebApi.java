@@ -23,7 +23,7 @@ class WebApi {
     }
 
     @PostMapping("/chess")
-    String chess(@RequestBody String message) throws JsonProcessingException {
+    private String chess(@RequestBody String message) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         String response = null;
         switch (message) {

@@ -128,7 +128,7 @@ class Uci {
         return out;
     }
 
-    public Board getBoard() {
+    Board getBoard() {
         return board;
     }
 }
