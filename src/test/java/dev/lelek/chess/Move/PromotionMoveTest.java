@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 class PromotionMoveTest {
 
     @Test
-    void testToString() {
+    void testGetToString() {
         String expected = "from: e7 to: e8 Promotion to: WHITE_QUEEN";
         String actual = new PromotionMove(new BoardPosition("e7"), new BoardPosition("e8"), BoardPiece.WHITE_QUEEN).toString();
         Assertions.assertEquals(expected, actual);

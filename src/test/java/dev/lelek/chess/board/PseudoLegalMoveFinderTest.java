@@ -210,7 +210,7 @@ public class PseudoLegalMoveFinderTest {
     private static List<Move> filterByStartingPosition(List<Move> legalMoves, BoardPosition boardPosition) {
         List<Move> moves = new ArrayList<>();
         for (Move move : legalMoves) {
-            if (move.from().equals(boardPosition)) {
+            if (move.getFrom().equals(boardPosition)) {
                 moves.add(move);
             }
         }

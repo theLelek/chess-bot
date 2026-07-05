@@ -22,9 +22,9 @@ class PieceSquareTableHandler {
     public int getEvaluation(BoardPiece piece, BoardPosition position) { // todo change so you dont only have 3 kind of evals
         int[][][] tables = PieceSquareTables.fromPiece(piece);
         double evaluation = 0;
-        evaluation += tables[0][position.y()][position.x()] * openingPercent;
-        evaluation += tables[1][position.y()][position.x()] * middlePercent;
-        evaluation += tables[2][position.y()][position.x()] * endPercent;
+        evaluation += tables[0][position.getY()][position.getX()] * openingPercent;
+        evaluation += tables[1][position.getY()][position.getX()] * middlePercent;
+        evaluation += tables[2][position.getY()][position.getX()] * endPercent;
         return (int) evaluation;
     }
 

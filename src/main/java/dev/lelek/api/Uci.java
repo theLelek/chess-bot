@@ -109,11 +109,11 @@ class Uci {
             return new PromotionMove(from, to, pieceToPromote);
         }
 
-        if (board.getPieceAt(from).isKing() && Math.abs(from.x() - to.x()) == 2) {
+        if (board.getPieceAt(from).isKing() && Math.abs(from.getX() - to.getX()) == 2) {
             return new CastlingMove(from, to);
         }
 
-        if (board.getPieceAt(from).isPawn() && board.getPieceAt(to) == null && from.x() != to.x()) {
+        if (board.getPieceAt(from).isPawn() && board.getPieceAt(to) == null && from.getX() != to.getX()) {
             return new EnPassantMove(from, to);
         }
 
@@ -121,7 +121,7 @@ class Uci {
     }
 
     private static String toUciMoveFormat(Move move) {
-        String out = move.from().toString() + move.to().toString();
+        String out = move.getFrom().toString() + move.getTo().toString();
         if (move instanceof PromotionMove) {
             out += ((PromotionMove) move).getPromotionPiece().getFen();
         }

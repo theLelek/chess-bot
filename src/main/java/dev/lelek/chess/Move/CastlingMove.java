@@ -16,10 +16,10 @@ public class CastlingMove extends Move {
     }
 
     public boolean isKingSideCastling() {
-        return to().x() == 6;
+        return getTo().getX() == 6;
     }
 
     public boolean isQueenSideCastling() {
-        return to().x() == 2;
+        return getTo().getX() == 2;
     }
 }

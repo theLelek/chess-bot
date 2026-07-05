@@ -82,9 +82,9 @@ public class PerftTest {
         positionsToCheck.add(kingPosition);
 
         if (previousMove instanceof CastlingMove castlingMove) {
-            BoardPosition positionToCheck = new BoardPosition(castlingMove.isKingSideCastling() ? 5 : 3, castlingMove.from().y());
+            BoardPosition positionToCheck = new BoardPosition(castlingMove.isKingSideCastling() ? 5 : 3, castlingMove.getFrom().getY());
             positionsToCheck.add(positionToCheck);
-            positionsToCheck.add(previousMove.from());
+            positionsToCheck.add(previousMove.getFrom());
         }
         return isPositionTargeted(pseudoLegalMoves, positionsToCheck);
     }
@@ -92,7 +92,7 @@ public class PerftTest {
     private static boolean isPositionTargeted(List<Move> moves, List<BoardPosition> positions) {
         for (Move move : moves) {
             for (BoardPosition position : positions) {
-                if (move.to().equals(position)) {
+                if (move.getTo().equals(position)) {
                     return true;
                 }
             }
