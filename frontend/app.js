@@ -148,7 +148,7 @@ function fieldClicked(field){
 
 
 function isCharLowerCase(testCharacter){
-    return testCharacter.toLowerCase() == testCharacter;
+    return testCharacter.toLowerCase() === testCharacter;
 }
 
 function turnBoard(){
@@ -173,12 +173,12 @@ function setFieldValueByNotation(notation, toSet) {
 }
 
 
-function move(posibleMoves){
+function move(possibleMoves){
     console.log("move: " + startCoordinates + " to " + endCoordinates);
 
-    moveString = startCoordinates + ";" + endCoordinates;
+    let moveString = startCoordinates + ";" + endCoordinates;
 
-    if(posibleMoves != null && !posibleMoves.contains(moveString)){
+    if(possibleMoves != null && !possibleMoves.contains(moveString)){
         console.log("invalidMove!");
     }
 
@@ -299,12 +299,20 @@ function renderBoard() {
     });
 }
 
-function reset(){
+function reset() {
     console.log("reseted");
 
     initializeField();
 
     renderBoard();
+
+    sendMessage("position startpos").then(function(response){
+        if(response.startsWith("ERROR")){
+            window.alert("Connection failed!");
+        }
+
+    })
+
 
     startCoordinates = null;
     endCoordinates = null;
@@ -312,8 +320,7 @@ function reset(){
 
 
 function saveGame() {
-    localStorage.setItem("chessBoard", JSON.stringify(field));
-    localStorage.setItem("isBotWhite", isBotWhite);
+    localStorage.setItem("chessBoard", fieldToFullFen(field, isBotWhite ? "w":"b"));
     console.log("game saved");
 }
 
@@ -323,28 +330,39 @@ function loadGame() {
     if (!saved) return;
     if(saved === "") return;
 
-    field = JSON.parse(saved);
-    isBotWhite = localStorage.getItem("isBotWhite");
+    updateFieldFromFen(saved);
     console.log("game loaded");
+
+    sendMessage("position " + localStorage.getItem("chessBoard")).then(function(response){
+        if(response.startsWith("ERROR")) {
+            initializeField();
+            window.alert("Connection refused"); //TODO do not now right now if every error starts with ERROR
+        }
+
+
+    });
+
 
     createBoard();
     renderBoard();
 }
 
 async function sendMove(from, to, ...promotion) {
-    let stringMove = "0\n" + from + " " + to;
+    let stringMove = from + " " + to;
     if (promotion !== undefined) stringMove += promotion;
 
-    let responseGotten = sendMessage(stringMove);
-    let responseString = await responseGotten;
-
-    if(typeof responseString !== "string") {
-        responseString = String(responseString);
+    let responseGotten;
+    try{
+        responseGotten = await sendMessage(stringMove);
+    } catch (error){
+        responseGotten = error.message;
     }
 
-    console.log(responseString);
+    console.log(typeof responseGotten);
 
-    return responseString;
+    console.log(responseGotten);
+
+    return responseGotten;
 }
 
 async function sendMessage(message = "isready") {
@@ -355,9 +373,9 @@ async function sendMessage(message = "isready") {
     })
         .then(async function (response) {
             if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
+                return "HTTP Error: " + response.statusText;
             }
-            return await response.text();
+            return response.text();
         })
         .catch(function (error) {
             return error.message;
@@ -366,7 +384,9 @@ async function sendMessage(message = "isready") {
 
 
 function updateFieldFromFen(fen) {
-    const boardString = fen().split(" ")[0];
+    const boardString = fen.split(" ")[0];
+
+    isWhiteToMove = boardString.split(" ")[1] === "w";
 
     const splitBoardString = boardString.split("/");
 
