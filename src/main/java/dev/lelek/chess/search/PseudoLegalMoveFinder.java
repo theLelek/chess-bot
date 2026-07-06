@@ -66,7 +66,7 @@ public class PseudoLegalMoveFinder {
             boolean interrupted = false;
 
             do {
-                if (currentPosition.x() + direction[0] < 0 || currentPosition.x() + direction[0] >= Board.SIZE || currentPosition.y() + direction[1] < 0 || currentPosition.y() + direction[1] >= Board.SIZE) {
+                if (currentPosition.getX() + direction[0] < 0 || currentPosition.getX() + direction[0] >= Board.SIZE || currentPosition.getY() + direction[1] < 0 || currentPosition.getY() + direction[1] >= Board.SIZE) {
                     interrupted = true;
                     continue;
                 }
@@ -87,7 +87,7 @@ public class PseudoLegalMoveFinder {
         Color color = (boardPiece.isWhite()) ? Color.WHITE : Color.BLACK;
         int direction = color.getMovingDirection();
         int startingY  = color.getPawnStartingRow();
-        int forwardY = boardPosition.y() + direction;
+        int forwardY = boardPosition.getY() + direction;
         OccupancyBitboard opponentPieceBitBoard = color.getOpponentPieceBitboard();
 
         if (forwardY < 0 || forwardY >= Board.SIZE) {
@@ -95,28 +95,28 @@ public class PseudoLegalMoveFinder {
         }
 
         // forward 1
-        BoardPosition forward1 = new BoardPosition(boardPosition.x(), forwardY);
+        BoardPosition forward1 = new BoardPosition(boardPosition.getX(), forwardY);
         if (! bitBoardState.getBit(OccupancyBitboard.ALL_PIECES, forward1)) {
             legalMoves.add(new Move(boardPosition, forward1));
         }
 
         // forward 2
-        if (boardPosition.y() == startingY
-                && ! bitBoardState.getBit(OccupancyBitboard.ALL_PIECES, new BoardPosition(boardPosition.x(), forwardY))
-                && ! bitBoardState.getBit(OccupancyBitboard.ALL_PIECES, new BoardPosition(boardPosition.x(), forwardY + direction))) {
-            legalMoves.add(new Move(boardPosition, new BoardPosition(boardPosition.x(), forwardY + direction)));
+        if (boardPosition.getY() == startingY
+                && ! bitBoardState.getBit(OccupancyBitboard.ALL_PIECES, new BoardPosition(boardPosition.getX(), forwardY))
+                && ! bitBoardState.getBit(OccupancyBitboard.ALL_PIECES, new BoardPosition(boardPosition.getX(), forwardY + direction))) {
+            legalMoves.add(new Move(boardPosition, new BoardPosition(boardPosition.getX(), forwardY + direction)));
         }
 
         // diagonal
-        if (boardPosition.x() - 1 >= 0) {
-            BoardPosition diagonalPiecePosition = new BoardPosition(boardPosition.x() - 1, forwardY);
+        if (boardPosition.getX() - 1 >= 0) {
+            BoardPosition diagonalPiecePosition = new BoardPosition(boardPosition.getX() - 1, forwardY);
             if (bitBoardState.getBit(OccupancyBitboard.ALL_PIECES, diagonalPiecePosition) && bitBoardState.getBit(opponentPieceBitBoard, diagonalPiecePosition)) {
                 legalMoves.add(new Move(boardPosition, diagonalPiecePosition));
             }
         }
 
-        if (boardPosition.x() + 1 < Board.SIZE) {
-            BoardPosition diagonalPiecePosition = new BoardPosition(boardPosition.x() + 1, forwardY);
+        if (boardPosition.getX() + 1 < Board.SIZE) {
+            BoardPosition diagonalPiecePosition = new BoardPosition(boardPosition.getX() + 1, forwardY);
             if (bitBoardState.getBit(OccupancyBitboard.ALL_PIECES, diagonalPiecePosition) && bitBoardState.getBit(opponentPieceBitBoard, diagonalPiecePosition)) {
                 legalMoves.add(new Move(boardPosition, diagonalPiecePosition));
             }
@@ -128,14 +128,14 @@ public class PseudoLegalMoveFinder {
         Color color = (isWhiteToMove) ? Color.WHITE : Color.BLACK;
         int promotionRow = color.getBackRank();
         for (int i = legalMoves.size() - 1; i >= 0; i--) {
-            if (! bitBoardState.getBit(color.getPawn(), legalMoves.get(i).from())) {
+            if (! bitBoardState.getBit(color.getPawn(), legalMoves.get(i).getFrom())) {
                 continue;
             }
-            if (legalMoves.get(i).to().y() == promotionRow) {
-                legalMoves.add(new PromotionMove(legalMoves.get(i).from(), legalMoves.get(i).to(), color.getQueen()));
-                legalMoves.add(new PromotionMove(legalMoves.get(i).from(), legalMoves.get(i).to(), color.getRook()));
-                legalMoves.add(new PromotionMove(legalMoves.get(i).from(), legalMoves.get(i).to(), color.getBishop()));
-                legalMoves.add(new PromotionMove(legalMoves.get(i).from(), legalMoves.get(i).to(), color.getKnight()));
+            if (legalMoves.get(i).getTo().getY() == promotionRow) {
+                legalMoves.add(new PromotionMove(legalMoves.get(i).getFrom(), legalMoves.get(i).getTo(), color.getQueen()));
+                legalMoves.add(new PromotionMove(legalMoves.get(i).getFrom(), legalMoves.get(i).getTo(), color.getRook()));
+                legalMoves.add(new PromotionMove(legalMoves.get(i).getFrom(), legalMoves.get(i).getTo(), color.getBishop()));
+                legalMoves.add(new PromotionMove(legalMoves.get(i).getFrom(), legalMoves.get(i).getTo(), color.getKnight()));
                 legalMoves.remove(i);
             }
         }
@@ -172,12 +172,12 @@ public class PseudoLegalMoveFinder {
         BoardPiece pawnBoardPiece = color.getPawn();
 
 
-        if (enPassantPosition.x() - 1 >= 0 && bitBoardState.getBit(pawnBoardPiece, new BoardPosition(enPassantPosition.x() - 1, enPassantPosition.y()))) {
-            legalMoves.add(new EnPassantMove(new BoardPosition(enPassantPosition.x() - 1, enPassantPosition.y()), new BoardPosition(board.getEnPassantTargetSquare().x(), board.getEnPassantTargetSquare().y())));
+        if (enPassantPosition.getX() - 1 >= 0 && bitBoardState.getBit(pawnBoardPiece, new BoardPosition(enPassantPosition.getX() - 1, enPassantPosition.getY()))) {
+            legalMoves.add(new EnPassantMove(new BoardPosition(enPassantPosition.getX() - 1, enPassantPosition.getY()), new BoardPosition(board.getEnPassantTargetSquare().getX(), board.getEnPassantTargetSquare().getY())));
         }
 
-        if (enPassantPosition.x() + 1 < Board.SIZE && bitBoardState.getBit(pawnBoardPiece, new BoardPosition(enPassantPosition.x() + 1, enPassantPosition.y()))) {
-            legalMoves.add(new EnPassantMove(new BoardPosition(enPassantPosition.x() + 1, enPassantPosition.y()), new BoardPosition(board.getEnPassantTargetSquare().x(), board.getEnPassantTargetSquare().y())));
+        if (enPassantPosition.getX() + 1 < Board.SIZE && bitBoardState.getBit(pawnBoardPiece, new BoardPosition(enPassantPosition.getX() + 1, enPassantPosition.getY()))) {
+            legalMoves.add(new EnPassantMove(new BoardPosition(enPassantPosition.getX() + 1, enPassantPosition.getY()), new BoardPosition(board.getEnPassantTargetSquare().getX(), board.getEnPassantTargetSquare().getY())));
         }
     }
 

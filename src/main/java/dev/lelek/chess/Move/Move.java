@@ -41,11 +41,11 @@ public class Move {
         return "from: " + from.toString() + " to: " + to.toString();
     }
 
-    public BoardPosition from() {
+    public BoardPosition getFrom() {
         return from;
     }
 
-    public BoardPosition to() {
+    public BoardPosition getTo() {
         return to;
     }
 }

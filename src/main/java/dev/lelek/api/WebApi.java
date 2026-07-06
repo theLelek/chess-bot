@@ -1,5 +1,7 @@
 package dev.lelek.api;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.lelek.chess.search.GameStatus;
 import dev.lelek.chess.search.LegalMoveFinder;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -9,8 +11,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.boot.SpringApplication;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
-
 @RestController
 @SpringBootApplication
 @CrossOrigin("*")
@@ -18,22 +18,19 @@ class WebApi {
 
     private final static Uci uci = new Uci();
 
-    static void start() throws IOException {
-        System.out.println("hello");
+    static void start() {
         SpringApplication.run(WebApi.class);
     }
 
-
-
     @PostMapping("/chess")
-    String chess(@RequestBody String message) throws ClassNotFoundException, IOException {
-        System.out.println(message);
-        String response;
+    private String chess(@RequestBody String message) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        String response = null;
         switch (message) {
-            case "get-legal-moves" -> response = LegalMoveFinder.getLegalMoves(uci.getBoard()).toString();
+            case "legal-moves" -> response = mapper.writeValueAsString(LegalMoveFinder.getLegalMoves(uci.getBoard()));
+            case "game-status" -> response = GameStatus.getGameStatus(uci.getBoard()).toString();
             default -> response = uci.handleCommand(message);
         }
-        response += " " + GameStatus.getGameStatus(uci.getBoard());
         return response;
     }
 }
