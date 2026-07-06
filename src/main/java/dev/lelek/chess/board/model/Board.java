@@ -107,28 +107,29 @@ public class Board {
         throw new NoKingFoundException("couldnt find king in board + " + Arrays.toString(pieceList));
     }
 
-    public static String toFen(Board board) {
-        String fen = piecePlacementsToFen(board);
-        fen += " " + (board.isWhiteToMove() ? "w" : "b");
-        fen += " " + castlingRightsToFen(board);
-        fen += " " + board.getEnPassantTargetSquare() == null ? "-" : board.getEnPassantTargetSquare().toFen();
-        fen += " " + board.getHalfmoveClock();
-        fen += " " + board.getFullmoveNumber();
+    public String toFen() {
+        String fen = piecePlacementsToFen();
+        fen += " " + (isWhiteToMove() ? "w" : "b");
+        fen += " " + castlingRightsToFen();
+        fen += " " + (enPassantTargetSquare == null ? "-" : enPassantTargetSquare.toFen());
+        fen += " " + halfmoveClock;
+        fen += " " + fullmoveNumber;
         return fen;
     }
 
-    private static String piecePlacementsToFen(Board board) {
+    private String piecePlacementsToFen() {
         String[] piecePlacements = new String[Board.SIZE];
+        Arrays.fill(piecePlacements, "");
         for (int i = 0; i < Board.SIZE; i++) {
             int column = 0;
             for (int j = 0; j < Board.SIZE; j++) {
-                BoardPiece piece = board.getPieceList()[i * Board.SIZE + j];
+                BoardPosition position = new BoardPosition(j, i);
+                BoardPiece piece = getPieceAt(position);
                 if (piece != null) {
                     if (column != 0) piecePlacements[i] += column;
                     piecePlacements[i] += piece.getFen();
                     column = 0;
                 } else {
-                    piecePlacements[i] += "-";
                     column++;
                 }
             }
@@ -137,10 +138,10 @@ public class Board {
         return String.join("/", piecePlacements);
     }
 
-    private static String castlingRightsToFen(Board board) {
+    private String castlingRightsToFen() {
         String castlingRights = "";
-        castlingRights += board.getCastlingRightsWhite().toFen(Color.WHITE);
-        castlingRights += board.getCastlingRightsBlack().toFen(Color.BLACK);
+        castlingRights += castlingRightsWhite.toFen(Color.WHITE);
+        castlingRights += castlingRightsBlack.toFen(Color.BLACK);
         if (castlingRights.isEmpty()) castlingRights = "-";
         return castlingRights;
     }
