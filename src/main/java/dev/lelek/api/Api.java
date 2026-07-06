@@ -1,13 +1,12 @@
 package dev.lelek.api;
 
-import java.io.IOException;
 import java.util.Scanner;
 
 public class Api {
 
-    static Scanner scanner = new Scanner(System.in); // todo use factory method design pattern
+    static Scanner scanner = new Scanner(System.in); // todo use factory method design pattern or singleton
 
-    public static void start(String[] args) throws IOException {
+    public static void start(String[] args) {
         if (args.length == 0) {
             startCli();
         } else if (args[0].equals("--web") || args[0].equals("-w")) {
@@ -17,7 +16,7 @@ public class Api {
         }
     }
 
-    static void startCli() {
+    private static void startCli() {
         String userInput = scanner.nextLine().trim();
         if (userInput.equals("play")) {
             PlayCli.start();

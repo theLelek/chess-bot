@@ -10,42 +10,42 @@ class LegalMoveFinderTest {
 
     @Test
     void generateMove_captureQueen() {
-        Board board = Board.initializeFromFen("k7/8/8/8/3q4/2Q5/8/K7 w - - 0 1");
+        Board board = Board.fromFen("k7/8/8/8/3q4/2Q5/8/K7 w - - 0 1");
         Move bestMove = MoveGenerator.generateMove(board, 3);
         Assertions.assertEquals(new Move("c3", "d4"), bestMove);
     }
 
     @Test
     void generateMove_captureQueenWhileInCheck() {
-        Board board = Board.initializeFromFen("K6k/8/8/8/8/8/8/3q3Q b - - 0 1");
+        Board board = Board.fromFen("K6k/8/8/8/8/8/8/3q3Q b - - 0 1");
         Move bestMove = MoveGenerator.generateMove(board, 1);
         Assertions.assertEquals(new Move("d1", "h1"), bestMove);
     }
 
     @Test
     void generateMove_checkmate() {
-        Board board = Board.initializeFromFen("1k6/1Q5R/8/8/8/8/8/K7 b - - 3 2");
+        Board board = Board.fromFen("1k6/1Q5R/8/8/8/8/8/K7 b - - 3 2");
         Move bestMove = MoveGenerator.generateMove(board, 2);
         Assertions.assertNull(bestMove);
     }
 
     @Test
     void generateMove_mateIn1ByQueen() {
-        Board board = Board.initializeFromFen("1k6/8/8/8/4Q3/8/8/K6B w - - 3 2");
+        Board board = Board.fromFen("1k6/8/8/8/4Q3/8/8/K6B w - - 3 2");
         Move bestMove = MoveGenerator.generateMove(board, 2);
         Assertions.assertEquals(new Move("e4", "b7"), bestMove);
     }
 
     @Test
     void generateMove_mateIn1ByRook() {
-        Board board = Board.initializeFromFen("1k6/7R/8/8/8/8/8/K4R2 w - - 3 2");
+        Board board = Board.fromFen("1k6/7R/8/8/8/8/8/K4R2 w - - 3 2");
         Move bestMove = MoveGenerator.generateMove(board, 2);
         Assertions.assertEquals(new Move("f1", "f8"), bestMove);
     }
 
     @Test
     void generateMove_mateIn2() {
-        Board board = Board.initializeFromFen("3qr2k/pbpp2pp/1p5N/3Q2b1/2P1P3/P7/1PP2PPP/R4RK1 w - - 1 2");
+        Board board = Board.fromFen("3qr2k/pbpp2pp/1p5N/3Q2b1/2P1P3/P7/1PP2PPP/R4RK1 w - - 1 2");
         Move bestMove = MoveGenerator.generateMove(board, 4);
         Assertions.assertEquals(new Move("d5", "g8"), bestMove);
     }
@@ -63,7 +63,7 @@ class LegalMoveFinderTest {
 
     @Test
     void isMoveLegal_customBoard() {
-        Board board = Board.initializeFromFen("rn1qkbnr/pppppppp/8/1b6/8/8/PPPP1PPP/rN2K2R w Kkq - 0 1");
+        Board board = Board.fromFen("rn1qkbnr/pppppppp/8/1b6/8/8/PPPP1PPP/rN2K2R w Kkq - 0 1");
 
         Move move1 = new Move("b1", "c3");
         Assertions.assertFalse(LegalMoveFinder.isMoveLegal(board, move1));
