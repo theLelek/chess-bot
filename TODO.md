@@ -38,3 +38,4 @@ MoveGenerator:
 maybe rename BoardPiece enum fields to format: PAWN_WHITE
 
 IMPROVE LOGGING IMPORTANT
+MoveGenerator.generateMove can return null!!!
