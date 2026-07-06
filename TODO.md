@@ -37,5 +37,7 @@ MoveGenerator:
 
 maybe rename BoardPiece enum fields to format: PAWN_WHITE
 
+add draw because of insufficient material
+
 IMPROVE LOGGING IMPORTANT
 MoveGenerator.generateMove can return null!!!
