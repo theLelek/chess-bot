@@ -20,7 +20,7 @@ public class MoveGenerator {
 
     public static Move generateMove(Board board, long timeMillis) {
         timedOut = false;
-        Move bestMove = null;
+        Move bestMove = negmax(board, null, 1, new Stack<>()).move();;
 
         new Thread(() -> {
             try {
@@ -29,10 +29,10 @@ public class MoveGenerator {
             } catch (InterruptedException ignored) {}
         }).start();
 
-        for (int i = 1; ; i++) {
+        for (int i = 2; ; i++) {
             BoardResults foo = negmax(board, null, i, new Stack<>());
             if (foo == null) {
-                break;
+                break; // timeMillis have passed
             }
             bestMove = foo.move();
         }
