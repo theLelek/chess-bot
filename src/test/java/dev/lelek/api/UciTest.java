@@ -13,13 +13,13 @@ public class UciTest {
         Assertions.assertEquals(Board.initializeDefaultBoard(), uci.getBoard());
 
         uci.handleCommand("position startpos moves e2e4 e7e5 g1f3 b8c6");
-        Assertions.assertEquals(Board.initializeFromFen("r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3"), uci.getBoard());
+        Assertions.assertEquals(Board.fromFen("r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3"), uci.getBoard());
 
         uci.handleCommand("position fen rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-        Assertions.assertEquals(Board.initializeFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"), uci.getBoard());
+        Assertions.assertEquals(Board.fromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"), uci.getBoard());
 
         uci.handleCommand("position fen rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 moves e2e4 e7e5 g1f3 b8c6");
-        Assertions.assertEquals(Board.initializeFromFen("r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3"), uci.getBoard());
+        Assertions.assertEquals(Board.fromFen("r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3"), uci.getBoard());
     }
 
     @Test

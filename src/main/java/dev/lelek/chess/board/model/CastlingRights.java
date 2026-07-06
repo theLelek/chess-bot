@@ -1,5 +1,7 @@
 package dev.lelek.chess.board.model;
 
+import dev.lelek.chess.Color;
+
 import java.util.Objects;
 
 public class CastlingRights {
@@ -23,6 +25,15 @@ public class CastlingRights {
             queenSide = fen.contains("q");
         }
         return new CastlingRights(kingSide, queenSide);
+    }
+
+    public String toFen(Color color) {
+        String fen = "";
+        if (canCastleKingSide) fen += "k";
+        if (canCastleQueenSide) fen += "q";
+
+        if (color == Color.WHITE) fen = fen.toUpperCase();
+        return fen;
     }
 
     public static CastlingRights copyOf(CastlingRights castlingRights) {

@@ -58,6 +58,10 @@ public class BoardPosition {
         return new BoardPosition(x + direction[0], y + direction[1]);
     }
 
+    public String toFen() {
+        return (char) (x + 97) + String.valueOf(Math.abs(y - Board.SIZE));
+    }
+
     public int getBitBoardSquare() {
         return (7 - y) * 8 + x;
     }

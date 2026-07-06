@@ -77,7 +77,7 @@ class Uci {
         if (command.startsWith("position startpos")) {
             return Board.initializeDefaultBoard();
         } else {
-            return Board.initializeFromFen(extractFen(command));
+            return Board.fromFen(extractFen(command));
         }
     }
 
@@ -100,7 +100,7 @@ class Uci {
         return moves;
     }
 
-    static Move fromUciMoveFormat(Board board, String uciMove) {
+    static Move fromUciMoveFormat(Board board, String uciMove) { // todo maybe move into move class
         BoardPosition from = new BoardPosition(uciMove.substring(0, 2));
         BoardPosition to = new BoardPosition(uciMove.substring(2, 4));
 

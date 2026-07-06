@@ -49,10 +49,10 @@ public class Board {
     }
 
     public static Board initializeDefaultBoard() {
-        return initializeFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+        return fromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
     }
 
-    public static Board initializeFromFen(String fen) {
+    public static Board fromFen(String fen) {
         log.info("initalized board: {}", fen);
         String[] fenParts = fen.split(" ");
         var isWhiteToMove = fenParts[1].equals("w");
@@ -93,7 +93,7 @@ public class Board {
         try {
             return initializeKingPosition(pieceList, color);
         } catch (NoKingFoundException e) {
-            log.warn("No king found in board: " + Arrays.toString(pieceList));
+            log.warn("No king found in board: {}", Arrays.toString(pieceList));
         }
         return null;
     }
@@ -105,6 +105,44 @@ public class Board {
             }
         }
         throw new NoKingFoundException("couldnt find king in board + " + Arrays.toString(pieceList));
+    }
+
+    public static String toFen(Board board) {
+        String fen = piecePlacementsToFen(board);
+        fen += " " + (board.isWhiteToMove() ? "w" : "b");
+        fen += " " + castlingRightsToFen(board);
+        fen += " " + board.getEnPassantTargetSquare() == null ? "-" : board.getEnPassantTargetSquare().toFen();
+        fen += " " + board.getHalfmoveClock();
+        fen += " " + board.getFullmoveNumber();
+        return fen;
+    }
+
+    private static String piecePlacementsToFen(Board board) {
+        String[] piecePlacements = new String[Board.SIZE];
+        for (int i = 0; i < Board.SIZE; i++) {
+            int column = 0;
+            for (int j = 0; j < Board.SIZE; j++) {
+                BoardPiece piece = board.getPieceList()[i * Board.SIZE + j];
+                if (piece != null) {
+                    if (column != 0) piecePlacements[i] += column;
+                    piecePlacements[i] += piece.getFen();
+                    column = 0;
+                } else {
+                    piecePlacements[i] += "-";
+                    column++;
+                }
+            }
+            if (column != 0) piecePlacements[i] += column;
+        }
+        return String.join("/", piecePlacements);
+    }
+
+    private static String castlingRightsToFen(Board board) {
+        String castlingRights = "";
+        castlingRights += board.getCastlingRightsWhite().toFen(Color.WHITE);
+        castlingRights += board.getCastlingRightsBlack().toFen(Color.BLACK);
+        if (castlingRights.isEmpty()) castlingRights = "-";
+        return castlingRights;
     }
 
     public void makeMove(Move move) {
