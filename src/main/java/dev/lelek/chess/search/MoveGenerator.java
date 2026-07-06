@@ -63,7 +63,7 @@ public class MoveGenerator {
             return null;
         }
 
-        if (board.getHalfmoveClock() == 50) { // 50 move rule
+        if (board.getHalfmoveClock() == 100) { // 50 move rule
             return new BoardResults(0, null);
         }
 
