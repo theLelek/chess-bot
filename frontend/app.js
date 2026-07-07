@@ -28,11 +28,15 @@ const maxThinkTimeForEngineInMilliseconds = 4000;
 let isBotWhite = false;
 let isWhiteToMove = true;
 
+
+
 initializeField();
 
 createBoard();
 
 renderBoard();
+
+
 
 
 
@@ -49,9 +53,20 @@ function initializeField(){
         ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'],
     ];
 
+    sendMessage("position startpos").then((position) => {
+        if(position.startsWith("ERROR")){
+            alertNoInternetMessage();
+            //window.location.reload();
+        }
+    });
+
     if(isBotWhite){
         turnField();
     }
+}
+
+function alertNoInternetMessage(){
+    window.alert("Something went wrong, please check your internet connection.");
 }
 
 function turnField(){
@@ -141,7 +156,12 @@ function fieldClicked(field){
     } else{
         endCoordinates = coordinates;
 
-        move(null);
+        move().then(function(response){
+            if(response.startsWith("ERROR")){
+                console.log(response);
+            }
+        });
+
         isWhiteToMove = !isWhiteToMove;
     }
 }
@@ -173,15 +193,41 @@ function setFieldValueByNotation(notation, toSet) {
 }
 
 
-function move(possibleMoves){
+async function move(){
+    let message = await sendMessage("get possible moves");
+    if(message.startsWith("ERROR")){
+        return message;
+    }
+    let possibleMoves = JSON.parse(message);
     console.log("move: " + startCoordinates + " to " + endCoordinates);
 
-    let moveString = startCoordinates + ";" + endCoordinates;
+    let moveString = startCoordinates + endCoordinates;
 
     if(possibleMoves != null && !possibleMoves.contains(moveString)){
         console.log("invalidMove!");
+        return;
     }
 
+    renderMove(startCoordinates, endCoordinates);
+
+    sendMove(startCoordinates, endCoordinates).then(function(result){
+        console.log(typeof result);
+        if(result === "ERROR invalid move"){
+            console.log("invalid move");
+            startCoordinates = null;
+            endCoordinates = null;
+        } else if(result.startsWith("ERROR")){
+
+        }
+
+    });
+    makeMove();
+
+    startCoordinates = null;
+    endCoordinates = null;
+}
+
+function makeMove(){
     if (startCoordinates === "e1" && endCoordinates === "g1") {
         makeSmallRochade("w");
     } else if (startCoordinates === "e1" && endCoordinates === "c1") {
@@ -190,20 +236,11 @@ function move(possibleMoves){
         makeSmallRochade("b");
     } else if (startCoordinates === "e8" && endCoordinates === "c8") {
         makeBigRochade("b");
-    } else{
-        makeMove();
-        renderMove(startCoordinates, endCoordinates);
+    }else {
+        let piece = getFieldValueByNotation(startCoordinates);
+        setFieldValueByNotation(endCoordinates, piece);
+        setFieldValueByNotation(startCoordinates, null);
     }
-    sendMove(startCoordinates, endCoordinates);
-
-    startCoordinates = null;
-    endCoordinates = null;
-}
-
-function makeMove(){
-    piece = getFieldValueByNotation(startCoordinates);
-    setFieldValueByNotation(endCoordinates, piece);
-    setFieldValueByNotation(startCoordinates, null);   
 }
 
 function makeSmallRochade(color){
@@ -238,9 +275,6 @@ function makeBigRochade(color){
     }
 }
 
-
-
-
 function renderMove(startCoordinates, endCoordinates, additionalCoordinates = []){
     let buttons = board.querySelectorAll(".field");
 
@@ -269,8 +303,6 @@ function renderMove(startCoordinates, endCoordinates, additionalCoordinates = []
         }
     });
 }
-
-
 
 function renderBoard() {
     let buttons = document.querySelectorAll(".field");
@@ -378,7 +410,7 @@ async function sendMessage(message = "isready") {
             return response.text();
         })
         .catch(function (error) {
-            return error.message;
+            return "ERROR " + error.message;
         });
 }
 
