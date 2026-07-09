@@ -11,7 +11,7 @@ public enum GameStatus {
     STALEMATE;
 
     public static GameStatus getGameStatus(Board board) {
-        BoardResults result = MoveGenerator.negmax(board, null, 1, new Stack<>());
+        BoardResults result = MoveGenerator.negmax(board, null, 1, new Stack<>(), false, -1);
         if (result.move() == null && result.score() == MoveGenerator.WORST) {
             return GameStatus.CHECKMATE;
         } else if (result.move() == null && result.score() == 0) {

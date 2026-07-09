@@ -8,6 +8,7 @@ import dev.lelek.chess.board.model.Board;
 import dev.lelek.chess.eval.BoardEvaluation;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class MoveGenerator {
 
@@ -16,45 +17,35 @@ public class MoveGenerator {
     static final int BEST = Integer.MAX_VALUE / 2;
     static final int WORST = Integer.MIN_VALUE / 2;
 
-    private static volatile boolean timedOut = false;
-
     public static Move generateMove(Board board, long timeMillis) {
-        timedOut = false;
-        Move bestMove = negmax(board, null, 1, new Stack<>()).move();;
+        Move bestMove = negmax(board, null, 1, new Stack<>(), false, -1).move();;
 
-        new Thread(() -> {
-            try {
-                Thread.sleep(timeMillis);
-                timedOut = true;
-            } catch (InterruptedException ignored) {}
-        }).start();
+        long deadline = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(timeMillis);
 
         for (int i = 2; ; i++) {
-            BoardResults foo = negmax(board, null, i, new Stack<>());
+            BoardResults foo = negmax(board, null, i, new Stack<>(), true, deadline);
             if (foo == null) {
                 break; // timeMillis have passed
             }
             bestMove = foo.move();
         }
-        timedOut = false;
         return bestMove;
     }
 
     public static Move generateMove(Board board, int maxDepth) {
-        timedOut = false;
         Move bestMove = null;
 
         for (int i = 1; i <= maxDepth; i++) {
-            bestMove = negmax(board, null, i, new Stack<>()).move();
+            bestMove = negmax(board, null, i, new Stack<>(), false, -1).move();
         }
-        timedOut = false;
         return bestMove;
     }
 
-    static BoardResults negmax(Board board, Move previousMove, int depth, Stack<UnmakeMoveInfo> unmakeMoveInfos) { // todo write more tests
-        if (timedOut) {
+    static BoardResults negmax(Board board, Move previousMove, int depth, Stack<UnmakeMoveInfo> unmakeMoveInfos, boolean hasTimeLimit, long deadline) { // todo write more tests
+        if (hasTimeLimit && System.nanoTime() - deadline >= 0) {
             return null;
         }
+
         Color color = board.isWhiteToMove() ? Color.WHITE : Color.BLACK;
 
         List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove());
@@ -80,7 +71,7 @@ public class MoveGenerator {
             board.makeMove(move);
 
             // boardResults will be null if move was illegal
-            BoardResults boardResults = negmax(board, move, depth - 1, unmakeMoveInfos);
+            BoardResults boardResults = negmax(board, move, depth - 1, unmakeMoveInfos, hasTimeLimit, deadline);
 
             if (boardResults != null && -boardResults.score() > bestScore) {
                 bestScore = -boardResults.score();
