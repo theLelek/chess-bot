@@ -73,7 +73,7 @@ public class MoveGenerator {
             // boardResults will be null if move was illegal
             BoardResults boardResults = negmax(board, move, depth - 1, unmakeMoveInfos, hasTimeLimit, deadline);
 
-            if (boardResults != null && -boardResults.score() > bestScore) {
+            if (boardResults != null && -boardResults.score() >= bestScore) {
                 bestScore = -boardResults.score();
                 bestMove = move;
                 foundLegalMove = true;
