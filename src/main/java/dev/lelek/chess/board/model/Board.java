@@ -49,10 +49,10 @@ public class Board {
     }
 
     public static Board initializeDefaultBoard() {
-        return initializeFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+        return fromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
     }
 
-    public static Board initializeFromFen(String fen) {
+    public static Board fromFen(String fen) {
         log.info("initalized board: {}", fen);
         String[] fenParts = fen.split(" ");
         var isWhiteToMove = fenParts[1].equals("w");
@@ -93,7 +93,7 @@ public class Board {
         try {
             return initializeKingPosition(pieceList, color);
         } catch (NoKingFoundException e) {
-            log.warn("No king found in board: " + Arrays.toString(pieceList));
+            log.warn("No king found in board: {}", Arrays.toString(pieceList));
         }
         return null;
     }
@@ -107,9 +107,48 @@ public class Board {
         throw new NoKingFoundException("couldnt find king in board + " + Arrays.toString(pieceList));
     }
 
+    public String toFen() {
+        String fen = piecePlacementsToFen();
+        fen += " " + (isWhiteToMove() ? "w" : "b");
+        fen += " " + castlingRightsToFen();
+        fen += " " + (enPassantTargetSquare == null ? "-" : enPassantTargetSquare.toFen());
+        fen += " " + halfmoveClock;
+        fen += " " + fullmoveNumber;
+        return fen;
+    }
+
+    private String piecePlacementsToFen() {
+        String[] piecePlacements = new String[Board.SIZE];
+        Arrays.fill(piecePlacements, "");
+        for (int i = 0; i < Board.SIZE; i++) {
+            int column = 0;
+            for (int j = 0; j < Board.SIZE; j++) {
+                BoardPosition position = new BoardPosition(j, i);
+                BoardPiece piece = getPieceAt(position);
+                if (piece != null) {
+                    if (column != 0) piecePlacements[i] += column;
+                    piecePlacements[i] += piece.getFen();
+                    column = 0;
+                } else {
+                    column++;
+                }
+            }
+            if (column != 0) piecePlacements[i] += column;
+        }
+        return String.join("/", piecePlacements);
+    }
+
+    private String castlingRightsToFen() {
+        String castlingRights = "";
+        castlingRights += castlingRightsWhite.toFen(Color.WHITE);
+        castlingRights += castlingRightsBlack.toFen(Color.BLACK);
+        if (castlingRights.isEmpty()) castlingRights = "-";
+        return castlingRights;
+    }
+
     public void makeMove(Move move) {
-        BoardPiece pieceToMove = pieceList[move.from().getBitBoardSquare()];
-        BoardPiece pieceToCapture = pieceList[move.to().getBitBoardSquare()];
+        BoardPiece pieceToMove = pieceList[move.getFrom().getBitBoardSquare()];
+        BoardPiece pieceToCapture = pieceList[move.getTo().getBitBoardSquare()];
 
         updateCastlingRights(move);
         halfmoveClock = (pieceToMove.isPawn() || pieceToCapture != null) ? 0 : halfmoveClock + 1;
@@ -119,16 +158,16 @@ public class Board {
 
         if (pieceToMove.isKing()) {
             if (pieceToMove.isWhite()) {
-                whiteKingPosition = move.to();
+                whiteKingPosition = move.getTo();
             } else {
-                blackKingPosition = move.to();
+                blackKingPosition = move.getTo();
             }
         }
     }
 
     private void updateCastlingRights(Move move) {
         Color color = (isWhiteToMove) ? Color.WHITE : Color.BLACK;
-        BoardPiece pieceToMove = pieceList[move.from().getBitBoardSquare()];
+        BoardPiece pieceToMove = pieceList[move.getFrom().getBitBoardSquare()];
 
         int homeRank = color.getHomeRank();
         int backRank = color.getBackRank();
@@ -139,27 +178,27 @@ public class Board {
             castlingRights.setCanCastleKingSide(false);
             castlingRights.setCanCastleQueenSide(false);
         }
-        if (move.from().equals(new BoardPosition(0, homeRank))) {
+        if (move.getFrom().equals(new BoardPosition(0, homeRank))) {
             castlingRights.setCanCastleQueenSide(false);
         }
-        if (move.from().equals(new BoardPosition(Board.SIZE - 1, homeRank))) {
+        if (move.getFrom().equals(new BoardPosition(Board.SIZE - 1, homeRank))) {
             castlingRights.setCanCastleKingSide(false);
         }
-        if (move.to().equals(new BoardPosition(0, backRank))) {
+        if (move.getTo().equals(new BoardPosition(0, backRank))) {
             castlingRightsOpponent.setCanCastleQueenSide(false);
         }
-        if (move.to().equals(new BoardPosition(Board.SIZE - 1, backRank))) {
+        if (move.getTo().equals(new BoardPosition(Board.SIZE - 1, backRank))) {
             castlingRightsOpponent.setCanCastleKingSide(false);
         }
     }
 
     private void updatePieces(Move move) {
-        BoardPiece pieceToMove = pieceList[move.from().getBitBoardSquare()];
+        BoardPiece pieceToMove = pieceList[move.getFrom().getBitBoardSquare()];
         Color color = (pieceToMove.isWhite()) ? Color.WHITE : Color.BLACK;
 
         switch (move) {
             case PromotionMove m:
-                changePieceNormal(move.from(), move.to(), null, m.getPromotionPiece());
+                changePieceNormal(move.getFrom(), move.getTo(), null, m.getPromotionPiece());
                 break;
             case EnPassantMove m:
                 updatePiecesEnPassantMove(m, false);
@@ -168,14 +207,14 @@ public class Board {
                 changePiecesCastlingMove(m, false);
                 break;
             default:
-                changePieceNormal(move.from(), move.to(), null, pieceList[move.from().getBitBoardSquare()]);
+                changePieceNormal(move.getFrom(), move.getTo(), null, pieceList[move.getFrom().getBitBoardSquare()]);
                 break;
         }
-        enPassantTargetSquare = (pieceToMove.isPawn() && Math.abs(move.from().y() - move.to().y()) == 2) ? new BoardPosition(move.to().x(), move.to().y() - color.getMovingDirection()) : null;
+        enPassantTargetSquare = (pieceToMove.isPawn() && Math.abs(move.getFrom().getY() - move.getTo().getY()) == 2) ? new BoardPosition(move.getTo().getX(), move.getTo().getY() - color.getMovingDirection()) : null;
     }
 
     public void unmakeMove(Move move, UnmakeMoveInfo unmakeMoveInfo) {
-        BoardPiece pieceToMove = pieceList[move.to().getBitBoardSquare()];
+        BoardPiece pieceToMove = pieceList[move.getTo().getBitBoardSquare()];
         castlingRightsWhite = unmakeMoveInfo.castlingRightsWhite();
         castlingRightsBlack = unmakeMoveInfo.castlingRightsBlack();
         enPassantTargetSquare = unmakeMoveInfo.enPassantTargetSquare();
@@ -186,20 +225,20 @@ public class Board {
 
         if (pieceToMove.isKing()) {
             if (pieceToMove.isWhite()) {
-                whiteKingPosition = move.from();
+                whiteKingPosition = move.getFrom();
             } else {
-                blackKingPosition = move.from();
+                blackKingPosition = move.getFrom();
             }
         }
     }
 
     private void outdatePieces(Move move, UnmakeMoveInfo unmakeMoveInfo) {
-        BoardPiece pieceToMove = pieceList[move.to().getBitBoardSquare()];
+        BoardPiece pieceToMove = pieceList[move.getTo().getBitBoardSquare()];
         Color color = (pieceToMove.isWhite()) ? Color.WHITE : Color.BLACK;
 
         switch (move) {
             case PromotionMove m:
-                changePieceNormal(move.to(), move.from(), unmakeMoveInfo.capturedPiece(), color.getPawn());
+                changePieceNormal(move.getTo(), move.getFrom(), unmakeMoveInfo.capturedPiece(), color.getPawn());
                 break;
             case EnPassantMove m:
                 updatePiecesEnPassantMove(m, true);
@@ -208,7 +247,7 @@ public class Board {
                 changePiecesCastlingMove(m, true);
                 break;
             default:
-                changePieceNormal(move.to(), move.from(), unmakeMoveInfo.capturedPiece(), pieceToMove);
+                changePieceNormal(move.getTo(), move.getFrom(), unmakeMoveInfo.capturedPiece(), pieceToMove);
                 break;
         }
         enPassantTargetSquare = unmakeMoveInfo.enPassantTargetSquare();
@@ -217,15 +256,15 @@ public class Board {
     private void changePiecesCastlingMove(CastlingMove move, boolean undo) {
         Color color = (isWhiteToMove) ? Color.WHITE : Color.BLACK;
 
-        BoardPosition kingFrom = undo ? move.to() : move.from();
-        BoardPosition kingTo = undo ? move.from() : move.to();
+        BoardPosition kingFrom = undo ? move.getTo() : move.getFrom();
+        BoardPosition kingTo = undo ? move.getFrom() : move.getTo();
 
         changePieceNormal(kingFrom, kingTo, null, color.getKing());
 
-        boolean isKingSideCastling = move.to().x() == Board.SIZE - 2;
+        boolean isKingSideCastling = move.getTo().getX() == Board.SIZE - 2;
 
-        BoardPosition rookOriginalFrom = new BoardPosition(isKingSideCastling ? Board.SIZE - 1 : 0, move.to().y());
-        BoardPosition rookOriginalTo = new BoardPosition(isKingSideCastling ? Board.SIZE - 3 : 3, move.to().y());
+        BoardPosition rookOriginalFrom = new BoardPosition(isKingSideCastling ? Board.SIZE - 1 : 0, move.getTo().getY());
+        BoardPosition rookOriginalTo = new BoardPosition(isKingSideCastling ? Board.SIZE - 3 : 3, move.getTo().getY());
 
         BoardPosition rookFrom = undo ? rookOriginalTo : rookOriginalFrom;
         BoardPosition rookTo = undo ? rookOriginalFrom : rookOriginalTo;
@@ -238,7 +277,7 @@ public class Board {
         BoardPosition enPassantPiecePosition = getEnPassantPiecePosition();
 
         if (!undo) {
-            changePieceNormal(move.from(), move.to(), null, pieceList[move.from().getBitBoardSquare()]);
+            changePieceNormal(move.getFrom(), move.getTo(), null, pieceList[move.getFrom().getBitBoardSquare()]);
 
             // remove pawn to be captured
             bitBoardState.clearBit(color.getOpponentPawn(), enPassantPiecePosition);
@@ -246,7 +285,7 @@ public class Board {
             bitBoardState.clearBit(OccupancyBitboard.ALL_PIECES, enPassantPiecePosition);
             pieceList[enPassantPiecePosition.getBitBoardSquare()] = null;
         } else {
-            changePieceNormal(move.to(), move.from(), null, pieceList[move.to().getBitBoardSquare()]);
+            changePieceNormal(move.getTo(), move.getFrom(), null, pieceList[move.getTo().getBitBoardSquare()]);
 
             // restore captured pawn
             bitBoardState.setBit(color.getOpponentPawn(), enPassantPiecePosition);
@@ -292,7 +331,7 @@ public class Board {
     public BoardPosition getEnPassantPiecePosition() {
         if (enPassantTargetSquare == null) throw new RuntimeException("No en passant target square set");
         Color color = (isWhiteToMove) ? Color.WHITE : Color.BLACK;
-        return new BoardPosition(enPassantTargetSquare.x(), enPassantTargetSquare.y() - color.getMovingDirection());
+        return new BoardPosition(enPassantTargetSquare.getX(), enPassantTargetSquare.getY() - color.getMovingDirection());
     }
 
     public BoardPiece getPieceAt(BoardPosition position) {

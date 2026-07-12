@@ -6,9 +6,22 @@ import dev.lelek.chess.Move.Move;
 import dev.lelek.chess.board.UnmakeMoveInfo;
 import dev.lelek.chess.board.model.Board;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class MoveValidator {
+public class LegalMoveFinder {
+
+    public static List<Move> getLegalMoves(Board board) {
+        List<Move> legalMoves = new ArrayList<>();
+        List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove());
+        for (Move move : pseudoLegalMoves) {
+            if (isMoveLegal(board, move)) {
+                legalMoves.add(move);
+            }
+        }
+        return legalMoves;
+    }
+
     public static boolean isMoveLegal(Board board, Move move) {
         List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove());
         if (! pseudoLegalMoves.contains(move)) return false;
@@ -24,8 +37,8 @@ public class MoveValidator {
     static boolean wasPreviousMoveIllegal(Board board, Move previousMove, List<Move> pseudoLegalMoves) {
         BoardPosition kingPosition = board.isWhiteToMove() ? board.getBlackKingPosition() : board.getWhiteKingPosition();
         if (previousMove instanceof CastlingMove castlingMove) {
-            BoardPosition positionToCheck2 = new BoardPosition(castlingMove.isKingSideCastling() ? 5 : 3, castlingMove.from().y());
-            BoardPosition positionToCheck3 = previousMove.from();
+            BoardPosition positionToCheck2 = new BoardPosition(castlingMove.isKingSideCastling() ? 5 : 3, castlingMove.getFrom().getY());
+            BoardPosition positionToCheck3 = previousMove.getFrom();
             return Utils.isPositionAttacked(pseudoLegalMoves, kingPosition, positionToCheck2, positionToCheck3);
         } else {
             return Utils.isPositionAttacked(pseudoLegalMoves, kingPosition);
