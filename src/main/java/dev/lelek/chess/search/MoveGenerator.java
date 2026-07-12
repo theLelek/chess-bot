@@ -79,7 +79,11 @@ public class MoveGenerator {
 
             board.unmakeMove(move, unmakeMoveInfos.pop());
         }
-        return getBoardResult(board, foundLegalMove, bestScore, bestMove);
+        if (hasTimeLimit && System.nanoTime() - deadline >= 0) {
+            return null;
+        } else {
+            return getBoardResult(board, foundLegalMove, bestScore, bestMove);
+        }
     }
 
     private static BoardResults getBoardResult(Board board, boolean foundLegalMove, int bestScore, Move bestMove) {

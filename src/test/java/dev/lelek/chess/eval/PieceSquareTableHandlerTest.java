@@ -13,7 +13,7 @@ class PieceSquareTableHandlerTest {
     @Test
     void main() {
         Board board = Board.fromFen("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1");
-        Move move = MoveGenerator.generateMove(board, 1);
+        Move move = MoveGenerator.generateMove(board, 4);
         System.out.println(move);
     }
 
