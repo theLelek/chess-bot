@@ -47,19 +47,17 @@ public class MoveGenerator {
         }
 
         Color color = board.isWhiteToMove() ? Color.WHITE : Color.BLACK;
-
         List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove());
 
         if (LegalMoveFinder.wasPreviousMoveIllegal(board, previousMove, pseudoLegalMoves)) {
             return null;
         }
-
         if (board.getHalfmoveClock() == 100) { // 50 move rule
             return new BoardResults(0, null);
         }
-
         if (depth == 0) {
-            return new BoardResults(random.nextInt(3) - 1 + BoardEvaluation.evaluate(board, color), null);
+            int sign = color == Color.WHITE ? 1 : -1;
+            return new BoardResults(sign * (random.nextInt(3) - 1 + BoardEvaluation.evaluate(board)), null);
         }
 
         Move bestMove = null;
@@ -70,7 +68,7 @@ public class MoveGenerator {
             unmakeMoveInfos.push(UnmakeMoveInfo.from(board, move));
             board.makeMove(move);
 
-            // boardResults will be null if move was illegal
+            // boardResults is null if move was illegal
             BoardResults boardResults = negmax(board, move, depth - 1, unmakeMoveInfos, hasTimeLimit, deadline);
 
             if (boardResults != null && -boardResults.score() >= bestScore) {

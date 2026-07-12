@@ -95,6 +95,10 @@ public enum Color {
         this.opponentKing = opponentKing;
     }
 
+    public Color opposite() {
+        return this == Color.WHITE ? Color.BLACK : Color.WHITE;
+    }
+
     public CastlingMove getCastlingMoveKingSide() {
         return castlingMoveKingSide;
     }

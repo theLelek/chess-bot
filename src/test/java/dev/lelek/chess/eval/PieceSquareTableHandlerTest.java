@@ -1,11 +1,21 @@
 package dev.lelek.chess.eval;
 
+import dev.lelek.chess.Color;
+import dev.lelek.chess.Move.Move;
 import dev.lelek.chess.board.model.Board;
+import dev.lelek.chess.search.MoveGenerator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 
 class PieceSquareTableHandlerTest {
+
+    @Test
+    void main() {
+        Board board = Board.fromFen("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1");
+        Move move = MoveGenerator.generateMove(board, 1);
+        System.out.println(move);
+    }
 
     @Test
     void fromBoard_defaultBoard() {

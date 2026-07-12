@@ -18,7 +18,7 @@ public class BoardEvaluation {
     private static final int QUEEN_VALUE = 1000;
     private static final int KING_VALUE = 0;
 
-    public static int evaluate(Board board, Color color) {
+    public static int evaluate(Board board) {
         int value = 0;
         PieceSquareTableHandler pieceSquareTableHandler = PieceSquareTableHandler.fromBoard(board);
         long bb = board.getBitBoardState().getBitboard(OccupancyBitboard.ALL_PIECES);
@@ -28,11 +28,11 @@ public class BoardEvaluation {
             int bitBoardSquare = Long.numberOfTrailingZeros(lsb);
 
             BoardPosition position = new BoardPosition(bitBoardSquare);
-            BoardPiece piece = board.getPieceList()[bitBoardSquare];
+            BoardPiece piece = board.getPieceAt(position);
 
-            int pieceValue = piece.hasColor(color) ? getValue(piece) : -getValue(piece);
+            int pieceValue = getValue(piece) + pieceSquareTableHandler.getEvaluation(piece, position);;
+            if (piece.isBlack()) pieceValue = -pieceValue;
             value += pieceValue;
-            value += pieceSquareTableHandler.getEvaluation(piece, position);
         }
         return value;
     }

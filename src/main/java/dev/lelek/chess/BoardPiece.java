@@ -44,7 +44,6 @@ public enum BoardPiece implements BitboardIndexProvider {
             throw new IllegalArgumentException();
         }
         return this.isWhite() == currentPiece.isWhite();
-
     }
 
     public boolean hasOppositeColor(BoardPiece currentPiece) {
