@@ -1,14 +1,12 @@
 package dev.lelek.chess.eval;
 
 import dev.lelek.chess.BoardPosition;
-import dev.lelek.chess.Color;
 import dev.lelek.chess.BoardPiece;
 import dev.lelek.chess.board.OccupancyBitboard;
 import dev.lelek.chess.board.model.Board;
 
 public class BoardEvaluation {
 
-    // right now 4250 is base eval for each color
     static final int DEFAULT_BOARD_VALUE = computeBoardValue(Board.initializeDefaultBoard());
 
     private static final int PAWN_VALUE = 100;
