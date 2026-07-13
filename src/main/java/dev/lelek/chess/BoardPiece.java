@@ -35,6 +35,24 @@ public enum BoardPiece implements BitboardIndexProvider {
         throw new IllegalArgumentException("Invalid fen for board piece: " + fen);
     }
 
+    public Color getColor() {
+        return switch (this) {
+            case WHITE_PAWN,
+                 WHITE_KNIGHT,
+                 WHITE_BISHOP,
+                 WHITE_ROOK,
+                 WHITE_QUEEN,
+                 WHITE_KING -> Color.WHITE;
+
+            case BLACK_PAWN,
+                 BLACK_KNIGHT,
+                 BLACK_BISHOP,
+                 BLACK_ROOK,
+                 BLACK_QUEEN,
+                 BLACK_KING -> Color.BLACK;
+        };
+    }
+
     public boolean hasColor(Color color) {
         return color == Color.WHITE ? isWhite() : isBlack();
     }
@@ -53,41 +71,40 @@ public enum BoardPiece implements BitboardIndexProvider {
         return this.isBlack() == currentPiece.isWhite();
     }
 
+    public char toFen() {
+        return fen;
+    }
+
     public boolean isWhite() {
-        String pieceName = this.toString();
-        return pieceName.startsWith("WHITE");
+        return getColor() == Color.WHITE;
     }
 
     public boolean isBlack() {
         return ! isWhite();
     }
 
-    public char getFen() {
-        return fen;
-    }
-
     public boolean isRook() {
-        return fen == 'r' || fen == 'R';
+        return this == WHITE_ROOK || this == BLACK_ROOK;
     }
 
     public boolean isKnight() {
-        return fen == 'n' || fen == 'N';
+        return this == WHITE_KNIGHT || this == BLACK_KNIGHT;
     }
 
     public boolean isBishop() {
-        return fen == 'b' || fen == 'B';
+        return this == WHITE_BISHOP || this == BLACK_BISHOP;
     }
 
     public boolean isQueen() {
-        return fen == 'q' || fen == 'Q';
+        return this == WHITE_QUEEN || this == BLACK_QUEEN;
     }
 
     public boolean isKing() {
-        return fen == 'k' || fen == 'K';
+        return this == WHITE_KING || this == BLACK_KING;
     }
 
     public boolean isPawn() {
-        return fen == 'p' || fen == 'P';
+        return this == WHITE_PAWN || this == BLACK_PAWN;
     }
 
     public int getBitboardIndex() {
