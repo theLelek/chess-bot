@@ -28,7 +28,10 @@ public class BoardEvaluation {
             BoardPosition position = new BoardPosition(bitBoardSquare);
             BoardPiece piece = board.getPieceAt(position);
 
-            int pieceValue = getValue(piece) + pieceSquareTableHandler.getEvaluation(piece, position);;
+            int pieceValue = getValue(piece);
+            pieceValue += pieceSquareTableHandler.getEvaluation(piece, position);
+            pieceValue += PawnStructure.getPassedPawnValue(board, position);
+
             if (piece.isBlack()) pieceValue = -pieceValue;
             value += pieceValue;
         }
