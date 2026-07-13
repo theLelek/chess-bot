@@ -20,8 +20,10 @@ public class Api {
         String userInput = scanner.nextLine().trim();
         if (userInput.equals("play")) {
             PlayCli.start();
-        } else {
+        } else if (userInput.equals("uci")){
             Uci.start();
+        } else {
+            System.out.println("invalid input");
         }
     }
 }
