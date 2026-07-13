@@ -1,14 +1,12 @@
 package dev.lelek.chess.eval;
 
 import dev.lelek.chess.BoardPosition;
-import dev.lelek.chess.Color;
 import dev.lelek.chess.BoardPiece;
 import dev.lelek.chess.board.OccupancyBitboard;
 import dev.lelek.chess.board.model.Board;
 
 public class BoardEvaluation {
 
-    // right now 4250 is base eval for each color
     static final int DEFAULT_BOARD_VALUE = computeBoardValue(Board.initializeDefaultBoard());
 
     private static final int PAWN_VALUE = 100;
@@ -18,7 +16,7 @@ public class BoardEvaluation {
     private static final int QUEEN_VALUE = 1000;
     private static final int KING_VALUE = 0;
 
-    public static int evaluate(Board board, Color color) {
+    public static int evaluate(Board board) {
         int value = 0;
         PieceSquareTableHandler pieceSquareTableHandler = PieceSquareTableHandler.fromBoard(board);
         long bb = board.getBitBoardState().getBitboard(OccupancyBitboard.ALL_PIECES);
@@ -28,11 +26,14 @@ public class BoardEvaluation {
             int bitBoardSquare = Long.numberOfTrailingZeros(lsb);
 
             BoardPosition position = new BoardPosition(bitBoardSquare);
-            BoardPiece piece = board.getPieceList()[bitBoardSquare];
+            BoardPiece piece = board.getPieceAt(position);
 
-            int pieceValue = piece.hasColor(color) ? getValue(piece) : -getValue(piece);
+            int pieceValue = getValue(piece);
+            pieceValue += pieceSquareTableHandler.getEvaluation(piece, position);
+            pieceValue += PawnStructure.getPassedPawnValue(board, position);
+
+            if (piece.isBlack()) pieceValue = -pieceValue;
             value += pieceValue;
-            value += pieceSquareTableHandler.getEvaluation(piece, position);
         }
         return value;
     }

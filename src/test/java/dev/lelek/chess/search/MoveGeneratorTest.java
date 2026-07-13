@@ -56,4 +56,11 @@ class MoveGeneratorTest {
         Move bestMove = MoveGenerator.generateMove(board, 4);
         Assertions.assertEquals(new Move("a1", "a2"), bestMove);
     }
+
+    @Test
+    void generateMove_littleTime_doesntReturnNull() {
+        Board board = Board.initializeDefaultBoard();
+        Move bestMove = MoveGenerator.generateMove(board, 1L);
+        Assertions.assertNotNull(bestMove);
+    }
 }
