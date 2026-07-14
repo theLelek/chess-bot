@@ -25,4 +25,3 @@ correctly implement Fifty-move rule
 add Seventy-five-move rule
 
 IMPROVE LOGGING IMPORTANT
-MoveGenerator.generateMove can return null!!!

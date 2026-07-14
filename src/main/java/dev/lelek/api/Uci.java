@@ -123,7 +123,7 @@ class Uci {
     private static String toUciMoveFormat(Move move) {
         String out = move.getFrom().toString() + move.getTo().toString();
         if (move instanceof PromotionMove) {
-            out += ((PromotionMove) move).getPromotionPiece().getFen();
+            out += ((PromotionMove) move).getPromotionPiece().toFen();
         }
         return out;
     }

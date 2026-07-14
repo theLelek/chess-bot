@@ -302,5 +302,9 @@ class BoardTest {
         String fen3 = "rn1qkbnr/ppp1pppp/3p4/8/2P1P1b1/3B1N2/PP1P1PPP/RNBQ1RK1 w q - 0 1";
         Board board3 = Board.fromFen(fen3);
         Assertions.assertEquals(fen3, board3.toFen());
+
+        String fen4 = "rn2k1r1/pp2pp1p/3p2p1/P4bn1/2pP4/2N1NB2/1PP1PP2/2B1K1RR b Kq d3 0 11";
+        Board board4 = Board.fromFen(fen4);
+        Assertions.assertEquals(fen4, board4.toFen());
     }
 }

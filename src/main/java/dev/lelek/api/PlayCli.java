@@ -50,7 +50,7 @@ class PlayCli { // todo convert to instantiatable class like Uci
                 BoardPosition position = new BoardPosition(j, i);
                 BoardPiece piece = board.getPieceList()[position.getBitBoardSquare()];
                 if (piece != null) {
-                    System.out.print(piece.getFen() + " ");
+                    System.out.print(piece.toFen() + " ");
                 } else {
                     System.out.print("  ");
                 }

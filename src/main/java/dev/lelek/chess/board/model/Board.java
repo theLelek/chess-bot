@@ -127,7 +127,7 @@ public class Board {
                 BoardPiece piece = getPieceAt(position);
                 if (piece != null) {
                     if (column != 0) piecePlacements[i] += column;
-                    piecePlacements[i] += piece.getFen();
+                    piecePlacements[i] += piece.toFen();
                     column = 0;
                 } else {
                     column++;

@@ -25,6 +25,7 @@ class WebApiIntegrationTest {
         sendCommand("position startpos");
         Assertions.assertEquals("readyok", sendCommand("isready"));
         Assertions.assertEquals("ONGOING", sendCommand("game-status"));
+        Assertions.assertEquals("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", sendCommand("fen"));
     }
 
     private String sendCommand(String command) throws Exception {

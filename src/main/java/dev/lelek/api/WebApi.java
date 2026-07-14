@@ -29,6 +29,7 @@ class WebApi {
         switch (message) {
             case "legal-moves" -> response = mapper.writeValueAsString(LegalMoveFinder.getLegalMoves(uci.getBoard()));
             case "game-status" -> response = GameStatus.getGameStatus(uci.getBoard()).toString();
+            case "fen" -> response = uci.getBoard().toFen();
             default -> response = uci.handleCommand(message);
         }
         return response;
