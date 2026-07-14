@@ -23,14 +23,14 @@ public class MoveGenerator {
 
 
     public static Move generateMove(Board board, long timeMillis) {
-        Move bestMove = negmax(board, PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove()), 1, new Stack<>(), false, -1).move();;
+        Move bestMove = negmax(board, PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove()), 1, new Stack<>(), false, -1, WORST, BEST).move();;
 
         long deadline = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(timeMillis);
 
         log.info("search started");
         int i;
         for (i = 2; ; i++) {
-            BoardResults foo = negmax(board, null, i, new Stack<>(), true, deadline);
+            BoardResults foo = negmax(board, PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove()), i, new Stack<>(), true, deadline, WORST, BEST);
             if (foo == null) {
                 break; // timeMillis have passed
             }
@@ -44,12 +44,12 @@ public class MoveGenerator {
         Move bestMove = null;
 
         for (int i = 1; i <= maxDepth; i++) {
-            bestMove = negmax(board, PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove()), i, new Stack<>(), false, -1).move();
+            bestMove = negmax(board, PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove()), i, new Stack<>(), false, -1, WORST, BEST).move();
         }
         return bestMove;
     }
 
-    static BoardResults negmax(Board board, List<Move> pseudoLegalMoves, int depth, Stack<UnmakeMoveInfo> unmakeMoveInfos, boolean hasTimeLimit, long deadline) { // todo write more tests
+    static BoardResults negmax(Board board, List<Move> pseudoLegalMoves, int depth, Stack<UnmakeMoveInfo> unmakeMoveInfos, boolean hasTimeLimit, long deadline, int alpha, int beta) { // todo write more tests
         if (hasTimeLimit && System.nanoTime() - deadline >= 0) {
             return null;
         }
@@ -57,11 +57,11 @@ public class MoveGenerator {
         Color color = board.isWhiteToMove() ? Color.WHITE : Color.BLACK;
 
         if (board.getHalfmoveClock() == 100) { // 50 move rule
-            return new BoardResults(0, null);
+            return new BoardResults(0, null, false, true);
         }
         if (depth == 0) {
             int sign = color == Color.WHITE ? 1 : -1;
-            return new BoardResults(sign * (random.nextInt(3) - 1 + BoardEvaluation.evaluate(board)), null);
+            return new BoardResults(sign * (random.nextInt(3) - 1 + BoardEvaluation.evaluate(board)), null, false, false);
         }
 
         Move bestMove = null;
@@ -79,35 +79,43 @@ public class MoveGenerator {
             }
             foundLegalMove = true;
 
-            BoardResults boardResults = negmax(board, PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove()), depth - 1, unmakeMoveInfos, hasTimeLimit, deadline);
-            if (hasTimeLimit && boardResults == null) break; // the time limit has been reached
+            BoardResults boardResults = negmax(board, currentPseudoLegalMoves, depth - 1, unmakeMoveInfos, hasTimeLimit, deadline, -beta, -alpha);
+            if (hasTimeLimit && boardResults == null) {
+                board.unmakeMove(move, unmakeMoveInfos.pop()); // todo why
+                return null; // the time limit has been reached
+            }
 
             int score = -boardResults.score();
             if (bestMove == null || score > bestScore) {
                 bestScore = score;
                 bestMove = move;
             }
+//            if (score >= beta) {
+//                board.unmakeMove(move, unmakeMoveInfos.pop());
+//                return new BoardResults(bestScore, null); // todo probably wrong
+//            }
+//            alpha = Math.max(alpha, score);
 
             board.unmakeMove(move, unmakeMoveInfos.pop());
         }
         if (hasTimeLimit && System.nanoTime() - deadline >= 0) {
             return null;
         }
-        return getBoardResult(board, foundLegalMove, bestScore, bestMove);
+        return getBoardResult(board, foundLegalMove, bestScore, bestMove, depth);
     }
 
-    private static BoardResults getBoardResult(Board board, boolean foundLegalMove, int bestScore, Move bestMove) {
+    private static BoardResults getBoardResult(Board board, boolean foundLegalMove, int bestScore, Move bestMove, int depth) {
         if (! foundLegalMove) {
             List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, ! board.isWhiteToMove());
             BoardPosition kingPosition = ! board.isWhiteToMove() ? board.getBlackKingPosition() : board.getWhiteKingPosition();
 
             if (Utils.isPositionAttacked(pseudoLegalMoves, kingPosition)) {
-                return new BoardResults(WORST, null); // checkmate
+                return new BoardResults(WORST - depth, null, true, false); // checkmate
             }
-            return new BoardResults(0, null); // stalemate
+            return new BoardResults(0, null, false, true); // stalemate
         }
-        return new BoardResults(bestScore, bestMove);
+        return new BoardResults(bestScore, bestMove, false, false);
     }
 }
 
-record BoardResults(int score, Move move) {}
+record BoardResults(int score, Move move, boolean isCheckmate, boolean isStalemate) {}

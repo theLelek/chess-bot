@@ -11,10 +11,10 @@ public enum GameStatus {
     STALEMATE;
 
     public static GameStatus getGameStatus(Board board) {
-        BoardResults result = MoveGenerator.negmax(board, PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove()), 1, new Stack<>(), false, -1);
-        if (result.move() == null && result.score() == MoveGenerator.WORST) {
+        BoardResults result = MoveGenerator.negmax(board, PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove()), 1, new Stack<>(), false, -1, MoveGenerator.WORST, MoveGenerator.BEST);
+        if (result.isCheckmate()) {
             return GameStatus.CHECKMATE;
-        } else if (result.move() == null && result.score() == 0) {
+        } else if (result.isStalemate()) {
             return GameStatus.STALEMATE;
         } else {
             return GameStatus.ONGOING;

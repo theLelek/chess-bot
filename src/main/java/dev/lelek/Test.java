@@ -1,14 +1,14 @@
 package dev.lelek;
 
+import dev.lelek.chess.Move.Move;
+import dev.lelek.chess.board.model.Board;
+import dev.lelek.chess.search.MoveGenerator;
+
 public class Test {
     public static void main(String[] args) {
-        long bitBoard = 0;
-        bitBoard |= (1L << 5); // place piece on 0
-        bitBoard &= ~(1L << 5); // removes piece on 5
-        boolean occupied = (bitBoard & (1L << 5)) != 0; // check if bit in 5 is occupied
-        bitBoard ^= (1L << 5); // reversed bit
-
-        
+        Board board = Board.fromFen("7k/3R4/1R6/8/8/8/8/7K w - - 1 1");
+        Move move = MoveGenerator.generateMove(board, 6);
+        System.out.println(move);
 
 
     }
