@@ -23,7 +23,7 @@ public class MoveGenerator {
 
 
     public static Move generateMove(Board board, long timeMillis) {
-        Move bestMove = negmax(board, null, 1, new Stack<>(), false, -1).move();;
+        Move bestMove = negmax(board, PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove()), 1, new Stack<>(), false, -1).move();;
 
         long deadline = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(timeMillis);
 
@@ -44,22 +44,18 @@ public class MoveGenerator {
         Move bestMove = null;
 
         for (int i = 1; i <= maxDepth; i++) {
-            bestMove = negmax(board, null, i, new Stack<>(), false, -1).move();
+            bestMove = negmax(board, PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove()), i, new Stack<>(), false, -1).move();
         }
         return bestMove;
     }
 
-    static BoardResults negmax(Board board, Move previousMove, int depth, Stack<UnmakeMoveInfo> unmakeMoveInfos, boolean hasTimeLimit, long deadline) { // todo write more tests
+    static BoardResults negmax(Board board, List<Move> pseudoLegalMoves, int depth, Stack<UnmakeMoveInfo> unmakeMoveInfos, boolean hasTimeLimit, long deadline) { // todo write more tests
         if (hasTimeLimit && System.nanoTime() - deadline >= 0) {
             return null;
         }
 
         Color color = board.isWhiteToMove() ? Color.WHITE : Color.BLACK;
-        List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove());
 
-        if (LegalMoveFinder.wasPreviousMoveIllegal(board, previousMove, pseudoLegalMoves)) {
-            return null;
-        }
         if (board.getHalfmoveClock() == 100) { // 50 move rule
             return new BoardResults(0, null);
         }
@@ -75,29 +71,35 @@ public class MoveGenerator {
         for (Move move : pseudoLegalMoves) {
             unmakeMoveInfos.push(UnmakeMoveInfo.from(board, move));
             board.makeMove(move);
+            List<Move> currentPseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove());
 
-            // boardResults is null if move was illegal
-            BoardResults boardResults = negmax(board, move, depth - 1, unmakeMoveInfos, hasTimeLimit, deadline);
+            if (LegalMoveFinder.wasPreviousMoveIllegal(board, move, currentPseudoLegalMoves)) {
+                board.unmakeMove(move, unmakeMoveInfos.pop());
+                continue;
+            }
+            foundLegalMove = true;
 
-            if (boardResults != null && -boardResults.score() >= bestScore) {
-                bestScore = -boardResults.score();
+            BoardResults boardResults = negmax(board, PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove()), depth - 1, unmakeMoveInfos, hasTimeLimit, deadline);
+            if (hasTimeLimit && boardResults == null) break; // the time limit has been reached
+
+            int score = -boardResults.score();
+            if (bestMove == null || score > bestScore) {
+                bestScore = score;
                 bestMove = move;
-                foundLegalMove = true;
             }
 
             board.unmakeMove(move, unmakeMoveInfos.pop());
         }
         if (hasTimeLimit && System.nanoTime() - deadline >= 0) {
             return null;
-        } else {
-            return getBoardResult(board, foundLegalMove, bestScore, bestMove);
         }
+        return getBoardResult(board, foundLegalMove, bestScore, bestMove);
     }
 
     private static BoardResults getBoardResult(Board board, boolean foundLegalMove, int bestScore, Move bestMove) {
         if (! foundLegalMove) {
-            List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, !board.isWhiteToMove());
-            BoardPosition kingPosition = !board.isWhiteToMove() ? board.getBlackKingPosition() : board.getWhiteKingPosition();
+            List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, ! board.isWhiteToMove());
+            BoardPosition kingPosition = ! board.isWhiteToMove() ? board.getBlackKingPosition() : board.getWhiteKingPosition();
 
             if (Utils.isPositionAttacked(pseudoLegalMoves, kingPosition)) {
                 return new BoardResults(WORST, null); // checkmate
