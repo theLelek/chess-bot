@@ -5,7 +5,7 @@ import dev.lelek.chess.board.model.Board;
 
 class PieceSquareTables { // todo maybe convert to enum
 
-    public static int[][][] fromPiece(BoardPiece piece) {
+    static int[][][] fromPiece(BoardPiece piece) {
         switch (piece) {
             case WHITE_PAWN -> {return pawnsWhite;}
             case BLACK_PAWN -> {return pawnsBlack;}
