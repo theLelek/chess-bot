@@ -16,6 +16,13 @@ const pieceNames = new Map([
 
 ]);
 
+let moves = [];
+
+let lastFen = null;
+let movesSinceLastFen = [];
+
+//TODO: implement promotion
+
 
 let field;
 
@@ -24,7 +31,6 @@ let endCoordinates = null;
 
 
 const boardSize = 8;
-const maxThinkTimeForEngineInMilliseconds = 4000;
 let isBotWhite = false;
 let isWhiteToMove = true;
 
@@ -53,6 +59,8 @@ function initializeField(){
         ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'],
     ];
 
+    lastFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+
     sendMessage("position startpos").then((position) => {
         if(position.startsWith("ERROR")){
             alertNoInternetMessage();
@@ -60,9 +68,12 @@ function initializeField(){
         }
     });
 
+    moves = [];
+
     if(isBotWhite){
         turnField();
     }
+    renderBoard();
 }
 
 function alertNoInternetMessage(){
@@ -100,47 +111,59 @@ function createBoard(){
             const col = !isBotWhite ? i : Math.abs(i - 7);
             const row = !isBotWhite ? j : Math.abs(j - 7);
 
-            let field = document.createElement("button");
+            let buttonElement = document.createElement("button");
 
-            const squareNumber = col*boardSize + row;
-            const char = String.fromCharCode(row + 97);
-
-
-            field.dataset.number = squareNumber;
-            field.dataset.coordinates = char + (col - 8)*-1;
-            field.dataset.col = i;
-            field.dataset.row = j;
+            buttonElement.dataset.number = col * boardSize + row;
+            buttonElement.dataset.coordinates = getNotationFromCoordinates(j,i);
+            buttonElement.dataset.col = i;
+            buttonElement.dataset.row = j;
 
             white = !white;
 
 
-            field.classList.add("field");
+            buttonElement.classList.add("field");
 
-            field.addEventListener("click", function(){
-                fieldClicked(field);
+            buttonElement.addEventListener("click", function(){
+                fieldClicked(buttonElement);
             })
 
 
             if(white){
-                field.classList.add("whiteField");
+                buttonElement.classList.add("whiteField");
             } else{
-                field.classList.add("blackField");
+                buttonElement.classList.add("blackField");
             }
 
             
 
 
-            board.appendChild(field);
+            board.appendChild(buttonElement);
         }
 
         
     }
 }
 
+function getNotationFromCoordinates(x, y){
+    const char = String.fromCharCode(x + 97);
+    return char + (y - 8)*-1;
+}
 
-function fieldClicked(field){
-    //if(isBotWhite === isWhiteToMove) return;
-    
+
+async function makeBotMove() {
+    sendMessage("go").then((response) => {
+        if(response.startsWith("ERROR")){
+            console.log("an error occurred ", response);
+        } else if(response.startsWith("bestmove ")){
+            response = response.slice(9);
+            movesSinceLastFen.push(response);
+            makeMove(response);
+        }
+    });
+}
+
+async function fieldClicked(field){
+
     let coordinates = field.dataset.coordinates;
 
     if(getFieldValueByNotation(coordinates) === null && startCoordinates === null){
@@ -151,16 +174,13 @@ function fieldClicked(field){
 
     if(startCoordinates === null){
         startCoordinates = coordinates;
-    } else if(startCoordinates == coordinates){
+    } else if(startCoordinates === coordinates){
         startCoordinates = null;
     } else{
         endCoordinates = coordinates;
 
-        move().then(function(response){
-            if(response.startsWith("ERROR")){
-                console.log(response);
-            }
-        });
+        await move();
+        await makeBotMove();
 
         isWhiteToMove = !isWhiteToMove;
     }
@@ -194,40 +214,57 @@ function setFieldValueByNotation(notation, toSet) {
 
 
 async function move(){
-    let message = await sendMessage("get possible moves");
-    if(message.startsWith("ERROR")){
-        return message;
+    let message = await sendMessage("legal-moves");
+    while(message.startsWith("ERROR")){
+        alertNoInternetMessage();
+        message = await sendMessage("get possible moves");
     }
     let possibleMoves = JSON.parse(message);
-    console.log("move: " + startCoordinates + " to " + endCoordinates);
+
+
+    let possibleStrings = possibleMoves.map(value => {
+        return getNotationFromCoordinates(value.from.x, value.from.y) + getNotationFromCoordinates(value.to.x, value.to.y);
+    });
+
 
     let moveString = startCoordinates + endCoordinates;
 
-    if(possibleMoves != null && !possibleMoves.contains(moveString)){
+    if(!possibleStrings.includes(moveString)){
         console.log("invalidMove!");
-        return;
+        return false;
     }
 
     renderMove(startCoordinates, endCoordinates);
 
-    sendMove(startCoordinates, endCoordinates).then(function(result){
-        console.log(typeof result);
-        if(result === "ERROR invalid move"){
-            console.log("invalid move");
-            startCoordinates = null;
-            endCoordinates = null;
-        } else if(result.startsWith("ERROR")){
+    let result = await sendMove(startCoordinates, endCoordinates);
 
-        }
+    let toReturn = false;
 
-    });
-    makeMove();
+    if(result === "ERROR invalid move"){
+        console.log("invalid move");
+    } else if(result.startsWith("ERROR")){
+        console.log("an error occurred: " + result);
+    } else{
+        makeMove();
+        renderMove(startCoordinates, endCoordinates);
+        moves.push(moveString);
+        toReturn = true;
+    }
 
     startCoordinates = null;
     endCoordinates = null;
+
+    console.log("move finished");
+    return toReturn;
 }
 
-function makeMove(){
+function makeMove(move){
+    if(move !== undefined){
+        startCoordinates = move.slice(0,2);
+        endCoordinates = move.slice(2);
+        console.log(startCoordinates);
+        console.log(endCoordinates);
+    }
     if (startCoordinates === "e1" && endCoordinates === "g1") {
         makeSmallRochade("w");
     } else if (startCoordinates === "e1" && endCoordinates === "c1") {
@@ -240,6 +277,11 @@ function makeMove(){
         let piece = getFieldValueByNotation(startCoordinates);
         setFieldValueByNotation(endCoordinates, piece);
         setFieldValueByNotation(startCoordinates, null);
+    }
+
+    if(move !== undefined){
+        startCoordinates = null;
+        endCoordinates = null;
     }
 }
 
@@ -351,53 +393,29 @@ function reset() {
 }
 
 
-function saveGame() {
-    localStorage.setItem("chessBoard", fieldToFullFen(field, isBotWhite ? "w":"b"));
-    console.log("game saved");
-}
 
-
-function loadGame() {
-    const saved = localStorage.getItem("chessBoard");
-    if (!saved) return;
-    if(saved === "") return;
-
-    updateFieldFromFen(saved);
-    console.log("game loaded");
-
-    sendMessage("position " + localStorage.getItem("chessBoard")).then(function(response){
-        if(response.startsWith("ERROR")) {
-            initializeField();
-            window.alert("Connection refused"); //TODO do not now right now if every error starts with ERROR
-        }
-
-
-    });
-
-
-    createBoard();
-    renderBoard();
-}
 
 async function sendMove(from, to, ...promotion) {
-    let stringMove = from + " " + to;
+    let stringMove = from + to;
     if (promotion !== undefined) stringMove += promotion;
+
+    movesSinceLastFen.push(stringMove);
+
+    const message = "position " +  lastFen + " " + movesSinceLastFen.join(" ");
+
+    console.log(message);
 
     let responseGotten;
     try{
-        responseGotten = await sendMessage(stringMove);
+        responseGotten = await sendMessage(message);
     } catch (error){
-        responseGotten = error.message;
+        responseGotten = "ERROR " + error.message;
     }
-
-    console.log(typeof responseGotten);
-
-    console.log(responseGotten);
 
     return responseGotten;
 }
 
-async function sendMessage(message = "isready") {
+async function sendMessage(message) {
     return fetch("http://127.0.0.1:8081/chess", {
         method: "POST",
         headers: { "Content-Type": "text/plain" },
@@ -480,4 +498,32 @@ function fieldToFen(field) {
 function fieldToFullFen(field, activeColor = "w", castling = "KQkq", enPassant = "-", halfmove = 0, fullmove = 1) {
     const boardString = fieldToFen(field);
     return `${boardString} ${activeColor} ${castling} ${enPassant} ${halfmove} ${fullmove}`;
+}
+
+function saveGame() {
+    localStorage.setItem("chessBoard", fieldToFullFen(field, isBotWhite ? "w":"b"));
+    console.log("game saved");
+}
+
+
+function loadGame() {
+    const saved = localStorage.getItem("chessBoard");
+    if (!saved) return;
+    if(saved === "") return;
+
+    updateFieldFromFen(saved);
+    console.log("game loaded");
+
+    sendMessage("position " + localStorage.getItem("chessBoard")).then(function(response){
+        if(response.startsWith("ERROR")) {
+            initializeField();
+            window.alert("Connection refused");
+        }
+
+
+    });
+
+
+    createBoard();
+    renderBoard();
 }
