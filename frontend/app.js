@@ -16,6 +16,13 @@ const pieceNames = new Map([
 
 ]);
 
+let moves = [];
+
+let lastFen = null;
+let movesSinceLastFen = [];
+
+//TODO: implement promotion
+
 
 let field;
 
@@ -24,15 +31,18 @@ let endCoordinates = null;
 
 
 const boardSize = 8;
-const maxThinkTimeForEngineInMilliseconds = 4000;
 let isBotWhite = false;
 let isWhiteToMove = true;
+
+
 
 initializeField();
 
 createBoard();
 
 renderBoard();
+
+
 
 
 
@@ -49,9 +59,27 @@ function initializeField(){
         ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'],
     ];
 
+    movesSinceLastFen = [];
+
+    lastFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+
+    sendMessage("position startpos").then((position) => {
+        if(position.startsWith("ERROR")){
+            alertNoInternetMessage();
+            //window.location.reload();
+        }
+    });
+
+    moves = [];
+
     if(isBotWhite){
         turnField();
     }
+    renderBoard();
+}
+
+function alertNoInternetMessage(){
+    window.alert("Something went wrong, please check your internet connection.");
 }
 
 function turnField(){
@@ -85,47 +113,58 @@ function createBoard(){
             const col = !isBotWhite ? i : Math.abs(i - 7);
             const row = !isBotWhite ? j : Math.abs(j - 7);
 
-            let field = document.createElement("button");
+            let buttonElement = document.createElement("button");
 
-            const squareNumber = col*boardSize + row;
-            const char = String.fromCharCode(row + 97);
-
-
-            field.dataset.number = squareNumber;
-            field.dataset.coordinates = char + (col - 8)*-1;
-            field.dataset.col = i;
-            field.dataset.row = j;
+            buttonElement.dataset.number = col * boardSize + row;
+            buttonElement.dataset.coordinates = getNotationFromCoordinates(j,i);
+            buttonElement.dataset.col = i;
+            buttonElement.dataset.row = j;
 
             white = !white;
 
 
-            field.classList.add("field");
+            buttonElement.classList.add("field");
 
-            field.addEventListener("click", function(){
-                fieldClicked(field);
+            buttonElement.addEventListener("click", function(){
+                fieldClicked(buttonElement);
             })
 
 
             if(white){
-                field.classList.add("whiteField");
+                buttonElement.classList.add("whiteField");
             } else{
-                field.classList.add("blackField");
+                buttonElement.classList.add("blackField");
             }
 
             
 
 
-            board.appendChild(field);
+            board.appendChild(buttonElement);
         }
 
         
     }
 }
 
+function getNotationFromCoordinates(x, y){
+    const char = String.fromCharCode(x + 97);
+    return char + (y - 8)*-1;
+}
 
-function fieldClicked(field){
-    //if(isBotWhite === isWhiteToMove) return;
-    
+
+async function makeBotMove() {
+    let response = await sendMessage("go");
+    if(response.startsWith("ERROR")){
+        console.log("an error occurred ", response);
+    } else if(response.startsWith("bestmove ")){
+        response = response.slice(9);
+        movesSinceLastFen.push(response);
+        makeMove(response);
+    }
+}
+
+async function fieldClicked(field){
+
     let coordinates = field.dataset.coordinates;
 
     if(getFieldValueByNotation(coordinates) === null && startCoordinates === null){
@@ -136,19 +175,26 @@ function fieldClicked(field){
 
     if(startCoordinates === null){
         startCoordinates = coordinates;
-    } else if(startCoordinates == coordinates){
+    } else if(startCoordinates === coordinates){
         startCoordinates = null;
     } else{
         endCoordinates = coordinates;
 
-        move(null);
-        isWhiteToMove = !isWhiteToMove;
+        let madeMove = await move();
+        startCoordinates = null;
+        endCoordinates = null;
+        if(!madeMove){
+            return;
+        }
+        await makeBotMove();
+        await sendPosition();
+
     }
 }
 
 
 function isCharLowerCase(testCharacter){
-    return testCharacter.toLowerCase() == testCharacter;
+    return testCharacter.toLowerCase() === testCharacter;
 }
 
 function turnBoard(){
@@ -173,15 +219,56 @@ function setFieldValueByNotation(notation, toSet) {
 }
 
 
-function move(posibleMoves){
-    console.log("move: " + startCoordinates + " to " + endCoordinates);
+async function move(){
+    let message = await sendMessage("legal-moves");
+    while(message.startsWith("ERROR")){
+        alertNoInternetMessage();
+        message = await sendMessage("get possible moves");
+    }
+    console.log("got legal moves");
+    let possibleMoves = JSON.parse(message);
 
-    moveString = startCoordinates + ";" + endCoordinates;
 
-    if(posibleMoves != null && !posibleMoves.contains(moveString)){
+    let possibleStrings = possibleMoves.map(value => {
+        return getNotationFromCoordinates(value.from.x, value.from.y) + getNotationFromCoordinates(value.to.x, value.to.y);
+    });
+
+
+    let moveString = startCoordinates + endCoordinates;
+
+    if(!possibleStrings.includes(moveString)){
         console.log("invalidMove!");
+        return false;
     }
 
+    renderMove(startCoordinates, endCoordinates);
+
+    let result = await sendMove(startCoordinates, endCoordinates);
+
+    let toReturn = false;
+
+    if(result === "ERROR invalid move"){
+        console.log("invalid move");
+    } else if(result.startsWith("ERROR")){
+        console.log("an error occurred: " + result);
+    } else{
+        makeMove();
+        renderMove(startCoordinates, endCoordinates);
+        moves.push(moveString);
+        toReturn = true;
+    }
+
+    console.log("move finished");
+    return toReturn;
+}
+
+function makeMove(move){
+    if(move !== undefined){
+        startCoordinates = move.slice(0,2);
+        endCoordinates = move.slice(2);
+        console.log(startCoordinates);
+        console.log(endCoordinates);
+    }
     if (startCoordinates === "e1" && endCoordinates === "g1") {
         makeSmallRochade("w");
     } else if (startCoordinates === "e1" && endCoordinates === "c1") {
@@ -190,20 +277,19 @@ function move(posibleMoves){
         makeSmallRochade("b");
     } else if (startCoordinates === "e8" && endCoordinates === "c8") {
         makeBigRochade("b");
-    } else{
-        makeMove();
-        renderMove(startCoordinates, endCoordinates);
+    }else {
+        let piece = getFieldValueByNotation(startCoordinates);
+        setFieldValueByNotation(endCoordinates, piece);
+        setFieldValueByNotation(startCoordinates, null);
     }
-    sendMove(startCoordinates, endCoordinates);
+    renderMove(startCoordinates, endCoordinates);
 
-    startCoordinates = null;
-    endCoordinates = null;
-}
+    isWhiteToMove = !isWhiteToMove;
 
-function makeMove(){
-    piece = getFieldValueByNotation(startCoordinates);
-    setFieldValueByNotation(endCoordinates, piece);
-    setFieldValueByNotation(startCoordinates, null);   
+    if(move !== undefined){
+        startCoordinates = null;
+        endCoordinates = null;
+    }
 }
 
 function makeSmallRochade(color){
@@ -238,9 +324,6 @@ function makeBigRochade(color){
     }
 }
 
-
-
-
 function renderMove(startCoordinates, endCoordinates, additionalCoordinates = []){
     let buttons = board.querySelectorAll(".field");
 
@@ -270,8 +353,6 @@ function renderMove(startCoordinates, endCoordinates, additionalCoordinates = []
     });
 }
 
-
-
 function renderBoard() {
     let buttons = document.querySelectorAll(".field");
 
@@ -299,55 +380,46 @@ function renderBoard() {
     });
 }
 
-function reset(){
+function reset() {
     console.log("reseted");
 
     initializeField();
 
     renderBoard();
 
+
     startCoordinates = null;
     endCoordinates = null;
 }
 
 
-function saveGame() {
-    localStorage.setItem("chessBoard", JSON.stringify(field));
-    localStorage.setItem("isBotWhite", isBotWhite);
-    console.log("game saved");
-}
 
-
-function loadGame() {
-    const saved = localStorage.getItem("chessBoard");
-    if (!saved) return;
-    if(saved === "") return;
-
-    field = JSON.parse(saved);
-    isBotWhite = localStorage.getItem("isBotWhite");
-    console.log("game loaded");
-
-    createBoard();
-    renderBoard();
-}
 
 async function sendMove(from, to, ...promotion) {
-    let stringMove = "0\n" + from + " " + to;
+    let stringMove = from + to;
     if (promotion !== undefined) stringMove += promotion;
 
-    let responseGotten = sendMessage(stringMove);
-    let responseString = await responseGotten;
+    movesSinceLastFen.push(stringMove);
 
-    if(typeof responseString !== "string") {
-        responseString = String(responseString);
-    }
-
-    console.log(responseString);
-
-    return responseString;
+    return await sendPosition();
 }
 
-async function sendMessage(message = "isready") {
+async function sendPosition(){
+    const message = "position fen " +  lastFen + " moves " + movesSinceLastFen.join(" ");
+
+    console.log(message);
+
+    let responseGotten;
+    try{
+        responseGotten = await sendMessage(message);
+    } catch (error){
+        responseGotten = "ERROR " + error.message;
+    }
+
+    return responseGotten;
+}
+
+async function sendMessage(message) {
     return fetch("http://127.0.0.1:8081/chess", {
         method: "POST",
         headers: { "Content-Type": "text/plain" },
@@ -355,18 +427,20 @@ async function sendMessage(message = "isready") {
     })
         .then(async function (response) {
             if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
+                return "HTTP Error: " + response.statusText;
             }
-            return await response.text();
+            return response.text();
         })
         .catch(function (error) {
-            return error.message;
+            return "ERROR " + error.message;
         });
 }
 
 
 function updateFieldFromFen(fen) {
-    const boardString = fen().split(" ")[0];
+    const boardString = fen.split(" ")[0];
+
+    isWhiteToMove = boardString.split(" ")[1] === "w";
 
     const splitBoardString = boardString.split("/");
 
@@ -428,4 +502,32 @@ function fieldToFen(field) {
 function fieldToFullFen(field, activeColor = "w", castling = "KQkq", enPassant = "-", halfmove = 0, fullmove = 1) {
     const boardString = fieldToFen(field);
     return `${boardString} ${activeColor} ${castling} ${enPassant} ${halfmove} ${fullmove}`;
+}
+
+function saveGame() {
+    localStorage.setItem("chessBoard", fieldToFullFen(field, isBotWhite ? "w":"b"));
+    console.log("game saved");
+}
+
+
+function loadGame() {
+    const saved = localStorage.getItem("chessBoard");
+    if (!saved) return;
+    if(saved === "") return;
+
+    updateFieldFromFen(saved);
+    console.log("game loaded");
+
+    sendMessage("position " + localStorage.getItem("chessBoard")).then(function(response){
+        if(response.startsWith("ERROR")) {
+            initializeField();
+            window.alert("Connection refused");
+        }
+
+
+    });
+
+
+    createBoard();
+    renderBoard();
 }
