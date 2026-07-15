@@ -59,6 +59,8 @@ function initializeField(){
         ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'],
     ];
 
+    movesSinceLastFen = [];
+
     lastFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
     sendMessage("position startpos").then((position) => {
@@ -384,13 +386,6 @@ function reset() {
     initializeField();
 
     renderBoard();
-
-    sendMessage("position startpos").then(function(response){
-        if(response.startsWith("ERROR")){
-            window.alert("Connection failed!");
-        }
-
-    })
 
 
     startCoordinates = null;
