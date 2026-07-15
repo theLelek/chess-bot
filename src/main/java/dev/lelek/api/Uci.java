@@ -6,6 +6,7 @@ import dev.lelek.chess.Move.EnPassantMove;
 import dev.lelek.chess.Move.Move;
 import dev.lelek.chess.Move.PromotionMove;
 import dev.lelek.chess.BoardPiece;
+import dev.lelek.chess.board.UnmakeMoveInfo;
 import dev.lelek.chess.board.model.Board;
 import dev.lelek.chess.search.MoveGenerator;
 import org.slf4j.Logger;
@@ -94,8 +95,17 @@ class Uci {
         }
         int start = command.indexOf("moves") + "moves".length() + 1;
         String[] movesPart = command.substring(start).split(" ");
+
+        List<UnmakeMoveInfo> unmakeMoveInfos = new ArrayList<>();
         for (String move : movesPart) {
-            moves.add(fromUciMoveFormat(board, move));
+            Move currentMove = fromUciMoveFormat(board, move);
+            moves.add(currentMove);
+            unmakeMoveInfos.add(UnmakeMoveInfo.from(board, currentMove));
+            board.makeMove(currentMove);
+        }
+        for (int i = moves.size() - 1; i >= 0; i--) {
+            Move move = moves.get(i);
+            board.unmakeMove(move, unmakeMoveInfos.removeLast());
         }
         return moves;
     }
