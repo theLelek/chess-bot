@@ -1,7 +1,11 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Test" type="Application" factoryName="Application">
-    <option name="MAIN_CLASS_NAME" value="dev.lelek.Test" />
+  <configuration default="false" name="Test" type="JUnit" factoryName="JUnit">
     <module name="chess-bot" />
+    <option name="PACKAGE_NAME" value="dev.lelek" />
+    <option name="MAIN_CLASS_NAME" value="" />
+    <option name="METHOD_NAME" value="" />
+    <option name="TEST_OBJECT" value="package" />
+    <dir value="$PROJECT_DIR$/src/test" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

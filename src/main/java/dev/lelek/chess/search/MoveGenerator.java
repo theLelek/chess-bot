@@ -118,4 +118,4 @@ public class MoveGenerator {
     }
 }
 
-record BoardResults(int score, Move move, boolean isCheckmate, boolean isStalemate) {}
+record BoardResults(int score, Move move, boolean hasLost, boolean hasDrawn) {}

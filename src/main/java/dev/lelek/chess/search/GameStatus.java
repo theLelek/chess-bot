@@ -12,9 +12,9 @@ public enum GameStatus {
 
     public static GameStatus getGameStatus(Board board) {
         BoardResults result = MoveGenerator.negmax(board, PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove()), 1, new Stack<>(), false, -1, MoveGenerator.WORST, MoveGenerator.BEST);
-        if (result.isCheckmate()) {
+        if (result.hasLost()) {
             return GameStatus.CHECKMATE;
-        } else if (result.isStalemate()) {
+        } else if (result.hasDrawn()) {
             return GameStatus.STALEMATE;
         } else {
             return GameStatus.ONGOING;
