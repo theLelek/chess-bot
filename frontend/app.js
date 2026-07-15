@@ -151,15 +151,14 @@ function getNotationFromCoordinates(x, y){
 
 
 async function makeBotMove() {
-    sendMessage("go").then((response) => {
-        if(response.startsWith("ERROR")){
-            console.log("an error occurred ", response);
-        } else if(response.startsWith("bestmove ")){
-            response = response.slice(9);
-            movesSinceLastFen.push(response);
-            makeMove(response);
-        }
-    });
+    let response = await sendMessage("go");
+    if(response.startsWith("ERROR")){
+        console.log("an error occurred ", response);
+    } else if(response.startsWith("bestmove ")){
+        response = response.slice(9);
+        movesSinceLastFen.push(response);
+        makeMove(response);
+    }
 }
 
 async function fieldClicked(field){
@@ -179,10 +178,15 @@ async function fieldClicked(field){
     } else{
         endCoordinates = coordinates;
 
-        await move();
+        let madeMove = await move();
+        startCoordinates = null;
+        endCoordinates = null;
+        if(!madeMove){
+            return;
+        }
         await makeBotMove();
+        await sendPosition();
 
-        isWhiteToMove = !isWhiteToMove;
     }
 }
 
@@ -219,6 +223,7 @@ async function move(){
         alertNoInternetMessage();
         message = await sendMessage("get possible moves");
     }
+    console.log("got legal moves");
     let possibleMoves = JSON.parse(message);
 
 
@@ -251,9 +256,6 @@ async function move(){
         toReturn = true;
     }
 
-    startCoordinates = null;
-    endCoordinates = null;
-
     console.log("move finished");
     return toReturn;
 }
@@ -278,6 +280,9 @@ function makeMove(move){
         setFieldValueByNotation(endCoordinates, piece);
         setFieldValueByNotation(startCoordinates, null);
     }
+    renderMove(startCoordinates, endCoordinates);
+
+    isWhiteToMove = !isWhiteToMove;
 
     if(move !== undefined){
         startCoordinates = null;
@@ -401,7 +406,11 @@ async function sendMove(from, to, ...promotion) {
 
     movesSinceLastFen.push(stringMove);
 
-    const message = "position " +  lastFen + " " + movesSinceLastFen.join(" ");
+    return await sendPosition();
+}
+
+async function sendPosition(){
+    const message = "position fen " +  lastFen + " moves " + movesSinceLastFen.join(" ");
 
     console.log(message);
 
