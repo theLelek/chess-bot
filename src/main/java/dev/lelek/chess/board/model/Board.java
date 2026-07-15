@@ -53,7 +53,7 @@ public class Board {
     }
 
     public static Board fromFen(String fen) {
-        log.info("initalized board: {}", fen);
+        log.debug("loaded fen: {}", fen);
         String[] fenParts = fen.split(" ");
         var isWhiteToMove = fenParts[1].equals("w");
         var castlingRightsWhite = CastlingRights.fromFen(fenParts[2], true);
@@ -104,7 +104,7 @@ public class Board {
                 return new BoardPosition(i);
             }
         }
-        throw new NoKingFoundException("couldnt find king in board + " + Arrays.toString(pieceList));
+        throw new NoKingFoundException("couldnt find king in board");
     }
 
     public String toFen() {
@@ -114,6 +114,7 @@ public class Board {
         fen += " " + (enPassantTargetSquare == null ? "-" : enPassantTargetSquare.toFen());
         fen += " " + halfmoveClock;
         fen += " " + fullmoveNumber;
+        log.debug("generated fen: {}", fen);
         return fen;
     }
 

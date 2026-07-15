@@ -30,6 +30,14 @@ class WebApiIntegrationTest {
     }
 
     @Test
+    void fenCommandTest() throws Exception {
+        sendCommand("uci");
+        String fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+        sendCommand("position fen " + fen);
+        String response = sendCommand("fen");
+        Assertions.assertEquals(fen, response);
+    
+    @Test
     void positionFenCommandWithMoves() throws Exception {
         sendCommand("uci");
         String position = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 moves e2e4 g8f6 e4e5";
