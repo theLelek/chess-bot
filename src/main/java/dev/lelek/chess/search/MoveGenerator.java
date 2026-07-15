@@ -6,29 +6,37 @@ import dev.lelek.chess.Move.Move;
 import dev.lelek.chess.board.UnmakeMoveInfo;
 import dev.lelek.chess.board.model.Board;
 import dev.lelek.chess.eval.BoardEvaluation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class MoveGenerator {
 
+    private static final Logger log = LoggerFactory.getLogger(MoveGenerator.class);
+
     private static final Random random = new Random();
 
     static final int BEST = Integer.MAX_VALUE / 2;
     static final int WORST = Integer.MIN_VALUE / 2;
+
 
     public static Move generateMove(Board board, long timeMillis) {
         Move bestMove = negmax(board, null, 1, new Stack<>(), false, -1).move();;
 
         long deadline = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(timeMillis);
 
-        for (int i = 2; ; i++) {
+        log.info("search started");
+        int i;
+        for (i = 2; ; i++) {
             BoardResults foo = negmax(board, null, i, new Stack<>(), true, deadline);
             if (foo == null) {
                 break; // timeMillis have passed
             }
             bestMove = foo.move();
         }
+        log.info("search competed depth reached: {}", i);
         return bestMove;
     }
 

@@ -28,6 +28,15 @@ class WebApiIntegrationTest {
         Assertions.assertEquals("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", sendCommand("fen"));
     }
 
+    @Test
+    void fenCommandTest() throws Exception {
+        sendCommand("uci");
+        String fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+        sendCommand("position fen " + fen);
+        String response = sendCommand("fen");
+        Assertions.assertEquals(fen, response);
+    }
+
     private String sendCommand(String command) throws Exception {
         return mockMvc.perform(MockMvcRequestBuilders.post("/chess")
                         .content(command)

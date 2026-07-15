@@ -24,21 +24,26 @@ class Uci {
     private Board board;
 
     static void start() {
+        log.info("started uci");
         Uci uci = new Uci();
-        System.out.println(uci.handleCommand("uci"));
         while (true) {
             String command = Api.scanner.nextLine();
+            log.info("uci command: {}", command);
             if (command.equals("quit")) return;
 
             Runnable runnable = () -> {
                 String response = uci.handleCommand(command);
-                if (response != null) System.out.println(response);
+                if (response != null) {
+                    System.out.println(response);
+                    log.info("uci reponse: {}", response);
+                }
             };
             new Thread(runnable).start();
         }
     }
     
     String handleCommand(String command) {
+        log.info("uci command: {}", command);
         String out = null;
         String[] parts = command.split(" ");
         switch (parts[0]) {
