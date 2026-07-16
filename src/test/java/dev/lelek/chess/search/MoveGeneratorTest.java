@@ -70,4 +70,12 @@ class MoveGeneratorTest {
         Move bestMove = MoveGenerator.generateMove(board, 5);
         Assertions.assertEquals(new Move("b6", "b8"), bestMove);
     }
+
+    @Test
+    void generateMove_esapeMate() {
+        Board board = Board.fromFen("1r4kr/3R1ppp/4p3/p4n2/5P2/2N4P/PPP3P1/3R3K b - - 2 25");
+        Move bestMove = MoveGenerator.generateMove(board, 1000L);
+        Assertions.assertNotEquals(new Move("f5", "e3"), bestMove);
+        System.out.println(bestMove);
+    }
 }

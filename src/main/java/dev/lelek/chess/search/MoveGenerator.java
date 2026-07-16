@@ -64,7 +64,7 @@ public class MoveGenerator {
         if (board.getHalfmoveClock() == 100) { // 50 move rule
             return new BoardResults(0, null, false, true);
         }
-        if (depth == 0) {
+        if (depth == 0) { // todo could stop at illegal position
             int sign = color == Color.WHITE ? 1 : -1;
             return new BoardResults(sign * (random.nextInt(3) - 1 + BoardEvaluation.evaluate(board)), null, false, false);
         }
@@ -86,7 +86,7 @@ public class MoveGenerator {
 
             BoardResults boardResults = negmax(board, currentPseudoLegalMoves, depth - 1, unmakeMoveInfos, hasTimeLimit, deadline, -beta, -alpha);
             if (hasTimeLimit && boardResults == null) {
-                board.unmakeMove(move, unmakeMoveInfos.pop()); // todo why
+                board.unmakeMove(move, unmakeMoveInfos.pop());
                 return null; // the time limit has been reached
             }
 
