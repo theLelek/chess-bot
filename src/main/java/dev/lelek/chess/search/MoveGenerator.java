@@ -18,19 +18,23 @@ public class MoveGenerator {
 
     private static final Random random = new Random();
 
-    static final int BEST = Integer.MAX_VALUE / 2;
-    static final int WORST = Integer.MIN_VALUE / 2;
+    static final int ALPHA_START = Integer.MIN_VALUE / 2;
+    static final int BETA_START = Integer.MAX_VALUE / 2;
+    static final int BEST = BETA_START / 2;
+    static final int WORST = ALPHA_START / 2;
 
 
     public static Move generateMove(Board board, long timeMillis) {
-        Move bestMove = negmax(board, PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove()), 1, new Stack<>(), false, -1, WORST, BEST).move();;
+        Move bestMove = negmax(board, PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove()), 1, new Stack<>(), false, -1, ALPHA_START, BETA_START).move();;
 
         long deadline = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(timeMillis);
 
         log.info("search started");
         int i;
+
+        List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove());
         for (i = 2; ; i++) {
-            BoardResults foo = negmax(board, PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove()), i, new Stack<>(), true, deadline, WORST, BEST);
+            BoardResults foo = negmax(board, pseudoLegalMoves, i, new Stack<>(), true, deadline, ALPHA_START, BETA_START);
             if (foo == null) {
                 break; // timeMillis have passed
             }
@@ -43,8 +47,9 @@ public class MoveGenerator {
     public static Move generateMove(Board board, int maxDepth) {
         Move bestMove = null;
 
+        List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove());
         for (int i = 1; i <= maxDepth; i++) {
-            bestMove = negmax(board, PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove()), i, new Stack<>(), false, -1, WORST, BEST).move();
+            bestMove = negmax(board, pseudoLegalMoves, i, new Stack<>(), false, -1, ALPHA_START, BETA_START).move();
         }
         return bestMove;
     }
@@ -90,11 +95,12 @@ public class MoveGenerator {
                 bestScore = score;
                 bestMove = move;
             }
-//            if (score >= beta) {
-//                board.unmakeMove(move, unmakeMoveInfos.pop());
-//                return new BoardResults(bestScore, null); // todo probably wrong
-//            }
-//            alpha = Math.max(alpha, score);
+
+            if (score >= beta) {
+                board.unmakeMove(move, unmakeMoveInfos.pop());
+                return new BoardResults(bestScore, bestMove, false, false); // todo probably wrong
+            }
+            alpha = Math.max(alpha, score);
 
             board.unmakeMove(move, unmakeMoveInfos.pop());
         }
