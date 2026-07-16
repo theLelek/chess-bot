@@ -1,18 +1,18 @@
-This repo contains a chess bot written fully in Java.
-
+This repo contains a chess engine written fully in Java.
 It is written from scratch without any chess libraries.
 
 # Features
 
-- Bitboard-based board representation
+- bitboards
+- dynamic make and unmake move logic
 - FEN support
-- Legal move generation
-- negmax search
-- UCI protocol
+- UCI support
 - Iterative deepening
-- ~~alpha-beta pruning~~
+- alpha-beta pruning
 - ~~Move ordering~~
 - ~~Transposition table~~
+- ~~Quiescence Search~~
+
 
 # APIs
 
