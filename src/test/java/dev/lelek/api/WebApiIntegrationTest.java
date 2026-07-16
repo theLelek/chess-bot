@@ -36,6 +36,7 @@ class WebApiIntegrationTest {
         sendCommand("position fen " + fen);
         String response = sendCommand("fen");
         Assertions.assertEquals(fen, response);
+    }
     
     @Test
     void positionFenCommandWithMoves() throws Exception {
