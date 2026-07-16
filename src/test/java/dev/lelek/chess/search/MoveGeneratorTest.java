@@ -63,4 +63,11 @@ class MoveGeneratorTest {
         Move bestMove = MoveGenerator.generateMove(board, 1L);
         Assertions.assertNotNull(bestMove);
     }
+
+    @Test
+    void generateMove_findShortestMate() {
+        Board board = Board.fromFen("7k/3R4/1R6/8/8/8/8/7K w - - 1 1");
+        Move bestMove = MoveGenerator.generateMove(board, 5);
+        Assertions.assertEquals(new Move("b6", "b8"), bestMove);
+    }
 }
