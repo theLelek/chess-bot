@@ -1,29 +1,32 @@
 package dev.lelek.chess;
 
 import dev.lelek.chess.board.BitboardIndexProvider;
+import dev.lelek.chess.eval.BoardEvaluation;
 
 public enum BoardPiece implements BitboardIndexProvider {
 
-    WHITE_PAWN('P', 0),
-    WHITE_KNIGHT('N', 1),
-    WHITE_BISHOP('B', 2),
-    WHITE_ROOK('R', 3),
-    WHITE_QUEEN('Q', 4),
-    WHITE_KING('K', 5),
+    WHITE_PAWN('P', 0, BoardEvaluation.PAWN_VALUE),
+    WHITE_KNIGHT('N', 1, BoardEvaluation.KNIGHT_VALUE),
+    WHITE_BISHOP('B', 2, BoardEvaluation.BISHOP_VALUE),
+    WHITE_ROOK('R', 3, BoardEvaluation.ROOK_VALUE),
+    WHITE_QUEEN('Q', 4, BoardEvaluation.QUEEN_VALUE),
+    WHITE_KING('K', 5, BoardEvaluation.KING_VALUE),
 
-    BLACK_PAWN('p', 6),
-    BLACK_KNIGHT('n', 7),
-    BLACK_BISHOP('b', 8),
-    BLACK_ROOK('r', 9),
-    BLACK_QUEEN('q', 10),
-    BLACK_KING('k', 11);
+    BLACK_PAWN('p', 6, BoardEvaluation.PAWN_VALUE),
+    BLACK_KNIGHT('n', 7, BoardEvaluation.KNIGHT_VALUE),
+    BLACK_BISHOP('b', 8, BoardEvaluation.BISHOP_VALUE),
+    BLACK_ROOK('r', 9, BoardEvaluation.ROOK_VALUE),
+    BLACK_QUEEN('q', 10, BoardEvaluation.QUEEN_VALUE),
+    BLACK_KING('k', 11, BoardEvaluation.KING_VALUE);
 
     private final char fen;
     private final int bitboardIndex;
+    private final int evaluation;
 
-    BoardPiece(char fen, int bitboardIndex) {
+    BoardPiece(char fen, int bitboardIndex, int evaluation) {
         this.fen = fen;
         this.bitboardIndex = bitboardIndex;
+        this.evaluation = evaluation;
     }
 
     public static BoardPiece fromFen(char fen) {
@@ -109,5 +112,9 @@ public enum BoardPiece implements BitboardIndexProvider {
 
     public int getBitboardIndex() {
         return bitboardIndex;
+    }
+
+    public int getEvaluation() {
+        return evaluation;
     }
 }
