@@ -78,4 +78,13 @@ class MoveGeneratorTest {
         Assertions.assertNotEquals(new Move("f5", "e3"), bestMove);
         System.out.println(bestMove);
     }
+
+    @Test
+    void generateMove_testTime() {
+        // depth 6 = 4.4 sec
+        // depth 5 = 0.384 sec
+        Board board = Board.initializeDefaultBoard();
+        Move bestMove = MoveGenerator.generateMove(board, 5);
+        System.out.println(bestMove);
+    }
 }
