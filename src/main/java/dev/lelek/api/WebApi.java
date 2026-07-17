@@ -32,7 +32,7 @@ class WebApi {
     private String chess(@RequestBody String message) throws JsonProcessingException {
         log.info("web api command: {}", message);
         ObjectMapper mapper = new ObjectMapper();
-        String response = null;
+        String response;
         switch (message) {
             case "legal-moves" -> response = mapper.writeValueAsString(LegalMoveFinder.getLegalMoves(uci.getBoard()));
             case "game-status" -> response = GameStatus.getGameStatus(uci.getBoard()).toString();
