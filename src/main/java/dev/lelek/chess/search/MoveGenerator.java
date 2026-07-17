@@ -23,9 +23,11 @@ public class MoveGenerator {
     static final int BEST = BETA_START / 2;
     static final int WORST = ALPHA_START / 2;
 
+    private static final int FIFTY_MOVE_RULE_HALFMOVES = 100;
+
 
     public static Move generateMove(Board board, long timeMillis) {
-        Move bestMove = negmax(board, PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove()), 1, new Stack<>(), false, -1, ALPHA_START, BETA_START).move();;
+        Move bestMove = negmax(board, PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove()), 1, new Stack<>(), false, -1, ALPHA_START, BETA_START).move();
 
         long deadline = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(timeMillis);
 
@@ -33,14 +35,16 @@ public class MoveGenerator {
         int i;
 
         List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove());
+        MoveOrdering.order(board, pseudoLegalMoves);
         for (i = 2; ; i++) {
-            BoardResults foo = negmax(board, pseudoLegalMoves, i, new Stack<>(), true, deadline, ALPHA_START, BETA_START);
-            if (foo == null) {
+            BoardResults boardResults = negmax(board, pseudoLegalMoves, i, new Stack<>(), true, deadline, ALPHA_START, BETA_START);
+            if (boardResults == null) {
                 break; // timeMillis have passed
             }
-            bestMove = foo.move();
+            bestMove = boardResults.move();
+            log.info("depth {} complete, best move: {}", i, bestMove);
         }
-        log.info("search competed depth reached: {}", i);
+        log.info("search completed, depth reached: {}", i);
         return bestMove;
     }
 
@@ -48,9 +52,14 @@ public class MoveGenerator {
         Move bestMove = null;
 
         List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove());
-        for (int i = 1; i <= maxDepth; i++) {
-            bestMove = negmax(board, pseudoLegalMoves, i, new Stack<>(), false, -1, ALPHA_START, BETA_START).move();
+        MoveOrdering.order(board, pseudoLegalMoves);
+        int i;
+        for (i = 1; i <= maxDepth; i++) {
+            BoardResults boardResults = negmax(board, pseudoLegalMoves, i, new Stack<>(), false, -1, ALPHA_START, BETA_START);
+            bestMove = boardResults.move();
+            log.info("depth {} complete, best move: {}", i, bestMove);
         }
+        log.info("search completed, depth reached: {}", i);
         return bestMove;
     }
 
@@ -61,10 +70,10 @@ public class MoveGenerator {
 
         Color color = board.isWhiteToMove() ? Color.WHITE : Color.BLACK;
 
-        if (board.getHalfmoveClock() == 100) { // 50 move rule
+        if (board.getHalfmoveClock() == FIFTY_MOVE_RULE_HALFMOVES) {
             return new BoardResults(0, null, false, true);
         }
-        if (depth == 0) {
+        if (depth == 0) { // todo could stop at illegal position
             int sign = color == Color.WHITE ? 1 : -1;
             return new BoardResults(sign * (random.nextInt(3) - 1 + BoardEvaluation.evaluate(board)), null, false, false);
         }
@@ -77,6 +86,7 @@ public class MoveGenerator {
             unmakeMoveInfos.push(UnmakeMoveInfo.from(board, move));
             board.makeMove(move);
             List<Move> currentPseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove());
+            MoveOrdering.order(board, currentPseudoLegalMoves);
 
             if (LegalMoveFinder.wasPreviousMoveIllegal(board, move, currentPseudoLegalMoves)) {
                 board.unmakeMove(move, unmakeMoveInfos.pop());
@@ -86,7 +96,7 @@ public class MoveGenerator {
 
             BoardResults boardResults = negmax(board, currentPseudoLegalMoves, depth - 1, unmakeMoveInfos, hasTimeLimit, deadline, -beta, -alpha);
             if (hasTimeLimit && boardResults == null) {
-                board.unmakeMove(move, unmakeMoveInfos.pop()); // todo why
+                board.unmakeMove(move, unmakeMoveInfos.pop());
                 return null; // the time limit has been reached
             }
 
@@ -98,7 +108,7 @@ public class MoveGenerator {
 
             if (score >= beta) {
                 board.unmakeMove(move, unmakeMoveInfos.pop());
-                return new BoardResults(bestScore, bestMove, false, false); // todo probably wrong
+                return new BoardResults(bestScore, bestMove, false, false);
             }
             alpha = Math.max(alpha, score);
 
@@ -107,20 +117,20 @@ public class MoveGenerator {
         if (hasTimeLimit && System.nanoTime() - deadline >= 0) {
             return null;
         }
-        return getBoardResult(board, foundLegalMove, bestScore, bestMove, depth);
-    }
-
-    private static BoardResults getBoardResult(Board board, boolean foundLegalMove, int bestScore, Move bestMove, int depth) {
         if (! foundLegalMove) {
-            List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, ! board.isWhiteToMove());
-            BoardPosition kingPosition = ! board.isWhiteToMove() ? board.getBlackKingPosition() : board.getWhiteKingPosition();
-
-            if (Utils.isPositionAttacked(pseudoLegalMoves, kingPosition)) {
-                return new BoardResults(WORST - depth, null, true, false); // checkmate
-            }
-            return new BoardResults(0, null, false, true); // stalemate
+            return getBoardResult(board, depth);
         }
         return new BoardResults(bestScore, bestMove, false, false);
+    }
+
+    private static BoardResults getBoardResult(Board board, int depth) {
+        List<Move> opponentPseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, ! board.isWhiteToMove());
+        BoardPosition kingPosition = ! board.isWhiteToMove() ? board.getBlackKingPosition() : board.getWhiteKingPosition();
+
+        if (Utils.isPositionAttacked(opponentPseudoLegalMoves, kingPosition)) { // checks if king is in check
+            return new BoardResults(WORST - depth, null, true, false); // checkmate
+        }
+        return new BoardResults(0, null, false, true); // stalemate
     }
 }
 

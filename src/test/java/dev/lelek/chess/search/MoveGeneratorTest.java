@@ -70,4 +70,23 @@ class MoveGeneratorTest {
         Move bestMove = MoveGenerator.generateMove(board, 5);
         Assertions.assertEquals(new Move("b6", "b8"), bestMove);
     }
+
+    @Test
+    void generateMove_esapeMate() {
+        Board board = Board.fromFen("1r4kr/3R1ppp/4p3/p4n2/5P2/2N4P/PPP3P1/3R3K b - - 2 25");
+        Move bestMove = MoveGenerator.generateMove(board, 1000L);
+        Assertions.assertNotEquals(new Move("f5", "e3"), bestMove);
+        System.out.println(bestMove);
+    }
+
+    @Test
+    void generateMove_testTime() {
+        // on default position:
+        // depth 6 = 4.4 sec
+        // depth 5 = 0.384 sec
+        // on perft position 4: 2.3 sec wihout and 1.37 with ordering
+        Board board = Board.fromFen("r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1");
+        Move bestMove = MoveGenerator.generateMove(board, 5);
+        System.out.println(bestMove);
+    }
 }

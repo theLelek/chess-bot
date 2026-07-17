@@ -44,7 +44,6 @@ class Uci {
     }
     
     String handleCommand(String command) {
-        log.info("uci command: {}", command);
         String out = null;
         String[] parts = command.split(" ");
         switch (parts[0]) {

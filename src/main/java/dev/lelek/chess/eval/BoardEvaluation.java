@@ -9,12 +9,12 @@ public class BoardEvaluation {
 
     static final int DEFAULT_BOARD_VALUE = computeBoardValue(Board.initializeDefaultBoard());
 
-    private static final int PAWN_VALUE = 100;
-    private static final int KNIGHT_VALUE = 350;
-    private static final int BISHOP_VALUE = 350;
-    private static final int ROOK_VALUE = 525;
-    private static final int QUEEN_VALUE = 1000;
-    private static final int KING_VALUE = 0;
+    public static final int PAWN_VALUE = 100;
+    public static final int KNIGHT_VALUE = 350;
+    public static final int BISHOP_VALUE = 350;
+    public static final int ROOK_VALUE = 525;
+    public static final int QUEEN_VALUE = 1000;
+    public static final int KING_VALUE = 0;
 
     public static int evaluate(Board board) {
         int value = 0;
