@@ -81,9 +81,11 @@ class MoveGeneratorTest {
 
     @Test
     void generateMove_testTime() {
+        // on default position:
         // depth 6 = 4.4 sec
         // depth 5 = 0.384 sec
-        Board board = Board.initializeDefaultBoard();
+        // on perft position 4: 2.3 sec wihout and 1.37 with ordering
+        Board board = Board.fromFen("r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1");
         Move bestMove = MoveGenerator.generateMove(board, 5);
         System.out.println(bestMove);
     }

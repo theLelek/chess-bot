@@ -23,6 +23,8 @@ public class MoveGenerator {
     static final int BEST = BETA_START / 2;
     static final int WORST = ALPHA_START / 2;
 
+    private static final int FIFTY_MOVE_RULE_HALFMOVES = 100;
+
 
     public static Move generateMove(Board board, long timeMillis) {
         Move bestMove = negmax(board, PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove()), 1, new Stack<>(), false, -1, ALPHA_START, BETA_START).move();
@@ -33,6 +35,7 @@ public class MoveGenerator {
         int i;
 
         List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove());
+        MoveOrdering.order(board, pseudoLegalMoves);
         for (i = 2; ; i++) {
             BoardResults boardResults = negmax(board, pseudoLegalMoves, i, new Stack<>(), true, deadline, ALPHA_START, BETA_START);
             if (boardResults == null) {
@@ -49,6 +52,7 @@ public class MoveGenerator {
         Move bestMove = null;
 
         List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove());
+        MoveOrdering.order(board, pseudoLegalMoves);
         int i;
         for (i = 1; i <= maxDepth; i++) {
             BoardResults boardResults = negmax(board, pseudoLegalMoves, i, new Stack<>(), false, -1, ALPHA_START, BETA_START);
@@ -66,7 +70,7 @@ public class MoveGenerator {
 
         Color color = board.isWhiteToMove() ? Color.WHITE : Color.BLACK;
 
-        if (board.getHalfmoveClock() == 100) { // 50 move rule
+        if (board.getHalfmoveClock() == FIFTY_MOVE_RULE_HALFMOVES) {
             return new BoardResults(0, null, false, true);
         }
         if (depth == 0) { // todo could stop at illegal position
@@ -82,6 +86,7 @@ public class MoveGenerator {
             unmakeMoveInfos.push(UnmakeMoveInfo.from(board, move));
             board.makeMove(move);
             List<Move> currentPseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove());
+            MoveOrdering.order(board, currentPseudoLegalMoves);
 
             if (LegalMoveFinder.wasPreviousMoveIllegal(board, move, currentPseudoLegalMoves)) {
                 board.unmakeMove(move, unmakeMoveInfos.pop());
