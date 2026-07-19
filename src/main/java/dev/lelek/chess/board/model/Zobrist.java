@@ -30,7 +30,7 @@ final class Zobrist {
 
     public static long fromBoard(Board board) {
         long hash = getPieceSquareHash(board) ^ getCastlingRightsHash(board);
-        if (board.getEnPassantTargetSquare() != null) hash ^= EN_PASSANT_KEYS[board.getEnPassantTargetSquare().getY()];
+        if (isEnPassantCaptureAvailable(board)) hash ^= EN_PASSANT_KEYS[board.getEnPassantTargetSquare().getX()];
         if (board.isBlackToMove()) hash ^= SIDE_TO_MOVE_KEYS;
         return hash;
     }
@@ -62,17 +62,17 @@ final class Zobrist {
         return hash;
     }
 
-    private boolean enPassantCaptureAvailable(Board board, int doublePushedFile, boolean whiteJustMoved) {
+    private static boolean isEnPassantCaptureAvailable(Board board) {
         Color color = board.isWhiteToMove() ? Color.WHITE : Color.BLACK;
-        int captureRank = color.get
-        long enemyPawns = board.getBitBoardState().getBitboard(
-                whiteJustMoved ? OccupancyBitboard.BLACK_PAWNS : OccupancyBitboard.WHITE_PAWNS
-        );
+        BoardPosition position = board.getEnPassantPiecePosition();
+        if (position == null) return false;
 
-        long adjacentMask = 0;
-        if (doublePushedFile > 0) adjacentMask |= squareMask(doublePushedFile - 1, captureRank);
-        if (doublePushedFile < 7) adjacentMask |= squareMask(doublePushedFile + 1, captureRank);
+        BoardPosition positionLeft = position.getX() == 0 ? null : new BoardPosition(position.getX() - 1, position.getY());
+        BoardPosition positionRight = position.getX() == Board.SIZE - 1 ? null : new BoardPosition(position.getX() + 1, position.getY());
 
-        return (enemyPawns & adjacentMask) != 0;
+        if (positionLeft != null && board.getPieceAt(positionLeft) == color.getPawn()) return true;
+        if (positionRight != null && board.getPieceAt(positionRight) == color.getPawn()) return true;
+
+        return false;
     }
 }
