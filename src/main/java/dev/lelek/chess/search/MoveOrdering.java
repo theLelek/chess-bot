@@ -6,7 +6,7 @@ import dev.lelek.chess.board.model.Board;
 
 import java.util.List;
 
-public class MoveOrdering {
+class MoveOrdering {
     public static void order(Board board, List<Move> moves) {
         int bestIdx = 0;
         int bestEvaluation = Integer.MIN_VALUE;

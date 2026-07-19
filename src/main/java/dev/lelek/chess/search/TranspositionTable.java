@@ -1,6 +1,6 @@
 package dev.lelek.chess.search;
 
-public class TranspositionTable {
+class TranspositionTable {
 
     public static final int SIZE = 65536;
     private static final TranspositionTable instance = new TranspositionTable();
