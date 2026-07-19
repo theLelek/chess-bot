@@ -6,7 +6,7 @@ import dev.lelek.chess.board.OccupancyBitboard;
 public enum Color {
 
     WHITE(
-            7, 0, 6, -1,
+            7, 0, 6, 4, -1,
             new CastlingMove(4, 7, 6, 7),
             new CastlingMove(4, 7, 2, 7),
             OccupancyBitboard.WHITE_PIECES,
@@ -27,7 +27,7 @@ public enum Color {
     ),
 
     BLACK(
-            0, 7, 1, 1,
+            0, 7, 1, 3, 1,
             new CastlingMove(4, 0, 6, 0),
             new CastlingMove(4, 0, 2, 0),
             OccupancyBitboard.BLACK_PIECES,
@@ -50,6 +50,8 @@ public enum Color {
     private final int homeRank;
     private final int backRank;
     private final int pawnStartingRow;
+    private final int enPassantTargetRow;
+
     private final int movingDirection;
 
     private final CastlingMove castlingMoveKingSide;
@@ -72,10 +74,11 @@ public enum Color {
     private final BoardPiece opponentQueen;
     private final BoardPiece opponentKing;
 
-    Color(int homeRank, int backRank, int pawnStartingRow, int movingDirection, CastlingMove castlingMoveKingSide, CastlingMove castlingMoveQueenSide, OccupancyBitboard ownOccupancyBitboard, OccupancyBitboard opponentOccupancyBitboard, BoardPiece pawn, BoardPiece knight, BoardPiece bishop, BoardPiece rook, BoardPiece queen, BoardPiece king, BoardPiece opponentPawn, BoardPiece opponentKnight, BoardPiece opponentBishop, BoardPiece opponentRook, BoardPiece opponentQueen, BoardPiece opponentKing) {
+    Color(int homeRank, int backRank, int pawnStartingRow, int enPassantTargetRow, int movingDirection, CastlingMove castlingMoveKingSide, CastlingMove castlingMoveQueenSide, OccupancyBitboard ownOccupancyBitboard, OccupancyBitboard opponentOccupancyBitboard, BoardPiece pawn, BoardPiece knight, BoardPiece bishop, BoardPiece rook, BoardPiece queen, BoardPiece king, BoardPiece opponentPawn, BoardPiece opponentKnight, BoardPiece opponentBishop, BoardPiece opponentRook, BoardPiece opponentQueen, BoardPiece opponentKing) {
         this.homeRank = homeRank;
         this.backRank = backRank;
         this.pawnStartingRow = pawnStartingRow;
+        this.enPassantTargetRow = enPassantTargetRow;
         this.movingDirection = movingDirection;
         this.castlingMoveKingSide = castlingMoveKingSide;
         this.castlingMoveQueenSide = castlingMoveQueenSide;
@@ -185,5 +188,9 @@ public enum Color {
 
     public BoardPiece getOpponentKing() {
         return opponentKing;
+    }
+
+    public int getEnPassantTargetRow() {
+        return enPassantTargetRow;
     }
 }
