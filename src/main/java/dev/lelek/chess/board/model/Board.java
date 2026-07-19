@@ -290,6 +290,7 @@ public class Board {
             bitBoardState.clearBit(color.getOpponentOccupancyBitboard(), enPassantPiecePosition);
             bitBoardState.clearBit(OccupancyBitboard.ALL_PIECES, enPassantPiecePosition);
             pieceList[enPassantPiecePosition.getBitBoardSquare()] = null;
+            zobristHash ^= Zobrist.getPieceSquareKey(color.getOpponentPawn(), enPassantPiecePosition);
         } else {
             changePieceNormal(move.getTo(), move.getFrom(), null, pieceList[move.getTo().getBitBoardSquare()]);
 
@@ -353,12 +354,12 @@ public class Board {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Board board = (Board) o;
-        return isWhiteToMove == board.isWhiteToMove && halfmoveClock == board.halfmoveClock && fullmoveNumber == board.fullmoveNumber && Objects.equals(castlingRightsWhite, board.castlingRightsWhite) && Objects.equals(castlingRightsBlack, board.castlingRightsBlack) && Objects.equals(enPassantTargetSquare, board.enPassantTargetSquare) && Objects.equals(bitBoardState, board.bitBoardState) && Objects.deepEquals(pieceList, board.pieceList) && Objects.equals(whiteKingPosition, board.whiteKingPosition) && Objects.equals(blackKingPosition, board.blackKingPosition);
+        return isWhiteToMove == board.isWhiteToMove && halfmoveClock == board.halfmoveClock && fullmoveNumber == board.fullmoveNumber && zobristHash == board.zobristHash && Objects.equals(castlingRightsWhite, board.castlingRightsWhite) && Objects.equals(castlingRightsBlack, board.castlingRightsBlack) && Objects.equals(enPassantTargetSquare, board.enPassantTargetSquare) && Objects.equals(bitBoardState, board.bitBoardState) && Objects.deepEquals(pieceList, board.pieceList) && Objects.equals(whiteKingPosition, board.whiteKingPosition) && Objects.equals(blackKingPosition, board.blackKingPosition);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(isWhiteToMove, castlingRightsWhite, castlingRightsBlack, enPassantTargetSquare, halfmoveClock, fullmoveNumber, bitBoardState, Arrays.hashCode(pieceList), whiteKingPosition, blackKingPosition);
+        return Objects.hash(isWhiteToMove, castlingRightsWhite, castlingRightsBlack, enPassantTargetSquare, halfmoveClock, fullmoveNumber, bitBoardState, Arrays.hashCode(pieceList), whiteKingPosition, blackKingPosition, zobristHash);
     }
 
     public boolean isWhiteToMove() {
