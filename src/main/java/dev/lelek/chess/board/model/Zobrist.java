@@ -9,18 +9,18 @@ import java.util.SplittableRandom;
 
 final class Zobrist {
 
-    private static final long SEED = 0;
+    static final long SEED = 0;
 
-    private static final long[][] Piece_Square_KEYS = new long[BoardPiece.values().length][Board.SIZE * Board.SIZE];
-    private static final long[] CASTLING_KEYS = new long[4];
-    private static final long[] EN_PASSANT_KEYS = new long[8];
-    private static final long SIDE_TO_MOVE_KEYS;
+    static final long[][] Piece_SQUARE_KEYS = new long[BoardPiece.values().length][Board.SIZE * Board.SIZE];
+    static final long[] CASTLING_KEYS = new long[4];
+    static final long[] EN_PASSANT_KEYS = new long[8];
+    static final long SIDE_TO_MOVE_KEYS;
 
     static {
         SplittableRandom random = new SplittableRandom(SEED);
-        for (int i = 0; i < Piece_Square_KEYS.length; i++) {
-            for (int j = 0; j < Piece_Square_KEYS[i].length; j++) {
-                Piece_Square_KEYS[i][j] = random.nextLong();
+        for (int i = 0; i < Piece_SQUARE_KEYS.length; i++) {
+            for (int j = 0; j < Piece_SQUARE_KEYS[i].length; j++) {
+                Piece_SQUARE_KEYS[i][j] = random.nextLong();
             }
         }
         for (int i = 0; i < CASTLING_KEYS.length; i++) CASTLING_KEYS[i] = random.nextLong();
@@ -46,7 +46,7 @@ final class Zobrist {
 
             BoardPosition position = new BoardPosition(bitBoardSquare);
             BoardPiece piece = board.getPieceAt(position);
-            hash = hash ^ Piece_Square_KEYS[piece.ordinal()][position.getBitBoardSquare()];
+            hash = hash ^ Piece_SQUARE_KEYS[piece.ordinal()][position.getBitBoardSquare()];
         }
         return hash;
     }
@@ -74,5 +74,9 @@ final class Zobrist {
         if (positionRight != null && board.getPieceAt(positionRight) == color.getPawn()) return true;
 
         return false;
+    }
+
+    static long getPieceSquareKey(BoardPiece piece, BoardPosition position) {
+        return Piece_SQUARE_KEYS[piece.ordinal()][position.getBitBoardSquare()];
     }
 }

@@ -33,9 +33,11 @@ public class Board {
     private BoardPosition whiteKingPosition;
     private BoardPosition blackKingPosition;
 
+    private long zobristHash;
+
     private static final Logger log = LoggerFactory.getLogger(Board.class);
 
-    private Board(boolean isWhiteToMove, CastlingRights castlingRightsWhite, CastlingRights castlingRightsBlack, BoardPosition enPassantTargetSquare, int halfmoveClock, int fullmoveNumber, BitBoardState bitBoardState, BoardPiece[] pieceList, BoardPosition whiteKingPosition, BoardPosition blackKingPosition) {
+    private Board(boolean isWhiteToMove, CastlingRights castlingRightsWhite, CastlingRights castlingRightsBlack, BoardPosition enPassantTargetSquare, int halfmoveClock, int fullmoveNumber, BitBoardState bitBoardState, BoardPiece[] pieceList, BoardPosition whiteKingPosition, BoardPosition blackKingPosition, long zobristHash) {
         this.isWhiteToMove = isWhiteToMove;
         this.castlingRightsWhite = castlingRightsWhite;
         this.castlingRightsBlack = castlingRightsBlack;
@@ -46,6 +48,7 @@ public class Board {
         this.pieceList = pieceList;
         this.whiteKingPosition = whiteKingPosition;
         this.blackKingPosition = blackKingPosition;
+        this.zobristHash = zobristHash;
     }
 
     public static Board initializeDefaultBoard() {
@@ -65,7 +68,9 @@ public class Board {
         var bitboardState = BitBoardState.initializeFromPieceList(pieceList);
         var whiteKingPosition = getKingBoardPosition(pieceList, Color.WHITE);
         var blackKingPosition = getKingBoardPosition(pieceList, Color.BLACK);
-        return new Board(isWhiteToMove, castlingRightsWhite, castlingRightsBlack, enPassantTarget, halfMoveClock, fullMoveNumber, bitboardState, pieceList, whiteKingPosition, blackKingPosition);
+        Board board = new Board(isWhiteToMove, castlingRightsWhite, castlingRightsBlack, enPassantTarget, halfMoveClock, fullMoveNumber, bitboardState, pieceList, whiteKingPosition, blackKingPosition, -1);
+        board.zobristHash = Zobrist.fromBoard(board);
+        return board;
     }
 
     private static BoardPiece[] initializePieceList(String fen) {
@@ -277,7 +282,7 @@ public class Board {
         Color color = (isWhiteToMove) ? Color.WHITE : Color.BLACK;
         BoardPosition enPassantPiecePosition = getEnPassantPiecePosition();
 
-        if (!undo) {
+        if (! undo) {
             changePieceNormal(move.getFrom(), move.getTo(), null, pieceList[move.getFrom().getBitBoardSquare()]);
 
             // remove pawn to be captured
@@ -294,6 +299,7 @@ public class Board {
             bitBoardState.setBit(OccupancyBitboard.ALL_PIECES, enPassantPiecePosition);
             pieceList[enPassantPiecePosition.getBitBoardSquare()] = color.getOpponentPawn();
         }
+        zobristHash ^= Zobrist.getPieceSquareKey(color.getOpponentPawn(), enPassantPiecePosition);
     }
 
     private void changePieceNormal(BoardPosition from, BoardPosition to, BoardPiece pieceToReplaceWith, BoardPiece pieceToBecome) {
@@ -306,6 +312,7 @@ public class Board {
         bitBoardState.clearBit(OccupancyBitboard.ALL_PIECES, from);
         bitBoardState.clearBit(color.getOwnOccupancyBitboard(), from);
         pieceList[from.getBitBoardSquare()] = null;
+        zobristHash ^= Zobrist.getPieceSquareKey(pieceToMove, from);
 
         // un-capturing a piece (used for unmakeMove)
         if (pieceToReplaceWith != null) {
@@ -313,6 +320,7 @@ public class Board {
             bitBoardState.setBit(OccupancyBitboard.ALL_PIECES, from);
             bitBoardState.setBit(color.getOpponentOccupancyBitboard(), from);
             pieceList[from.getBitBoardSquare()] = pieceToReplaceWith;
+            zobristHash ^= Zobrist.getPieceSquareKey(pieceToReplaceWith, from);
         }
 
         // capture piece if it exists
@@ -320,6 +328,7 @@ public class Board {
             bitBoardState.clearBit(pieceToCapture, to);
             bitBoardState.clearBit(OccupancyBitboard.ALL_PIECES, to);
             bitBoardState.clearBit(color.getOpponentOccupancyBitboard(), to);
+            zobristHash ^= Zobrist.getPieceSquareKey(pieceToCapture, to);
         }
 
         // place piece on to
@@ -327,6 +336,7 @@ public class Board {
         bitBoardState.setBit(OccupancyBitboard.ALL_PIECES, to);
         bitBoardState.setBit(color.getOwnOccupancyBitboard(), to);
         pieceList[to.getBitBoardSquare()] = pieceToBecome;
+        zobristHash ^= Zobrist.getPieceSquareKey(pieceToBecome, to);
     }
 
     public BoardPosition getEnPassantPiecePosition() {
