@@ -330,7 +330,7 @@ public class Board {
     }
 
     public BoardPosition getEnPassantPiecePosition() {
-        if (enPassantTargetSquare == null) throw new RuntimeException("No en passant target square set");
+        if (enPassantTargetSquare == null) return null;
         Color color = (isWhiteToMove) ? Color.WHITE : Color.BLACK;
         return new BoardPosition(enPassantTargetSquare.getX(), enPassantTargetSquare.getY() - color.getMovingDirection());
     }
