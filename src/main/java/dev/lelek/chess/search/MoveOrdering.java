@@ -9,7 +9,7 @@ import dev.lelek.chess.eval.BoardEvaluation;
 import java.util.List;
 
 class MoveOrdering { // todo add tests
-    static void order(Board board, List<Move> moves) {
+    static void order(Board board, List<Move> moves) { // todo refactor so that not all moves are ordered at once
         int bestIdx = -1;
         int bestEvaluation = Integer.MIN_VALUE;
 
