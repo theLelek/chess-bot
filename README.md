@@ -10,7 +10,7 @@ It is written from scratch without any chess libraries.
 - Iterative deepening
 - alpha-beta pruning
 - Move ordering
-- ~~Transposition table~~
+- Transposition table
 - ~~Quiescence Search~~
 
 
