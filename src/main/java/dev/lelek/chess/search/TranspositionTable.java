@@ -5,7 +5,7 @@ class TranspositionTable {
     static final int SIZE = 65536;
     private static final TranspositionTable instance = new TranspositionTable();
 
-    private final TranspositionTableEntry[] transpositionTable = new TranspositionTableEntry[SIZE];
+    private TranspositionTableEntry[] transpositionTable = new TranspositionTableEntry[SIZE];
 
     static {
         if (! (SIZE > 0 && Long.bitCount(SIZE) == 1)) {
@@ -26,6 +26,10 @@ class TranspositionTable {
 
     void setEntry(long zobristHash, TranspositionTableEntry entry) {
         transpositionTable[getIndex(zobristHash)] = entry;
+    }
+
+    void clear() {
+        transpositionTable = new TranspositionTableEntry[SIZE];
     }
 
     private static int getIndex(long zobristHash) {

@@ -4,9 +4,16 @@ import dev.lelek.chess.board.model.Fen;
 import dev.lelek.chess.Move.Move;
 import dev.lelek.chess.board.model.Board;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class GameStatusTest {
+
+    @BeforeEach
+    void setup() {
+        TranspositionTable tt = TranspositionTable.getInstance();
+        tt.clear();
+    }
 
     @Test
     void checkMate() {

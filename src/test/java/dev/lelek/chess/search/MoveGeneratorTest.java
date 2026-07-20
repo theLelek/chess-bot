@@ -4,9 +4,17 @@ import dev.lelek.chess.board.model.Fen;
 import dev.lelek.chess.Move.Move;
 import dev.lelek.chess.board.model.Board;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class MoveGeneratorTest {
+
+    @BeforeEach
+    void setup() {
+        TranspositionTable tt = TranspositionTable.getInstance();
+        tt.clear();
+    }
+
     @Test
     void generateMove_captureQueen() {
         Board board = Fen.fromFen("k7/8/8/8/3q4/2Q5/8/K7 w - - 0 1");
