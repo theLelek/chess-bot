@@ -27,7 +27,10 @@ public class MoveGenerator {
     private static final int FIFTY_MOVE_RULE_HALFMOVES = 100;
 
 
+    private static long nodeCount = 0;
+
     public static Move generateMove(Board board, long timeMillis) {
+        nodeCount = 0;
         Move bestMove = negmax(board, PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove()), 1, new Stack<>(), false, -1, ALPHA_START, BETA_START).move();
 
         long deadline = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(timeMillis);
@@ -37,30 +40,37 @@ public class MoveGenerator {
 
         List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove());
         MoveOrdering.order(board, pseudoLegalMoves);
+        nodeCount = 0;
         for (i = 2; ; i++) {
             BoardResults boardResults = negmax(board, pseudoLegalMoves, i, new Stack<>(), true, deadline, ALPHA_START, BETA_START);
             if (boardResults == null) {
                 break; // timeMillis have passed
             }
             bestMove = boardResults.move();
-            log.info("depth {} complete, best move: {}", i, bestMove);
+            log.info("depth {} complete, best move: {}, node count: {}", i, bestMove, nodeCount);
+            nodeCount = 0;
         }
-        log.info("search completed, depth reached: {}", i);
+        log.info("search completed, depth reached: {}, node count: {}", i - 1, nodeCount);
+        nodeCount = 0;
         return bestMove;
     }
 
     public static Move generateMove(Board board, int maxDepth) {
+        nodeCount = 0;
         Move bestMove = null;
 
         List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove());
         MoveOrdering.order(board, pseudoLegalMoves);
         int i;
+        nodeCount = 0;
         for (i = 1; i <= maxDepth; i++) {
             BoardResults boardResults = negmax(board, pseudoLegalMoves, i, new Stack<>(), false, -1, ALPHA_START, BETA_START);
             bestMove = boardResults.move();
-            log.info("depth {} complete, best move: {}", i, bestMove);
+            log.info("depth {} complete, best move: {}, node count: {}", i, bestMove, nodeCount);
+            nodeCount = 0;
         }
-        log.info("search completed, depth reached: {}", i);
+        log.info("search completed, depth reached: {}, node count: {}", i - 1, nodeCount);
+        nodeCount = 0;
         return bestMove;
     }
 
@@ -72,19 +82,22 @@ public class MoveGenerator {
         Color color = board.isWhiteToMove() ? Color.WHITE : Color.BLACK;
 
         if (board.getHalfmoveClock() == FIFTY_MOVE_RULE_HALFMOVES) {
+            nodeCount++;
             return new BoardResults(0, null, false, true);
         }
 
         TranspositionTable tt = TranspositionTable.getInstance();
         TranspositionTableEntry entry = tt.getEntry(board.getZobristHash());
         if (entry != null && entry.zobristHash() == board.getZobristHash() && entry.searchedDepth() >= depth) {
-            return tt.getEntry(board.getZobristHash()).boardResults();
+            nodeCount++;
+            return new BoardResults(entry.score(), entry.move(), false, false);
         }
         if (entry != null && entry.zobristHash() != board.getZobristHash()) {
             log.error("hash collision in tt, fen: {}", Fen.toFen(board));
         }
         if (depth == 0) { // todo could stop at illegal position
             int sign = color == Color.WHITE ? 1 : -1;
+            nodeCount++;
             return new BoardResults(sign * (random.nextInt(3) - 1 + BoardEvaluation.evaluate(board)), null, false, false);
         }
 
@@ -128,11 +141,12 @@ public class MoveGenerator {
             return null;
         }
         if (! foundLegalMove) {
+            nodeCount++;
             return getBoardResult(board, depth);
         }
         BoardResults boardResults = new BoardResults(bestScore, bestMove, false, false);
 
-        tt.setEntry(board.getZobristHash(), new TranspositionTableEntry(board.getZobristHash(), depth, boardResults));
+        tt.setEntry(board.getZobristHash(), new TranspositionTableEntry(board.getZobristHash(), depth, bestMove, bestScore));
         return boardResults;
     }
 

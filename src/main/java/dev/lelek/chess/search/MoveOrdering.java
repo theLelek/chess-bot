@@ -2,16 +2,26 @@ package dev.lelek.chess.search;
 
 import dev.lelek.chess.BoardPiece;
 import dev.lelek.chess.Move.Move;
+import dev.lelek.chess.Move.PromotionMove;
 import dev.lelek.chess.board.model.Board;
+import dev.lelek.chess.eval.BoardEvaluation;
 
 import java.util.List;
 
 class MoveOrdering {
-    public static void order(Board board, List<Move> moves) {
-        int bestIdx = 0;
+    static void order(Board board, List<Move> moves) {
+        int bestIdx = -1;
         int bestEvaluation = Integer.MIN_VALUE;
 
+        Move pvMove = getPvMove(board);
+        int pvMoveIndex = -1;
+
+
         for (int i = 0; i < moves.size(); i++) {
+            if (moves.get(i).equals(pvMove)) {
+                pvMoveIndex = i;
+                continue;
+            }
             int evaluation = evaluateMove(board, moves.get(i));
             if (evaluation > bestEvaluation) {
                 bestEvaluation = evaluation;
@@ -19,9 +29,23 @@ class MoveOrdering {
             }
         }
 
-        if (bestIdx != 0) {
-            swap(moves, 0, bestIdx);
+        if (pvMoveIndex != -1) {
+            swap(moves, 0, pvMoveIndex);
+
+            if (bestIdx == 0) {
+                bestIdx = pvMoveIndex;
+            }
         }
+
+        if (bestIdx != -1) {
+            swap(moves, pvMoveIndex != -1 ? 1 : 0, bestIdx);
+        }
+    }
+
+    private static Move getPvMove(Board board) {
+        TranspositionTable tt = TranspositionTable.getInstance();
+        TranspositionTableEntry entry = tt.getEntry(board.getZobristHash());
+        return entry == null ? null : entry.move();
     }
 
     private static int evaluateMove(Board board, Move move) { // higher = better
@@ -31,6 +55,7 @@ class MoveOrdering {
         int evaluation = 0;
         evaluation -= pieceFrom.getEvaluation();
         evaluation += pieceTo.getEvaluation();
+        if (move instanceof PromotionMove) evaluation += BoardEvaluation.PAWN_VALUE / 2;
         return evaluation;
     }
 
