@@ -11,7 +11,6 @@ It is written from scratch without any chess libraries.
 - alpha-beta pruning
 - Move ordering
 - Transposition table
-- ~~Quiescence Search~~
 
 
 # APIs
