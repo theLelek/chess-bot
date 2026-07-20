@@ -26,50 +26,37 @@ public class MoveGenerator {
 
     private static final int FIFTY_MOVE_RULE_HALFMOVES = 100;
 
-
     private static long nodeCount = 0;
 
     public static Move generateMove(Board board, long timeMillis) {
-        nodeCount = 0;
-        Move bestMove = negmax(board, PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove()), 1, new Stack<>(), false, -1, ALPHA_START, BETA_START).move();
-
-        long deadline = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(timeMillis);
-
-        log.info("search started");
-        int i;
-
-        List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove());
-        MoveOrdering.order(board, pseudoLegalMoves);
-        nodeCount = 0;
-        for (i = 2; ; i++) {
-            BoardResults boardResults = negmax(board, pseudoLegalMoves, i, new Stack<>(), true, deadline, ALPHA_START, BETA_START);
-            if (boardResults == null) {
-                break; // timeMillis have passed
-            }
-            bestMove = boardResults.move();
-            log.info("depth {} complete, best move: {}, node count: {}", i, bestMove, nodeCount);
-            nodeCount = 0;
-        }
-        log.info("search completed, depth reached: {}, node count: {}", i - 1, nodeCount);
-        nodeCount = 0;
-        return bestMove;
+        return generateMove(board, -1, System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(timeMillis), true);
     }
 
     public static Move generateMove(Board board, int maxDepth) {
-        nodeCount = 0;
-        Move bestMove = null;
+        return generateMove(board, maxDepth, -1, false);
+    }
 
-        List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove());
-        MoveOrdering.order(board, pseudoLegalMoves);
-        int i;
+    private static Move generateMove(Board board, int maxDepth, long deadline, boolean useTimeLimit) {
         nodeCount = 0;
-        for (i = 1; i <= maxDepth; i++) {
-            BoardResults boardResults = negmax(board, pseudoLegalMoves, i, new Stack<>(), false, -1, ALPHA_START, BETA_START);
-            bestMove = boardResults.move();
+
+        List<Move> moves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, board.isWhiteToMove());
+        MoveOrdering.order(board, moves);
+
+        Move bestMove = useTimeLimit ? negmax(board, moves, 1, new Stack<>(), false, -1, ALPHA_START, BETA_START).move() : null;
+        int startDepth = useTimeLimit ? 2 : 1;
+
+        log.info("search started");
+        int i;
+        for (i = startDepth; useTimeLimit || i <= maxDepth; i++) {
+            BoardResults result = negmax(board, moves, i, new Stack<>(), useTimeLimit, deadline, ALPHA_START, BETA_START);
+            if (result == null) break;
+
+            bestMove = result.move();
             log.info("depth {} complete, best move: {}, node count: {}", i, bestMove, nodeCount);
             nodeCount = 0;
         }
-        log.info("search completed, depth reached: {}, node count: {}", i - 1, nodeCount);
+
+        log.info("search completed, depth reached: {}, partially searched nodes: {}", i - 1, nodeCount);
         nodeCount = 0;
         return bestMove;
     }
