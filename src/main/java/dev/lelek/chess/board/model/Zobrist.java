@@ -27,7 +27,7 @@ final class Zobrist {
         SIDE_TO_MOVE_KEY = random.nextLong();
     }
 
-    static long fromBoard(Board board) {
+    public static long fromBoard(Board board) {
         long hash = getPieceSquareHash(board) ^ getCastlingRightsHash(board);
         if (board.isEnPassantCaptureAvailable()) hash ^= getEnPassantKeys(board.getEnPassantTargetSquare());
         if (board.isBlackToMove()) hash ^= SIDE_TO_MOVE_KEY;

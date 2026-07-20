@@ -1,6 +1,7 @@
 package dev.lelek.api;
 
 import dev.lelek.chess.BoardPosition;
+import dev.lelek.chess.board.model.Fen;
 import dev.lelek.chess.Move.Move;
 import dev.lelek.chess.BoardPiece;
 import dev.lelek.chess.board.model.Board;
@@ -16,20 +17,20 @@ class PlayCli { // todo convert to instantiatable class like Uci
 
     static void start() {
         log.info("started play cli");
-        Board board = Board.initializeDefaultBoard();
-        log.info("fen: {}", board.toFen());
+        Board board = Fen.initializeDefaultBoard();
+        log.info("fen: {}", Fen.toFen(board));
         printBoard(board);
         while (GameStatus.getGameStatus(board) == GameStatus.ONGOING) {
             Move playerMove = getPlayerMove(board);
             board.makeMove(playerMove);
             log.info("player move: {}", playerMove);
-            log.info("fen: {}", board.toFen());
+            log.info("fen: {}", Fen.toFen(board));
             if (GameStatus.getGameStatus(board) != GameStatus.ONGOING) break;
 
             Move engineMove = MoveGenerator.generateMove(board, (long) 1000); // 1 second for engine move
             board.makeMove(engineMove);
             log.info("engine move: {}", engineMove);
-            log.info("fen: {}", board.toFen());
+            log.info("fen: {}", Fen.toFen(board));
 
             printBoard(board);
             System.out.println("engine move: " + engineMove);

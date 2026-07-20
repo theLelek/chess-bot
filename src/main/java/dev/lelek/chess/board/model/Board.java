@@ -37,7 +37,7 @@ public class Board {
 
     private static final Logger log = LoggerFactory.getLogger(Board.class);
 
-    private Board(boolean isWhiteToMove, CastlingRights castlingRightsWhite, CastlingRights castlingRightsBlack, BoardPosition enPassantTargetSquare, int halfmoveClock, int fullmoveNumber, BitBoardState bitBoardState, BoardPiece[] pieceList, BoardPosition whiteKingPosition, BoardPosition blackKingPosition, long zobristHash) {
+    public Board(boolean isWhiteToMove, CastlingRights castlingRightsWhite, CastlingRights castlingRightsBlack, BoardPosition enPassantTargetSquare, int halfmoveClock, int fullmoveNumber, BitBoardState bitBoardState, BoardPiece[] pieceList, BoardPosition whiteKingPosition, BoardPosition blackKingPosition, long zobristHash) {
         this.isWhiteToMove = isWhiteToMove;
         this.castlingRightsWhite = castlingRightsWhite;
         this.castlingRightsBlack = castlingRightsBlack;
@@ -49,107 +49,6 @@ public class Board {
         this.whiteKingPosition = whiteKingPosition;
         this.blackKingPosition = blackKingPosition;
         this.zobristHash = zobristHash;
-    }
-
-    public static Board initializeDefaultBoard() {
-        return fromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-    }
-
-    public static Board fromFen(String fen) {
-        log.debug("loaded fen: {}", fen);
-        String[] fenParts = fen.split(" ");
-        var isWhiteToMove = fenParts[1].equals("w");
-        var castlingRightsWhite = CastlingRights.fromFen(fenParts[2], true);
-        var castlingRightsBlack = CastlingRights.fromFen(fenParts[2], false);
-        var enPassantTarget = (! fenParts[3].equals("-")) ? new BoardPosition(fenParts[3]) : null;
-        var halfMoveClock = Integer.parseInt(fenParts[4]);
-        var fullMoveNumber = Integer.parseInt(fenParts[5]);
-        var pieceList = initializePieceList(fenParts[0]);
-        var bitboardState = BitBoardState.initializeFromPieceList(pieceList);
-        var whiteKingPosition = getKingBoardPosition(pieceList, Color.WHITE);
-        var blackKingPosition = getKingBoardPosition(pieceList, Color.BLACK);
-        Board board = new Board(isWhiteToMove, castlingRightsWhite, castlingRightsBlack, enPassantTarget, halfMoveClock, fullMoveNumber, bitboardState, pieceList, whiteKingPosition, blackKingPosition, -1);
-        board.zobristHash = Zobrist.fromBoard(board);
-        return board;
-    }
-
-    private static BoardPiece[] initializePieceList(String fen) {
-        BoardPiece[] pieceList = new BoardPiece[Board.SIZE * Board.SIZE];
-        String[] lines = fen.split("/");
-
-        for (int i = 0; i < lines.length; i++) {
-            int column = 0;
-            for (int j = 0; j < lines[i].length(); j++) {
-                char currentChar = lines[i].charAt(j);
-                BoardPosition currentPosition = new BoardPosition(column, i);
-                if (Character.isDigit(currentChar)) {
-                    column += currentChar - '0';
-                } else {
-                    BoardPiece piece = BoardPiece.fromFen(currentChar);
-                    pieceList[currentPosition.getBitBoardSquare()] = piece;
-                    column++;
-                }
-            }
-        }
-        return pieceList;
-    }
-
-    private static BoardPosition getKingBoardPosition(BoardPiece[] pieceList, Color color) {
-        try {
-            return initializeKingPosition(pieceList, color);
-        } catch (NoKingFoundException e) {
-            log.warn("No king found in board: {}", Arrays.toString(pieceList));
-        }
-        return null;
-    }
-
-    private static BoardPosition initializeKingPosition(BoardPiece[] pieceList, Color color) {
-        for (int i = 0; i < pieceList.length; i++) {
-            if (pieceList[i] == color.getKing()) {
-                return new BoardPosition(i);
-            }
-        }
-        throw new NoKingFoundException("couldnt find king in board");
-    }
-
-    public String toFen() {
-        String fen = piecePlacementsToFen();
-        fen += " " + (isWhiteToMove() ? "w" : "b");
-        fen += " " + castlingRightsToFen();
-        fen += " " + (enPassantTargetSquare == null ? "-" : enPassantTargetSquare.toFen());
-        fen += " " + halfmoveClock;
-        fen += " " + fullmoveNumber;
-        log.debug("generated fen: {}", fen);
-        return fen;
-    }
-
-    private String piecePlacementsToFen() {
-        String[] piecePlacements = new String[Board.SIZE];
-        Arrays.fill(piecePlacements, "");
-        for (int i = 0; i < Board.SIZE; i++) {
-            int column = 0;
-            for (int j = 0; j < Board.SIZE; j++) {
-                BoardPosition position = new BoardPosition(j, i);
-                BoardPiece piece = getPieceAt(position);
-                if (piece != null) {
-                    if (column != 0) piecePlacements[i] += column;
-                    piecePlacements[i] += piece.toFen();
-                    column = 0;
-                } else {
-                    column++;
-                }
-            }
-            if (column != 0) piecePlacements[i] += column;
-        }
-        return String.join("/", piecePlacements);
-    }
-
-    private String castlingRightsToFen() {
-        String castlingRights = "";
-        castlingRights += castlingRightsWhite.toFen(Color.WHITE);
-        castlingRights += castlingRightsBlack.toFen(Color.BLACK);
-        if (castlingRights.isEmpty()) castlingRights = "-";
-        return castlingRights;
     }
 
     public void makeMove(Move move) {
@@ -471,5 +370,9 @@ public class Board {
 
     public long getZobristHash() {
         return zobristHash;
+    }
+
+    void setZobristHash(long zobristHash) {
+        this.zobristHash = zobristHash;
     }
 }

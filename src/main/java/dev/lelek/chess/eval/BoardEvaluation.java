@@ -2,12 +2,13 @@ package dev.lelek.chess.eval;
 
 import dev.lelek.chess.BoardPosition;
 import dev.lelek.chess.BoardPiece;
+import dev.lelek.chess.board.model.Fen;
 import dev.lelek.chess.board.OccupancyBitboard;
 import dev.lelek.chess.board.model.Board;
 
 public class BoardEvaluation {
 
-    static final int DEFAULT_BOARD_VALUE = computeBoardValue(Board.initializeDefaultBoard());
+    static final int DEFAULT_BOARD_VALUE = computeBoardValue(Fen.initializeDefaultBoard());
 
     public static final int PAWN_VALUE = 100;
     public static final int KNIGHT_VALUE = 350;

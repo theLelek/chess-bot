@@ -2,6 +2,7 @@ package dev.lelek.chess.search;
 
 import dev.lelek.chess.BoardPosition;
 import dev.lelek.chess.Color;
+import dev.lelek.chess.board.model.Fen;
 import dev.lelek.chess.Move.Move;
 import dev.lelek.chess.board.UnmakeMoveInfo;
 import dev.lelek.chess.board.model.Board;
@@ -80,7 +81,7 @@ public class MoveGenerator {
             return tt.getEntry(board.getZobristHash()).boardResults();
         }
         if (entry != null && entry.zobristHash() != board.getZobristHash()) {
-            log.error("hash collision in tt, fen: {}", board.toFen());
+            log.error("hash collision in tt, fen: {}", Fen.toFen(board));
         }
         if (depth == 0) { // todo could stop at illegal position
             int sign = color == Color.WHITE ? 1 : -1;
