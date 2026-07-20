@@ -2,6 +2,7 @@ package dev.lelek.api;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dev.lelek.chess.board.model.Fen;
 import dev.lelek.chess.search.GameStatus;
 import dev.lelek.chess.search.LegalMoveFinder;
 import org.slf4j.Logger;
@@ -36,7 +37,7 @@ class WebApi {
         switch (message) {
             case "legal-moves" -> response = mapper.writeValueAsString(LegalMoveFinder.getLegalMoves(uci.getBoard()));
             case "game-status" -> response = GameStatus.getGameStatus(uci.getBoard()).toString();
-            case "fen" -> response = uci.getBoard().toFen();
+            case "fen" -> response = Fen.toFen(uci.getBoard());
             default -> response = uci.handleCommand(message);
         }
         log.info("web api response: {}", response);

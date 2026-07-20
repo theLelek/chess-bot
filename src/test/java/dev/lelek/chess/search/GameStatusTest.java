@@ -1,15 +1,23 @@
 package dev.lelek.chess.search;
 
+import dev.lelek.chess.board.model.Fen;
 import dev.lelek.chess.Move.Move;
 import dev.lelek.chess.board.model.Board;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class GameStatusTest {
 
+    @BeforeEach
+    void setup() {
+        TranspositionTable tt = TranspositionTable.getInstance();
+        tt.clear();
+    }
+
     @Test
     void checkMate() {
-        Board board = Board.fromFen("1r6/8/8/8/8/8/8/Kq6 w - - 0 1");
+        Board board = Fen.fromFen("1r6/8/8/8/8/8/8/Kq6 w - - 0 1");
         Move bestMove = MoveGenerator.generateMove(board, 1);
         Assertions.assertEquals(GameStatus.CHECKMATE, GameStatus.getGameStatus(board));
         Assertions.assertNull(bestMove);
@@ -17,7 +25,7 @@ class GameStatusTest {
 
     @Test
     void stalemate() {
-        Board board = Board.fromFen("8/8/8/8/8/1q6/8/K7 w - - 0 1");
+        Board board = Fen.fromFen("8/8/8/8/8/1q6/8/K7 w - - 0 1");
         Move bestMove = MoveGenerator.generateMove(board, 1);
         Assertions.assertEquals(GameStatus.STALEMATE, GameStatus.getGameStatus(board));
         Assertions.assertNull(bestMove);
@@ -25,7 +33,7 @@ class GameStatusTest {
 
     @Test
     void ongoing() {
-        Board board = Board.fromFen("1r6/8/1q6/8/8/8/8/K7 w - - 0 1");
+        Board board = Fen.fromFen("1r6/8/1q6/8/8/8/8/K7 w - - 0 1");
         Move bestMove = MoveGenerator.generateMove(board, 1);
         Assertions.assertEquals(GameStatus.ONGOING, GameStatus.getGameStatus(board));
         Assertions.assertEquals(new Move("a1", "a2"), bestMove);

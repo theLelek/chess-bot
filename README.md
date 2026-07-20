@@ -9,14 +9,14 @@ It is written from scratch without any chess libraries.
 - UCI support
 - Iterative deepening
 - alpha-beta pruning
-- ~~Move ordering~~
+- Move ordering
 - ~~Transposition table~~
 - ~~Quiescence Search~~
 
 
 # APIs
 
-There are three APIs.
+There are 3 APIs.
 
 ## UCI API
 

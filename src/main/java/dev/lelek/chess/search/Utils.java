@@ -5,7 +5,7 @@ import dev.lelek.chess.Move.Move;
 
 import java.util.List;
 
-public class Utils {
+class Utils {
     public static boolean isPositionAttacked(List<Move> moves, BoardPosition... positions) {
         for (Move move : moves) {
             for (BoardPosition position : positions) {

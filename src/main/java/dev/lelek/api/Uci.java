@@ -1,6 +1,7 @@
 package dev.lelek.api;
 
 import dev.lelek.chess.BoardPosition;
+import dev.lelek.chess.board.model.Fen;
 import dev.lelek.chess.Move.CastlingMove;
 import dev.lelek.chess.Move.EnPassantMove;
 import dev.lelek.chess.Move.Move;
@@ -80,9 +81,9 @@ class Uci {
 
     private static Board extractStartPosition(String command) {
         if (command.startsWith("position startpos")) {
-            return Board.initializeDefaultBoard();
+            return Fen.initializeDefaultBoard();
         } else {
-            return Board.fromFen(extractFen(command));
+            return Fen.fromFen(extractFen(command));
         }
     }
 

@@ -3,6 +3,7 @@ package dev.lelek.chess.board;
 import dev.lelek.chess.BoardPiece;
 import dev.lelek.chess.BoardPosition;
 import dev.lelek.chess.Color;
+import dev.lelek.chess.board.model.Fen;
 import dev.lelek.chess.Move.CastlingMove;
 import dev.lelek.chess.Move.EnPassantMove;
 import dev.lelek.chess.Move.Move;
@@ -20,7 +21,7 @@ public class PseudoLegalMoveFinderTest {
     @Test
     @DisplayName("test find legal moves with black bishop at f8")
     public void testFindLegalMoves1() {
-        Board board = Board.fromFen("r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 1");
+        Board board = Fen.fromFen("r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 1");
         List<Move> legalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, false);
         List<Move> actual = filterByStartingPosition(legalMoves, new BoardPosition("f8"));
         List<Move> expected = Arrays.asList(new Move("f8", "e7"), new Move("f8", "d6"), new Move("f8", "c5"), new Move("f8", "b4"), new Move("f8", "a3"));
@@ -30,7 +31,7 @@ public class PseudoLegalMoveFinderTest {
     @Test
     @DisplayName("com.example.Test find legal pawn move with black pawn on h7, can capture and move two fields foreward")
     public void testFindLegalPawnMoves2() {
-        Board board = Board.fromFen("rnbqkbnr/p1pppppp/6P1/8/1p6/8/PPPPPP1P/RNBQKBNR w KQkq - 0 1");
+        Board board = Fen.fromFen("rnbqkbnr/p1pppppp/6P1/8/1p6/8/PPPPPP1P/RNBQKBNR w KQkq - 0 1");
         List<Move> legalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, false);
         List<Move> actual = filterByStartingPosition(legalMoves, new BoardPosition(7, 1));
         List<Move> expected = Arrays.asList(new Move("h7", "h6"), new Move("h7", "h5"), new Move("h7", "g6"));
@@ -40,7 +41,7 @@ public class PseudoLegalMoveFinderTest {
     @Test
     @DisplayName("com.example.Test white knight on b1 in starting position can only move to a3 and c3")
     public void testFindLegalKnightMoves1() {
-        Board board = Board.fromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+        Board board = Fen.fromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
         List<Move> legalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, true);
         List<Move> actual = filterByStartingPosition(legalMoves, new BoardPosition(1, 7));
         List<Move> expected = Arrays.asList(new Move("b1", "c3"), new Move("b1", "a3"));
@@ -50,7 +51,7 @@ public class PseudoLegalMoveFinderTest {
     @Test
     @DisplayName("com.example.Test white pawn on e3 blocked by black pawn on e4 has no legal moves")
     public void testFindLegalPawnMovesBlocked() {
-        Board board = Board.fromFen("4k3/8/8/8/4p3/4P3/8/4K3 w - - 0 1");
+        Board board = Fen.fromFen("4k3/8/8/8/4p3/4P3/8/4K3 w - - 0 1");
         List<Move> legalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, true);
         List<Move> actual = filterByStartingPosition(legalMoves, new BoardPosition(4, 5));
         Assertions.assertTrue(actual.isEmpty(), "Expected blocked pawn to have no legal moves");
@@ -59,7 +60,7 @@ public class PseudoLegalMoveFinderTest {
     @Test
     @DisplayName("com.example.Test black bishop on f8 has no moves when blocked by own pawns")
     public void testFindLegalBishopMovesBlocked() {
-        Board board = Board.fromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+        Board board = Fen.fromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
         List<Move> legalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, false);
         List<Move> actual = filterByStartingPosition(legalMoves, new BoardPosition(5, 0));
         Assertions.assertTrue(actual.isEmpty(), "Expected f8 bishop to have no legal moves in starting position");
@@ -68,7 +69,7 @@ public class PseudoLegalMoveFinderTest {
     @Test
     @DisplayName("com.example.Test white pawn on e2 in starting position can move to e3 or e4")
     public void testFindLegalPawnMovesDoubleStep() {
-        Board board = Board.fromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+        Board board = Fen.fromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
         List<Move> legalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, true);
         List<Move> actual = filterByStartingPosition(legalMoves, new BoardPosition(4, 6));
         List<Move> expected = Arrays.asList(new Move("e2", "e3"), new Move("e2", "e4"));
@@ -78,7 +79,7 @@ public class PseudoLegalMoveFinderTest {
     // castling
     @Test
     void getPseudoLegalCastlingRights() {
-        Board board = Board.initializeDefaultBoard();
+        Board board = Fen.initializeDefaultBoard();
         List<Move> legalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, true);
         List<CastlingMove> actual = filterByType(legalMoves, CastlingMove.class);
         List<CastlingMove> expected = Arrays.asList();
@@ -88,7 +89,7 @@ public class PseudoLegalMoveFinderTest {
 
     @Test
     void white_canCastleBothSides_whenAllSquaresClear() {
-        Board board = Board.fromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1");
+        Board board = Fen.fromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1");
         List<Move> legalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, true);
         List<CastlingMove> actual = filterByType(legalMoves, CastlingMove.class);
         List<CastlingMove> expected = Arrays.asList(Color.WHITE.getCastlingMoveKingSide(), Color.WHITE.getCastlingMoveQueenSide());
@@ -97,7 +98,7 @@ public class PseudoLegalMoveFinderTest {
 
     @Test
     void white_cannotCastleEitherSide_whenSquaresBlocked() {
-        Board board = Board.initializeDefaultBoard();
+        Board board = Fen.initializeDefaultBoard();
         List<Move> legalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, true);
 
         List<CastlingMove> actual = filterByType(legalMoves, CastlingMove.class);
@@ -108,7 +109,7 @@ public class PseudoLegalMoveFinderTest {
 
     @Test
     void black_canCastleBothSides_whenAllSquaresClear() {
-        Board board = Board.fromFen("r3k2r/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1");
+        Board board = Fen.fromFen("r3k2r/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1");
         List<Move> legalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, false);
 
         List<CastlingMove> actual = filterByType(legalMoves, CastlingMove.class);
@@ -123,7 +124,7 @@ public class PseudoLegalMoveFinderTest {
     // promotion
     @Test
     void getPromotionMoves_returnsEmpty_whenNoPawnsNearPromotion() {
-        Board board = Board.initializeDefaultBoard();
+        Board board = Fen.initializeDefaultBoard();
         List<Move> legalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, true);
         List<PromotionMove> promotionMoves = filterByType(legalMoves, PromotionMove.class);
         Assertions.assertTrue(promotionMoves.isEmpty());
@@ -131,7 +132,7 @@ public class PseudoLegalMoveFinderTest {
 
     @Test
     void getPromotionMoves_returnsPromotionMove_whenWhitePawnOnSeventhRank() {
-        Board board = Board.fromFen("8/4P3/8/8/8/8/8/4K2k w - - 0 1");
+        Board board = Fen.fromFen("8/4P3/8/8/8/8/8/4K2k w - - 0 1");
         List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, true);
         List<PromotionMove> promotionMoves = filterByType(pseudoLegalMoves, PromotionMove.class);
         List<PromotionMove> expected = Arrays.asList(new PromotionMove("e7", "e8", BoardPiece.WHITE_KNIGHT), new PromotionMove("e7", "e8", BoardPiece.WHITE_ROOK), new PromotionMove("e7", "e8", BoardPiece.WHITE_QUEEN), new PromotionMove("e7", "e8", BoardPiece.WHITE_BISHOP));
@@ -140,7 +141,7 @@ public class PseudoLegalMoveFinderTest {
 
     @Test
     void getPromotionMoves_returnsPromotionMove_whenBlackPawnOnSecondRank() {
-        Board board = Board.fromFen("4K2k/8/8/8/8/8/4p3/8 b - - 0 1");
+        Board board = Fen.fromFen("4K2k/8/8/8/8/8/4p3/8 b - - 0 1");
         List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, false);
         List<PromotionMove> promotionMoves = filterByType(pseudoLegalMoves, PromotionMove.class);
         List<PromotionMove> expected = Arrays.asList(new PromotionMove("e2", "e1", BoardPiece.BLACK_KNIGHT), new PromotionMove("e2", "e1", BoardPiece.BLACK_BISHOP), new PromotionMove("e2", "e1", BoardPiece.BLACK_ROOK), new PromotionMove("e2", "e1", BoardPiece.BLACK_QUEEN));
@@ -149,7 +150,7 @@ public class PseudoLegalMoveFinderTest {
 
     @Test
     void getPromotionMoves_returnsMultiplePromotionMoves_whenMultiplePawnsOnSeventhRank() {
-        Board board = Board.fromFen("8/2P1P3/8/8/8/8/8/4K2k w - - 0 1");
+        Board board = Fen.fromFen("8/2P1P3/8/8/8/8/8/4K2k w - - 0 1");
         List<Move> pseudoLegalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, true);
         List<PromotionMove> promotionMoves = filterByType(pseudoLegalMoves, PromotionMove.class);
         List<PromotionMove> expected = Arrays.asList(
@@ -169,7 +170,7 @@ public class PseudoLegalMoveFinderTest {
     // en pessant
     @Test
     void white_canCaptureEnPassant_whenPawnMovesTwoSquaresPast() {
-        Board board = Board.fromFen("8/8/8/3pP3/8/8/8/4K2k w - d6 0 1");
+        Board board = Fen.fromFen("8/8/8/3pP3/8/8/8/4K2k w - d6 0 1");
         List<Move> legalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, true);
         List<EnPassantMove> enPassantMoves = filterByType(legalMoves, EnPassantMove.class);
         List<EnPassantMove> expected = Arrays.asList(new EnPassantMove("e5", "d6"));
@@ -178,7 +179,7 @@ public class PseudoLegalMoveFinderTest {
 
     @Test
     void black_canCaptureEnPassant_whenPawnMovesTwoSquaresPast() {
-        Board board = Board.fromFen("8/8/8/8/3Pp3/8/8/4K2k b - d3 0 1");
+        Board board = Fen.fromFen("8/8/8/8/3Pp3/8/8/4K2k b - d3 0 1");
         List<Move> legalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, false);
         List<EnPassantMove> enPassantMoves = filterByType(legalMoves, EnPassantMove.class);
         List<EnPassantMove> expected = Arrays.asList(new EnPassantMove("e4", "d3"));
@@ -187,7 +188,7 @@ public class PseudoLegalMoveFinderTest {
 
     @Test
     void no_enPassant_whenPawnDidNotMoveTwoSquares() {
-        Board board = Board.fromFen("8/8/8/4p3/3P4/8/8/4K2k w - - 0 1");
+        Board board = Fen.fromFen("8/8/8/4p3/3P4/8/8/4K2k w - - 0 1");
         List<Move> legalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, true);
         List<EnPassantMove> enPassantMoves = filterByType(legalMoves, EnPassantMove.class);
         Assertions.assertTrue(enPassantMoves.isEmpty());
@@ -195,7 +196,7 @@ public class PseudoLegalMoveFinderTest {
 
     @Test
     void no_enPassant_whenPawnsAreNotAdjacent() {
-        Board board = Board.fromFen("8/8/8/8/2p1P3/8/8/4K2k w - c6 0 1");
+        Board board = Fen.fromFen("8/8/8/8/2p1P3/8/8/4K2k w - c6 0 1");
         List<Move> legalMoves = PseudoLegalMoveFinder.getPseudoLegalMoves(board, true);
         List<EnPassantMove> enPassantMoves = filterByType(legalMoves, EnPassantMove.class);
         Assertions.assertTrue(enPassantMoves.isEmpty());

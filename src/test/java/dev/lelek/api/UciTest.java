@@ -1,6 +1,6 @@
 package dev.lelek.api;
 
-import dev.lelek.chess.board.model.Board;
+import dev.lelek.chess.board.model.Fen;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -10,16 +10,16 @@ public class UciTest {
         Uci uci = new Uci();
 
         uci.handleCommand("position startpos");
-        Assertions.assertEquals(Board.initializeDefaultBoard(), uci.getBoard());
+        Assertions.assertEquals(Fen.initializeDefaultBoard(), uci.getBoard());
 
         uci.handleCommand("position startpos moves e2e4 e7e5 g1f3 b8c6");
-        Assertions.assertEquals(Board.fromFen("r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3"), uci.getBoard());
+        Assertions.assertEquals(Fen.fromFen("r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3"), uci.getBoard());
 
         uci.handleCommand("position fen rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-        Assertions.assertEquals(Board.fromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"), uci.getBoard());
+        Assertions.assertEquals(Fen.fromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"), uci.getBoard());
 
         uci.handleCommand("position fen rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 moves e2e4 e7e5 g1f3 b8c6");
-        Assertions.assertEquals(Board.fromFen("r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3"), uci.getBoard());
+        Assertions.assertEquals(Fen.fromFen("r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3"), uci.getBoard());
     }
 
     @Test
