@@ -74,7 +74,7 @@ public class MoveGenerator {
         if (depth == 0) { // todo could stop at illegal position
             int sign = color == Color.WHITE ? 1 : -1;
             nodeCount++;
-            return new BoardResults(sign * (random.nextInt(3) - 1 + BoardEvaluation.evaluate(board)), null, false, false);
+            return new BoardResults(sign * (random.nextInt(3) - 1 + BoardEvaluation.evaluate(board, pseudoLegalMoves)), null, false, false);
         }
 
         TranspositionTable tt = TranspositionTable.getInstance();

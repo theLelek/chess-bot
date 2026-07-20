@@ -28,7 +28,7 @@ class PieceSquareTableHandler {
     }
 
     static PieceSquareTableHandler fromBoard(Board board) {
-        double gamePhase = (double) BoardEvaluation.computeBoardValue(board) / BoardEvaluation.DEFAULT_BOARD_VALUE;
+        double gamePhase = (double) BoardEvaluation.computePiecesValue(board) / BoardEvaluation.DEFAULT_BOARD_VALUE;
         // score = 1 -> opening
         // score = 0.75 -> half opening and half middle game
 
