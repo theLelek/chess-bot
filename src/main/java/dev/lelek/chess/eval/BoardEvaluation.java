@@ -26,8 +26,9 @@ public class BoardEvaluation {
         int value = evaluatePieces(board);
         int sign = board.isWhiteToMove() ? 1 : -1;
 
-
         value += sign * pseudoLegalMoves.size();
+        value += kingsSafety(board);
+
         return value;
     }
 
@@ -54,7 +55,7 @@ public class BoardEvaluation {
         return value;
     }
 
-    private static int kingSafety(Board board) {
+    private static int kingsSafety(Board board) {
         int evaluation = 0;
 
         BoardPosition whiteKing = board.getWhiteKingPosition();
