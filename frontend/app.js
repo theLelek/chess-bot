@@ -22,6 +22,7 @@ let lastFen = null;
 let movesSinceLastFen = [];
 
 //TODO: implement promotion
+//TODO: implement Checkmate and draw
 
 
 let field;
@@ -241,7 +242,6 @@ async function move(){
         return false;
     }
 
-    renderMove(startCoordinates, endCoordinates);
 
     let result = await sendMove(startCoordinates, endCoordinates);
 
@@ -269,16 +269,28 @@ function makeMove(move){
         console.log(startCoordinates);
         console.log(endCoordinates);
     }
-    if (startCoordinates === "e1" && endCoordinates === "g1") {
-        makeSmallRochade("w");
-    } else if (startCoordinates === "e1" && endCoordinates === "c1") {
-        makeBigRochade("w");
-    } else if (startCoordinates === "e8" && endCoordinates === "g8") {
-        makeSmallRochade("b");
-    } else if (startCoordinates === "e8" && endCoordinates === "c8") {
-        makeBigRochade("b");
-    }else {
-        let piece = getFieldValueByNotation(startCoordinates);
+
+    let piece = getFieldValueByNotation(startCoordinates);
+    let castle = true;
+    if(piece.toLowerCase() === "k"){
+        if (startCoordinates === "e1" && endCoordinates === "g1") {
+            makeSmallRochade("w");
+        } else if (startCoordinates === "e1" && endCoordinates === "c1") {
+            makeBigRochade("w");
+        } else if (startCoordinates === "e8" && endCoordinates === "g8") {
+            makeSmallRochade("b");
+        } else if (startCoordinates === "e8" && endCoordinates === "c8") {
+            makeBigRochade("b");
+        } else{
+            castle = false;
+        }
+    }
+    if(!castle){
+        if(piece === "p" && endCoordinates.endsWith("1")){
+            piece = "q";
+        } else if(piece === "P" && endCoordinates.endsWith("8")){
+            piece = "Q";
+        }
         setFieldValueByNotation(endCoordinates, piece);
         setFieldValueByNotation(startCoordinates, null);
     }
@@ -353,7 +365,7 @@ function renderMove(startCoordinates, endCoordinates, additionalCoordinates = []
     });
 }
 
-function renderBoard() {
+function renderBoard(checkmated) {
     let buttons = document.querySelectorAll(".field");
 
     buttons.forEach(button => {
@@ -362,6 +374,7 @@ function renderBoard() {
         let col = button.dataset.col;
 
         let piece = field[col][row];
+
         const pieceName = pieceNames.get(piece);
 
 
@@ -373,7 +386,11 @@ function renderBoard() {
 
             
             img.src = "img/" + pieceName + ".png";
-            
+
+
+            if(checkmated === piece){
+                img.style.transform = "rotate(-90deg)"
+            }
 
             button.appendChild(img);
         }
