@@ -1,8 +1,7 @@
 package dev.lelek.chess.search;
+class TranspositionTable { // static final int SIZE = 16_777_216;
+    static final int SIZE = 134_217_728; // 2^27
 
-class TranspositionTable {
-
-    static final int SIZE = 16_777_216;
     private static final TranspositionTable instance = new TranspositionTable();
 
     private TranspositionTableEntry[] transpositionTable = new TranspositionTableEntry[SIZE];
@@ -21,7 +20,7 @@ class TranspositionTable {
 
     TranspositionTableEntry getEntry(long zobristHash) {
         TranspositionTableEntry entry = transpositionTable[getIndex(zobristHash)];
-        return (entry != null && entry.zobristHash() == zobristHash) ? entry : null;
+        return entry;
     }
 
     void setEntry(long zobristHash, TranspositionTableEntry entry) {

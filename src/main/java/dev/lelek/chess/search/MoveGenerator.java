@@ -2,7 +2,6 @@ package dev.lelek.chess.search;
 
 import dev.lelek.chess.BoardPosition;
 import dev.lelek.chess.Color;
-import dev.lelek.chess.board.model.Fen;
 import dev.lelek.chess.Move.Move;
 import dev.lelek.chess.board.UnmakeMoveInfo;
 import dev.lelek.chess.board.model.Board;
@@ -72,20 +71,16 @@ public class MoveGenerator {
             nodeCount++;
             return new BoardResults(0, null, false, true);
         }
-
-        TranspositionTable tt = TranspositionTable.getInstance();
-        TranspositionTableEntry entry = tt.getEntry(board.getZobristHash());
-        if (entry != null && entry.zobristHash() == board.getZobristHash() && entry.searchedDepth() >= depth) {
-            nodeCount++;
-            return new BoardResults(entry.score(), entry.move(), false, false);
-        }
-        if (entry != null && entry.zobristHash() != board.getZobristHash()) {
-            log.error("hash collision in tt, fen: {}", Fen.toFen(board));
-        }
         if (depth == 0) { // todo could stop at illegal position
             int sign = color == Color.WHITE ? 1 : -1;
             nodeCount++;
             return new BoardResults(sign * (random.nextInt(3) - 1 + BoardEvaluation.evaluate(board)), null, false, false);
+        }
+
+        TranspositionTable tt = TranspositionTable.getInstance();
+        TranspositionTableEntry entry = tt.getEntry(board.getZobristHash());
+        if (entry != null && entry.zobristHash() == board.getZobristHash() && entry.searchedDepth() >= depth) {
+            return new BoardResults(entry.score(), entry.move(), false, false);
         }
 
         Move bestMove = null;
