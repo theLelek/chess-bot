@@ -243,7 +243,12 @@ async function move(){
     }
 
 
-    let result = await sendMove(startCoordinates, endCoordinates);
+    let result;
+    if(isPromotion()) {
+        result = await sendMove(startCoordinates, endCoordinates, isWhiteToMove ? "Q":"q");
+    } else {
+        result = await sendMove(startCoordinates, endCoordinates);
+    }
 
     let toReturn = false;
 
@@ -271,8 +276,9 @@ function makeMove(move){
     }
 
     let piece = getFieldValueByNotation(startCoordinates);
-    let castle = true;
+    let castle = false;
     if(piece.toLowerCase() === "k"){
+        castle = true;
         if (startCoordinates === "e1" && endCoordinates === "g1") {
             makeSmallRochade("w");
         } else if (startCoordinates === "e1" && endCoordinates === "c1") {
@@ -286,10 +292,8 @@ function makeMove(move){
         }
     }
     if(!castle){
-        if(piece === "p" && endCoordinates.endsWith("1")){
-            piece = "q";
-        } else if(piece === "P" && endCoordinates.endsWith("8")){
-            piece = "Q";
+        if(isPromotion()){
+            piece = isWhiteToMove ? "Q" : "q";
         }
         setFieldValueByNotation(endCoordinates, piece);
         setFieldValueByNotation(startCoordinates, null);
@@ -302,6 +306,16 @@ function makeMove(move){
         startCoordinates = null;
         endCoordinates = null;
     }
+}
+
+function isPromotion(){
+    const piece = getFieldValueByNotation(startCoordinates);
+    if(piece === "p" && endCoordinates.endsWith("1")){
+        return true;
+    } else if(piece === "P" && endCoordinates.endsWith("8")){
+        return true;
+    }
+    return false;
 }
 
 function makeSmallRochade(color){
@@ -444,7 +458,7 @@ async function sendMessage(message) {
     })
         .then(async function (response) {
             if (!response.ok) {
-                return "HTTP Error: " + response.statusText;
+                return "ERROR " + response.statusText;
             }
             return response.text();
         })
