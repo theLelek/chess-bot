@@ -85,8 +85,19 @@ class MoveGeneratorTest {
         // depth 6 = 4.4 sec
         // depth 5 = 0.384 sec
         // on perft position 4: 2.3 sec wihout and 1.37 with ordering
-        Board board = Board.fromFen("r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1");
-        Move bestMove = MoveGenerator.generateMove(board, 5);
+//        Board board = Board.fromFen("8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 1 ");
+        Board board = Board.initializeDefaultBoard();
+        Move bestMove = MoveGenerator.generateMove(board, 6);
         System.out.println(bestMove);
+    }
+
+    @Test
+    void LaskerReichhelmPosition() {
+        /* this is a famous endgame position where the engine needs to look very deep into the future
+        it can only be solved if the tt is used correctly
+        */
+        Board board = Board.fromFen("8/k7/3p4/p2P1p2/P2P1P2/8/8/K7 w - - 0 1");
+        Move move = MoveGenerator.generateMove(board, 30);
+        System.out.println(move);
     }
 }

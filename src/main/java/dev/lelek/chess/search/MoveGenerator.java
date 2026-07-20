@@ -73,6 +73,15 @@ public class MoveGenerator {
         if (board.getHalfmoveClock() == FIFTY_MOVE_RULE_HALFMOVES) {
             return new BoardResults(0, null, false, true);
         }
+
+        TranspositionTable tt = TranspositionTable.getInstance();
+        TranspositionTableEntry entry = tt.getEntry(board.getZobristHash());
+        if (entry != null && entry.zobristHash() == board.getZobristHash() && entry.searchedDepth() >= depth) {
+            return tt.getEntry(board.getZobristHash()).boardResults();
+        }
+        if (entry != null && entry.zobristHash() != board.getZobristHash()) {
+            log.error("hash collision in tt, fen: {}", board.toFen());
+        }
         if (depth == 0) { // todo could stop at illegal position
             int sign = color == Color.WHITE ? 1 : -1;
             return new BoardResults(sign * (random.nextInt(3) - 1 + BoardEvaluation.evaluate(board)), null, false, false);
@@ -120,7 +129,10 @@ public class MoveGenerator {
         if (! foundLegalMove) {
             return getBoardResult(board, depth);
         }
-        return new BoardResults(bestScore, bestMove, false, false);
+        BoardResults boardResults = new BoardResults(bestScore, bestMove, false, false);
+
+        tt.setEntry(board.getZobristHash(), new TranspositionTableEntry(board.getZobristHash(), depth, boardResults));
+        return boardResults;
     }
 
     private static BoardResults getBoardResult(Board board, int depth) {
@@ -133,5 +145,3 @@ public class MoveGenerator {
         return new BoardResults(0, null, false, true); // stalemate
     }
 }
-
-record BoardResults(int score, Move move, boolean hasLost, boolean hasDrawn) {}
