@@ -156,11 +156,15 @@ public class Board {
         BoardPiece pieceToMove = pieceList[move.getFrom().getBitBoardSquare()];
         BoardPiece pieceToCapture = pieceList[move.getTo().getBitBoardSquare()];
 
-        updateCastlingRights(move);
+        if (isEnPassantCaptureAvailable()) zobristHash ^= Zobrist.getEnPassantKeys(enPassantTargetSquare); // unmake previous possible en passant
+        zobristHash ^= Zobrist.SIDE_TO_MOVE_KEY;
         halfmoveClock = (pieceToMove.isPawn() || pieceToCapture != null) ? 0 : halfmoveClock + 1;
         if (isBlackToMove()) fullmoveNumber++;
+
+        updateCastlingRights(move);
         updatePieces(move);
         isWhiteToMove = ! isWhiteToMove;
+        if (isEnPassantCaptureAvailable()) zobristHash ^= Zobrist.getEnPassantKeys(enPassantTargetSquare);
 
         if (pieceToMove.isKing()) {
             if (pieceToMove.isWhite()) {
@@ -172,29 +176,51 @@ public class Board {
     }
 
     private void updateCastlingRights(Move move) {
-        Color color = (isWhiteToMove) ? Color.WHITE : Color.BLACK;
+        Color color = isWhiteToMove ? Color.WHITE : Color.BLACK;
         BoardPiece pieceToMove = pieceList[move.getFrom().getBitBoardSquare()];
 
         int homeRank = color.getHomeRank();
         int backRank = color.getBackRank();
-        CastlingRights castlingRights = (isWhiteToMove) ? castlingRightsWhite : castlingRightsBlack;
-        CastlingRights castlingRightsOpponent = (isWhiteToMove) ? castlingRightsBlack : castlingRightsWhite;
+        CastlingRights castlingRights =         isWhiteToMove ? castlingRightsWhite : castlingRightsBlack;
+        CastlingRights castlingRightsOpponent = isWhiteToMove ? castlingRightsBlack : castlingRightsWhite;
+        long kingSideCastleKey =            isWhiteToMove ? Zobrist.getKingSideCastleWhiteKey() : Zobrist.getKingSideCastleBlackKey();
+        long kingSideCastleOpponentKey =    isWhiteToMove ? Zobrist.getKingSideCastleBlackKey() : Zobrist.getKingSideCastleWhiteKey();
+        long queenSideCastleKey =           isWhiteToMove ? Zobrist.getQueenSideCastleWhiteKey() : Zobrist.getQueenSideCastleBlackKey();
+        long queenSideCastleOpponentKey =   isWhiteToMove ? Zobrist.getQueenSideCastleBlackKey() : Zobrist.getQueenSideCastleWhiteKey();
 
         if (pieceToMove.isKing()) {
-            castlingRights.setCanCastleKingSide(false);
-            castlingRights.setCanCastleQueenSide(false);
+            if (castlingRights.canCastleKingSide()) {
+                castlingRights.setCanCastleKingSide(false);
+                zobristHash ^= kingSideCastleKey;
+            }
+            if (castlingRights.canCastleQueenSide()) {
+                castlingRights.setCanCastleQueenSide(false);
+                zobristHash ^= queenSideCastleKey;
+            }
         }
         if (move.getFrom().equals(new BoardPosition(0, homeRank))) {
-            castlingRights.setCanCastleQueenSide(false);
+            if (castlingRights.canCastleQueenSide()) {
+                castlingRights.setCanCastleQueenSide(false);
+                zobristHash ^= queenSideCastleKey;
+            }
         }
         if (move.getFrom().equals(new BoardPosition(Board.SIZE - 1, homeRank))) {
-            castlingRights.setCanCastleKingSide(false);
+            if (castlingRights.canCastleKingSide()) {
+                castlingRights.setCanCastleKingSide(false);
+                zobristHash ^= kingSideCastleKey;
+            }
         }
         if (move.getTo().equals(new BoardPosition(0, backRank))) {
-            castlingRightsOpponent.setCanCastleQueenSide(false);
+            if (castlingRightsOpponent.canCastleQueenSide()) {
+                castlingRightsOpponent.setCanCastleQueenSide(false);
+                zobristHash ^= queenSideCastleOpponentKey;
+            }
         }
         if (move.getTo().equals(new BoardPosition(Board.SIZE - 1, backRank))) {
-            castlingRightsOpponent.setCanCastleKingSide(false);
+            if (castlingRightsOpponent.canCastleKingSide()) {
+                castlingRightsOpponent.setCanCastleKingSide(false);
+                zobristHash ^= kingSideCastleOpponentKey;
+            }
         }
     }
 
@@ -219,15 +245,32 @@ public class Board {
         enPassantTargetSquare = (pieceToMove.isPawn() && Math.abs(move.getFrom().getY() - move.getTo().getY()) == 2) ? new BoardPosition(move.getTo().getX(), move.getTo().getY() - color.getMovingDirection()) : null;
     }
 
+    boolean isEnPassantCaptureAvailable() {
+        Color color = isWhiteToMove() ? Color.WHITE : Color.BLACK;
+        BoardPosition position = getEnPassantPiecePosition();
+        if (position == null) return false;
+
+        BoardPosition positionLeft = position.getX() == 0 ? null : new BoardPosition(position.getX() - 1, position.getY());
+        BoardPosition positionRight = position.getX() == Board.SIZE - 1 ? null : new BoardPosition(position.getX() + 1, position.getY());
+
+        if (positionLeft != null && getPieceAt(positionLeft) == color.getPawn()) return true;
+        if (positionRight != null && getPieceAt(positionRight) == color.getPawn()) return true;
+
+        return false;
+    }
+
     public void unmakeMove(Move move, UnmakeMoveInfo unmakeMoveInfo) {
         BoardPiece pieceToMove = pieceList[move.getTo().getBitBoardSquare()];
-        castlingRightsWhite = unmakeMoveInfo.castlingRightsWhite();
-        castlingRightsBlack = unmakeMoveInfo.castlingRightsBlack();
+        zobristHash ^= Zobrist.SIDE_TO_MOVE_KEY;
+
+        unmakeCastlingRights(unmakeMoveInfo);
         enPassantTargetSquare = unmakeMoveInfo.enPassantTargetSquare();
         halfmoveClock = unmakeMoveInfo.halfMoveClock();
         if (isWhiteToMove) fullmoveNumber--;
         isWhiteToMove = ! isWhiteToMove;
         outdatePieces(move, unmakeMoveInfo);
+
+        if (isEnPassantCaptureAvailable()) zobristHash ^= Zobrist.getEnPassantKeys(enPassantTargetSquare); // unmake previous possible en passant
 
         if (pieceToMove.isKing()) {
             if (pieceToMove.isWhite()) {
@@ -236,6 +279,23 @@ public class Board {
                 blackKingPosition = move.getFrom();
             }
         }
+    }
+
+    private void unmakeCastlingRights(UnmakeMoveInfo unmakeMoveInfo) {
+        if (castlingRightsWhite.canCastleKingSide() != unmakeMoveInfo.castlingRightsWhite().canCastleKingSide())
+            zobristHash ^= Zobrist.getKingSideCastleWhiteKey();
+
+        if (castlingRightsWhite.canCastleQueenSide() != unmakeMoveInfo.castlingRightsWhite().canCastleQueenSide())
+            zobristHash ^= Zobrist.getQueenSideCastleWhiteKey();
+
+        if (castlingRightsBlack.canCastleKingSide() != unmakeMoveInfo.castlingRightsBlack().canCastleKingSide())
+            zobristHash ^= Zobrist.getKingSideCastleBlackKey();
+
+        if (castlingRightsBlack.canCastleQueenSide() != unmakeMoveInfo.castlingRightsBlack().canCastleQueenSide())
+            zobristHash ^= Zobrist.getQueenSideCastleBlackKey();
+
+        castlingRightsWhite = unmakeMoveInfo.castlingRightsWhite();
+        castlingRightsBlack = unmakeMoveInfo.castlingRightsBlack();
     }
 
     private void outdatePieces(Move move, UnmakeMoveInfo unmakeMoveInfo) {
@@ -290,7 +350,6 @@ public class Board {
             bitBoardState.clearBit(color.getOpponentOccupancyBitboard(), enPassantPiecePosition);
             bitBoardState.clearBit(OccupancyBitboard.ALL_PIECES, enPassantPiecePosition);
             pieceList[enPassantPiecePosition.getBitBoardSquare()] = null;
-            zobristHash ^= Zobrist.getPieceSquareKey(color.getOpponentPawn(), enPassantPiecePosition);
         } else {
             changePieceNormal(move.getTo(), move.getFrom(), null, pieceList[move.getTo().getBitBoardSquare()]);
 
@@ -367,7 +426,7 @@ public class Board {
     }
 
     public boolean isBlackToMove(){
-        return !isWhiteToMove;
+        return ! isWhiteToMove;
     }
 
     public CastlingRights getCastlingRightsWhite() {
@@ -408,5 +467,9 @@ public class Board {
 
     public BoardPosition getBlackKingPosition() {
         return blackKingPosition;
+    }
+
+    public long getZobristHash() {
+        return zobristHash;
     }
 }

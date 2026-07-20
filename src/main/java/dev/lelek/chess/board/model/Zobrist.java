@@ -2,7 +2,6 @@ package dev.lelek.chess.board.model;
 
 import dev.lelek.chess.BoardPiece;
 import dev.lelek.chess.BoardPosition;
-import dev.lelek.chess.Color;
 import dev.lelek.chess.board.OccupancyBitboard;
 
 import java.util.SplittableRandom;
@@ -14,7 +13,7 @@ final class Zobrist {
     static final long[][] Piece_SQUARE_KEYS = new long[BoardPiece.values().length][Board.SIZE * Board.SIZE];
     static final long[] CASTLING_KEYS = new long[4];
     static final long[] EN_PASSANT_KEYS = new long[8];
-    static final long SIDE_TO_MOVE_KEYS;
+    static final long SIDE_TO_MOVE_KEY;
 
     static {
         SplittableRandom random = new SplittableRandom(SEED);
@@ -25,13 +24,13 @@ final class Zobrist {
         }
         for (int i = 0; i < CASTLING_KEYS.length; i++) CASTLING_KEYS[i] = random.nextLong();
         for (int i = 0; i < EN_PASSANT_KEYS.length; i++) EN_PASSANT_KEYS[i] = random.nextLong();
-        SIDE_TO_MOVE_KEYS = random.nextLong();
+        SIDE_TO_MOVE_KEY = random.nextLong();
     }
 
-    public static long fromBoard(Board board) {
+    static long fromBoard(Board board) {
         long hash = getPieceSquareHash(board) ^ getCastlingRightsHash(board);
-        if (isEnPassantCaptureAvailable(board)) hash ^= EN_PASSANT_KEYS[board.getEnPassantTargetSquare().getX()];
-        if (board.isBlackToMove()) hash ^= SIDE_TO_MOVE_KEYS;
+        if (board.isEnPassantCaptureAvailable()) hash ^= getEnPassantKeys(board.getEnPassantTargetSquare());
+        if (board.isBlackToMove()) hash ^= SIDE_TO_MOVE_KEY;
         return hash;
     }
 
@@ -46,7 +45,7 @@ final class Zobrist {
 
             BoardPosition position = new BoardPosition(bitBoardSquare);
             BoardPiece piece = board.getPieceAt(position);
-            hash = hash ^ Piece_SQUARE_KEYS[piece.ordinal()][position.getBitBoardSquare()];
+            hash ^= Piece_SQUARE_KEYS[piece.ordinal()][position.getBitBoardSquare()];
         }
         return hash;
     }
@@ -62,21 +61,28 @@ final class Zobrist {
         return hash;
     }
 
-    private static boolean isEnPassantCaptureAvailable(Board board) {
-        Color color = board.isWhiteToMove() ? Color.WHITE : Color.BLACK;
-        BoardPosition position = board.getEnPassantPiecePosition();
-        if (position == null) return false;
-
-        BoardPosition positionLeft = position.getX() == 0 ? null : new BoardPosition(position.getX() - 1, position.getY());
-        BoardPosition positionRight = position.getX() == Board.SIZE - 1 ? null : new BoardPosition(position.getX() + 1, position.getY());
-
-        if (positionLeft != null && board.getPieceAt(positionLeft) == color.getPawn()) return true;
-        if (positionRight != null && board.getPieceAt(positionRight) == color.getPawn()) return true;
-
-        return false;
-    }
-
     static long getPieceSquareKey(BoardPiece piece, BoardPosition position) {
         return Piece_SQUARE_KEYS[piece.ordinal()][position.getBitBoardSquare()];
+    }
+
+    static long getKingSideCastleWhiteKey() {
+        return CASTLING_KEYS[0];
+    }
+
+    static long getQueenSideCastleWhiteKey() {
+        return CASTLING_KEYS[1];
+    }
+
+    static long getKingSideCastleBlackKey() {
+        return CASTLING_KEYS[2];
+    }
+
+    static long getQueenSideCastleBlackKey() {
+        return CASTLING_KEYS[3];
+    }
+
+    static long getEnPassantKeys(BoardPosition position) {
+        if (position == null) return 0;
+        return EN_PASSANT_KEYS[position.getX()];
     }
 }

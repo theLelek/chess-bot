@@ -271,11 +271,14 @@ class BoardTest {
         Assertions.assertEquals(Board.fromFen("8/7k/8/8/3Pp3/8/8/RK6 b - d3 0 4"), board2);
     }
 
-    @Test void move_general() {
+    @Test
+    void move_general() {
         Board board = Board.initializeDefaultBoard();
+        System.out.println(board.getZobristHash());
         Move move = new Move("a2", "a4");
         UnmakeMoveInfo unmakeMoveInfo = UnmakeMoveInfo.from(board, move);
         board.makeMove(move);
+        System.out.println(board.getZobristHash());
         Assertions.assertEquals(Board.fromFen("rnbqkbnr/pppppppp/8/8/P7/8/1PPPPPPP/RNBQKBNR b KQkq a3 0 1"), board);
         board.unmakeMove(move, unmakeMoveInfo);
         Assertions.assertEquals(Board.initializeDefaultBoard(), board);
